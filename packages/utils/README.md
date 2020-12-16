@@ -1,4 +1,4 @@
-# magicflow
+# @magicflow/utils
 
 Just another awesome magic.
 

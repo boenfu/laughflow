@@ -1,4 +1,4 @@
-# magicflow
+# @magicflow/condition
 
 Just another awesome magic.
 

@@ -1,0 +1,65 @@
+{
+  "extends": "@mufan/code-boilerplates/typescript",
+  "options": {
+    "name": "magicflow",
+    "license": "MIT",
+    "author": "Chengdu Mufan Technology Co., Ltd.",
+    "packages": [
+      {
+        "name": "@magicflow/core",
+        "tsProjects": [
+          {
+            "name": "library"
+          },
+          {
+            "name": "test"
+          }
+        ]
+      },
+      {
+        "name": "@magicflow/condition",
+        "tsProjects": [
+          {
+            "name": "library"
+          },
+          {
+            "name": "test"
+          }
+        ]
+      },
+      {
+        "name": "@magicflow/converter",
+        "tsProjects": [
+          {
+            "name": "library"
+          },
+          {
+            "name": "test"
+          }
+        ]
+      },
+      {
+        "name": "@magicflow/utils",
+        "tsProjects": [
+          {
+            "name": "library"
+          },
+          {
+            "name": "test"
+          }
+        ]
+      },
+      {
+        "name": "@magicflow/plugins",
+        "tsProjects": [
+          {
+            "name": "library"
+          },
+          {
+            "name": "test"
+          }
+        ]
+      }
+    ]
+  }
+}

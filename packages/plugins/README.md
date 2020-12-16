@@ -1,4 +1,4 @@
-# magicflow
+# @magicflow/plugins
 
 Just another awesome magic.
 

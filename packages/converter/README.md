@@ -1,4 +1,4 @@
-# magicflow
+# @magicflow/converter
 
 Just another awesome magic.
 

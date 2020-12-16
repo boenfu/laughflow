@@ -1,0 +1,35 @@
+{
+  "references": [
+    {
+      "path": "packages/core/src/library"
+    },
+    {
+      "path": "packages/core/src/test"
+    },
+    {
+      "path": "packages/condition/src/library"
+    },
+    {
+      "path": "packages/condition/src/test"
+    },
+    {
+      "path": "packages/converter/src/library"
+    },
+    {
+      "path": "packages/converter/src/test"
+    },
+    {
+      "path": "packages/utils/src/library"
+    },
+    {
+      "path": "packages/utils/src/test"
+    },
+    {
+      "path": "packages/plugins/src/library"
+    },
+    {
+      "path": "packages/plugins/src/test"
+    }
+  ],
+  "files": []
+}
