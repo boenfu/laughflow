@@ -7,10 +7,6 @@
   "main": "bld/library/index.js",
   "module": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
-  "scripts": {
-    "build": "microbundle build --css-modules false --jsx React.createElement -f es",
-    "dev": "microbundle watch --css-modules false --jsx React.createElement -f es"
-  },
   "peerDependencies": {
     "react": ">=16.8.0"
   },
@@ -30,7 +26,6 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/styled-components": "^5.1.5",
-    "microbundle": "^0.13.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   }
