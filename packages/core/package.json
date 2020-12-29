@@ -3,7 +3,35 @@
   "version": "0.0.0",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "source": "src/library/index.ts",
+  "main": "bld/library/index.js",
+  "module": "bld/library/index.js",
+  "types": "bld/library/index.d.ts",
+  "scripts": {
+    "build": "microbundle build --css-modules false --jsx React.createElement -f es",
+    "dev": "microbundle watch --css-modules false --jsx React.createElement -f es"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
   "dependencies": {
+    "@magicflow/icons": "link:../icons",
+    "immer": "^8.0.0",
+    "lodash-es": "^4.17.20",
+    "nanoid": "^3.1.20",
+    "rc-bezier": "^0.2.4",
+    "styled-components": "^5.2.1",
+    "tslang": "^0.1.23",
     "tslib": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.4",
+    "@types/nanoid": "^2.1.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/styled-components": "^5.1.5",
+    "microbundle": "^0.13.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
   }
 }

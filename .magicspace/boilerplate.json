@@ -59,6 +59,17 @@
             "name": "test"
           }
         ]
+      },
+      {
+        "name": "@magicflow/icons",
+        "tsProjects": [
+          {
+            "name": "library"
+          },
+          {
+            "name": "test"
+          }
+        ]
       }
     ]
   }

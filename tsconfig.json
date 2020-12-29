@@ -31,5 +31,8 @@
       "path": "packages/plugins/src/test"
     }
   ],
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true
+  },
   "files": []
 }
