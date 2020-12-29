@@ -32,9 +32,6 @@
     },
     {
       "path": "packages/icons/src/library"
-    },
-    {
-      "path": "packages/icons/src/test"
     }
   ],
   "files": []

@@ -72,9 +72,6 @@
         "tsProjects": [
           {
             "name": "library"
-          },
-          {
-            "name": "test"
           }
         ]
       }
