@@ -1,0 +1,42 @@
+{
+  "root": true,
+  "ignorePatterns": ["bld", ".bld-cache"],
+  "extends": ["eslint:recommended"],
+  "env": {
+    "node": true,
+    "es2020": true
+  },
+  "overrides": [
+    {
+      "files": ["**/*.{ts,tsx}"],
+      "extends": ["plugin:@mufan/default"],
+      "parserOptions": {
+        "project": "!(node_modules)/**/tsconfig.json"
+      }
+    },
+    {
+      "files": ["packages/core/src/test/**/*.{ts,tsx}"],
+      "extends": ["plugin:@mufan/override-dev"]
+    },
+    {
+      "files": ["packages/condition/src/test/**/*.{ts,tsx}"],
+      "extends": ["plugin:@mufan/override-dev"]
+    },
+    {
+      "files": ["packages/converter/src/test/**/*.{ts,tsx}"],
+      "extends": ["plugin:@mufan/override-dev"]
+    },
+    {
+      "files": ["packages/utils/src/test/**/*.{ts,tsx}"],
+      "extends": ["plugin:@mufan/override-dev"]
+    },
+    {
+      "files": ["packages/plugins/src/test/**/*.{ts,tsx}"],
+      "extends": ["plugin:@mufan/override-dev"]
+    },
+    {
+      "files": ["packages/icons/src/test/**/*.{ts,tsx}"],
+      "extends": ["plugin:@mufan/override-dev"]
+    }
+  ]
+}
