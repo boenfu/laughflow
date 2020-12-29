@@ -33,10 +33,6 @@
     {
       "files": ["packages/plugins/src/test/**/*.{ts,tsx}"],
       "extends": ["plugin:@mufan/override-dev"]
-    },
-    {
-      "files": ["packages/icons/src/test/**/*.{ts,tsx}"],
-      "extends": ["plugin:@mufan/override-dev"]
     }
   ]
 }
