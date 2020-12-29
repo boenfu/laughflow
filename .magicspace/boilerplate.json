@@ -9,10 +9,17 @@
         "name": "@magicflow/core",
         "tsProjects": [
           {
-            "name": "library"
+            "name": "library",
+            "references": [
+              {
+                "package": "@magicflow/icons",
+                "project": "library"
+              }
+            ]
           },
           {
-            "name": "test"
+            "name": "test",
+            "references": ["library"]
           }
         ]
       },

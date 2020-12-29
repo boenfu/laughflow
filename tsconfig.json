@@ -29,10 +29,13 @@
     },
     {
       "path": "packages/plugins/src/test"
+    },
+    {
+      "path": "packages/icons/src/library"
+    },
+    {
+      "path": "packages/icons/src/test"
     }
   ],
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true
-  },
   "files": []
 }

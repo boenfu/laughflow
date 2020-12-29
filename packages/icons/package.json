@@ -3,12 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
-  "source": "src/library/index.tsx",
-  "main": "bld/library/index.tsx",
-  "module": "bld/library/index.tsx",
-  "types": "bld/library/index.tsx",
+  "main": "bld/library/index.js",
+  "types": "bld/library/index.d.ts",
   "scripts": {
-    "build": "npx @svgr/cli ./src/library/resources --out-dir ./bld/library --typescript --icon"
+    "prebuild": "rimraf ./src/library/*.tsx && svgr ./resources --out-dir ./src/library --typescript --icon"
   },
   "peerDependencies": {
     "react": ">=16.8.0"

@@ -2,7 +2,7 @@ import {CheckSolid, TimesSolid} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {MenuPopup, NODE_WIDTH} from '../../components';
+import {MenuPopup} from '../../components';
 import {LeafMetadata, LeafType} from '../../core';
 
 export interface LeafProps {
