@@ -1,6 +1,6 @@
 import {PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
-import {Bezier as _Bezier, Mark} from 'rc-bezier';
-import React, {FC, useCallback, useContext} from 'react';
+import {Bezier as _Bezier, BezierStroke, Mark} from 'rc-bezier';
+import React, {FC, useCallback, useContext, useState} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../../components';
@@ -28,15 +28,14 @@ const MarkWrapper = styled.div`
 `;
 
 const PlusCircleSolid = styled(_PlusCircleSolid)`
+  opacity: 1;
   color: ${props => props.theme.primary};
 
-  filter: brightness(0.95);
-
   &:hover {
-    filter: brightness(1.05);
+    opacity: 0.8;
   }
 
-  ${transition(['filter'])}
+  ${transition(['opacity'])}
 `;
 
 const AddMark: FC<{active: boolean; edge: ProcedureEdge}> = ({
@@ -60,12 +59,33 @@ const AddMark: FC<{active: boolean; edge: ProcedureEdge}> = ({
   );
 };
 
-export function useAddMark(edge: ProcedureEdge): [Mark] {
+export function useAddMark(
+  edge: ProcedureEdge,
+): [BezierStroke | undefined, Mark] {
+  const [stroke, setStroke] = useState<BezierStroke | undefined>();
+
+  const onMouseEnter = useCallback(() => {
+    setStroke({
+      width: 2,
+      color: '#000',
+    });
+  }, [edge]);
+
+  // const onMouseMove = useCallback(() => {}, [edge]);
+
+  const onMouseLeave = useCallback(() => {
+    setStroke(undefined);
+  }, [edge]);
+
   return [
+    stroke,
     {
       key: 'add',
       position: 0.5,
       render: <AddMark edge={edge} active={false} />,
+      onMouseEnter,
+      // onMouseMove,
+      onMouseLeave,
     },
   ];
 }

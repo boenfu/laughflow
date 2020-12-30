@@ -46,33 +46,42 @@ export const Editor: FC<EditorProps> = props => {
 
   const procedure = new Procedure(definition, setDefinition);
 
-  function renderNode(nodeEdge: ProcedureNodeEdge): ReactNode {
+  function renderNode(
+    nodeEdge: ProcedureNodeEdge,
+    boundary = false,
+  ): ReactNode {
     let node = nodeEdge.to;
     let edges = fromMap[node] || [];
 
     return (
       <EditorContext.Provider value={{props, procedure}}>
         {node !== 'start' ? (
-          <ConnectionLine type="node" edge={nodeEdge} />
+          <ConnectionLine type="node" edge={nodeEdge} boundary={boundary} />
         ) : undefined}
         <Node
           className={node === 'start' ? 'active' : ''}
           node={nodeMap.get(node)! || {id: node}}
         >
           <Row>
-            {sortBy(edges, edge => +!('leaf' in edge)).map(edge => {
+            {sortBy(edges, edge => +!('leaf' in edge)).map((edge, index) => {
+              let boundary = index === 0 || index === edges.length - 1;
+
               if ('leaf' in edge) {
                 return (
                   <Fragment key={`leaf:${edge.from}-${edge.leaf}`}>
                     <Leaf leaf={leafMap.get(edge.leaf)!} />
-                    <ConnectionLine type="leaf" edge={edge} />
+                    <ConnectionLine
+                      type="leaf"
+                      edge={edge}
+                      boundary={boundary}
+                    />
                   </Fragment>
                 );
               }
 
               return (
                 <Fragment key={`node:${edge.from}-${edge.to}`}>
-                  {renderNode(edge)}
+                  {renderNode(edge, boundary)}
                 </Fragment>
               );
             })}

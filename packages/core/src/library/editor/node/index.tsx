@@ -1,7 +1,7 @@
 import React, {CSSProperties, FC, ReactNode} from 'react';
 import styled from 'styled-components';
 
-import {NODE_WIDTH, transition} from '../../components';
+import {transition} from '../../components';
 import {NodeMetadata} from '../../core';
 
 import {Leaves} from './@leaves';
@@ -36,7 +36,8 @@ const Header = styled.div`
 `;
 
 const Wrapper = styled.div`
-  width: ${NODE_WIDTH}px;
+  margin: 0 16px;
+  width: 220px;
   display: inline-block;
   vertical-align: top;
   border-radius: 4px;

@@ -1,52 +1,37 @@
-import {CheckSolid, TimesSolid} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {MenuPopup} from '../../components';
 import {LeafMetadata, LeafType} from '../../core';
+
+import {DoneLeaf} from './@done';
+import {TerminateLeaf} from './@terminate';
+import {WormholeLeaf} from './@wormhole';
 
 export interface LeafProps {
   leaf: LeafMetadata;
 }
 
 const Wrapper = styled.div`
-  width: 120px;
+  margin: 0 16px;
   display: inline-block;
   text-align: center;
   vertical-align: top;
 `;
 
-const Content = styled.div`
-  width: 32px;
-  height: 32px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: #fff;
-  box-shadow: 0 2px 4px ${props => props.theme.shadow};
-  overflow: hidden;
-
-  &.done {
-    background-color: #81cb5f;
-  }
-
-  &.terminated {
-    background-color: #e55a3a;
-  }
-`;
-
-const TYPE_ICON: Partial<{[key in LeafType]: JSX.Element}> = {
-  done: <CheckSolid />,
-  terminated: <TimesSolid />,
+const LEAF_COMPONENTS: Partial<
+  {[key in LeafType]: FC<{leaf: LeafMetadata}>}
+> = {
+  done: DoneLeaf,
+  terminate: TerminateLeaf,
+  wormhole: WormholeLeaf,
 };
 
 export const Leaf: FC<LeafProps> = ({leaf}) => {
+  let Leaf = LEAF_COMPONENTS[leaf.type]!;
+
   return (
     <Wrapper>
-      <Content className={leaf.type}>
-        {TYPE_ICON[leaf.type] || <MenuPopup>123213</MenuPopup>}
-      </Content>
+      <Leaf leaf={leaf} />
     </Wrapper>
   );
 };
