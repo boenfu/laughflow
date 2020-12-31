@@ -1,6 +1,13 @@
 import {PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
-import {Bezier as _Bezier, BezierStroke, Mark} from 'rc-bezier';
-import React, {FC, useCallback, useContext, useState} from 'react';
+import {Bezier as _Bezier, BezierPoint, Mark} from 'rc-bezier';
+import React, {
+  FC,
+  MouseEventHandler,
+  useCallback,
+  useContext,
+  useReducer,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../../components';
@@ -12,6 +19,18 @@ const MarkWrapper = styled.div`
   display: flex;
   font-size: 24px;
   cursor: pointer;
+
+  @keyframes mark-transform {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  animation: mark-transform 0.2s 0.2s linear both;
 
   &::after {
     position: absolute;
@@ -38,10 +57,12 @@ const PlusCircleSolid = styled(_PlusCircleSolid)`
   ${transition(['opacity'])}
 `;
 
-const AddMark: FC<{active: boolean; edge: ProcedureEdge}> = ({
-  active,
-  edge,
-}) => {
+const AddMark: FC<{
+  active: boolean;
+  edge: ProcedureEdge;
+  onMouseEnter: MouseEventHandler;
+  onMouseLeave: MouseEventHandler;
+}> = ({active, edge, onMouseEnter, onMouseLeave}) => {
   const {procedure} = useContext(EditorContext);
 
   const onClick = useCallback(() => {
@@ -53,38 +74,65 @@ const AddMark: FC<{active: boolean; edge: ProcedureEdge}> = ({
   }
 
   return (
-    <MarkWrapper onClick={onClick}>
+    <MarkWrapper
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <PlusCircleSolid />
     </MarkWrapper>
   );
 };
 
-export function useAddMark(
-  edge: ProcedureEdge,
-): [BezierStroke | undefined, Mark] {
-  const [stroke, setStroke] = useState<BezierStroke | undefined>();
+export function useAddMark(edge: ProcedureEdge): [Mark] {
+  const [position, setPosition] = useState<BezierPoint | undefined>(undefined);
 
-  const onMouseEnter = useCallback(() => {
-    setStroke({
-      width: 2,
-      color: '#000',
-    });
-  }, [edge]);
+  const [active, dispatch] = useReducer((active: number, action: number) => {
+    return active + action;
+  }, 0);
 
-  // const onMouseMove = useCallback(() => {}, [edge]);
+  const onMouseEnter = useCallback(
+    point => {
+      dispatch(1);
+      setPosition(point);
+    },
+    [dispatch],
+  );
 
-  const onMouseLeave = useCallback(() => {
-    setStroke(undefined);
-  }, [edge]);
+  const onMouseMove = useCallback(point => {
+    setPosition(point);
+  }, []);
+
+  const onMouseLeave = useCallback(
+    point => {
+      setPosition(point);
+      dispatch(-1);
+    },
+    [dispatch],
+  );
+
+  const onMarkEnter = useCallback(() => {
+    dispatch(1);
+  }, [dispatch]);
+
+  const onMarkLeave = useCallback(() => {
+    dispatch(-1);
+  }, [dispatch]);
 
   return [
-    stroke,
     {
       key: 'add',
-      position: 0.5,
-      render: <AddMark edge={edge} active={false} />,
+      position,
+      render: (
+        <AddMark
+          edge={edge}
+          active={!!(active > 0 && position)}
+          onMouseEnter={onMarkEnter}
+          onMouseLeave={onMarkLeave}
+        />
+      ),
       onMouseEnter,
-      // onMouseMove,
+      onMouseMove,
       onMouseLeave,
     },
   ];

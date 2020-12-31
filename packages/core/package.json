@@ -8,7 +8,8 @@
   "module": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
   "peerDependencies": {
-    "react": ">=16.8.0"
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
   },
   "dependencies": {
     "@magicflow/icons": "*",
@@ -16,6 +17,7 @@
     "lodash-es": "^4.17.20",
     "nanoid": "^3.1.20",
     "rc-bezier": "^0.2.4",
+    "rc-tooltip": "^5.0.1",
     "styled-components": "^5.2.1",
     "tslang": "^0.1.23",
     "tslib": "^2.0.3"

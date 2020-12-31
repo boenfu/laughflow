@@ -11,7 +11,7 @@ import {
   ProcedureNodeEdge,
 } from '../core';
 
-import {ConnectionLine} from './connection-line';
+import {ConnectionLine, ConnectionLineBoundary} from './connection-line';
 import {EditorContext} from './context';
 import {EditorProps} from './editor.doc';
 import {Leaf} from './leaf';
@@ -48,7 +48,7 @@ export const Editor: FC<EditorProps> = props => {
 
   function renderNode(
     nodeEdge: ProcedureNodeEdge,
-    boundary = false,
+    boundary?: ConnectionLineBoundary,
   ): ReactNode {
     let node = nodeEdge.to;
     let edges = fromMap[node] || [];
@@ -64,7 +64,12 @@ export const Editor: FC<EditorProps> = props => {
         >
           <Row>
             {sortBy(edges, edge => +!('leaf' in edge)).map((edge, index) => {
-              let boundary = index === 0 || index === edges.length - 1;
+              let boundary: ConnectionLineBoundary | undefined =
+                index === 0
+                  ? 'start'
+                  : index === edges.length - 1
+                  ? 'end'
+                  : undefined;
 
               if ('leaf' in edge) {
                 return (

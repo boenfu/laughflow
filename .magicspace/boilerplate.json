@@ -60,7 +60,13 @@
         "name": "@magicflow/plugins",
         "tsProjects": [
           {
-            "name": "library"
+            "name": "library",
+            "references": [
+              {
+                "package": "@magicflow/core",
+                "project": "library"
+              }
+            ]
           },
           {
             "name": "test"

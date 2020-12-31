@@ -19,13 +19,15 @@ const Wrapper = styled(Bezier)`
   }
 `;
 
+export type ConnectionLineBoundary = 'start' | 'end';
+
 export interface ConnectionLineProps {
   type: ProcedureChildrenType;
   edge: ProcedureEdge;
   /**
    * 只有边际的两个元素才会绘制向下的圆弧
    */
-  boundary?: boolean;
+  boundary?: ConnectionLineBoundary;
 }
 
 export const ConnectionLine: FC<ConnectionLineProps> = ({
@@ -33,12 +35,12 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
   edge,
   boundary,
 }) => {
-  const [stroke, Mark] = useAddMark(edge);
+  const [Mark] = useAddMark(edge);
 
   return (
     <Wrapper
       className="connection-line"
-      stroke={stroke || STROKE_DEFAULT}
+      stroke={STROKE_DEFAULT}
       startNode={['parent', 'previousSibling']}
       endNode={
         type === 'node' ? ['nextSibling', 'firstChild'] : 'previousSibling'
@@ -47,25 +49,41 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
       generatePath={points => {
         let start = points[0];
         let end = points[points.length - 1];
-        let r = ARC_RADIUS_DEFAULT;
 
         if (start.x === end.x) {
           return `M ${start.x},${start.y} V ${end.y}`;
         }
 
-        let d = end.x > start.x ? 1 : -1;
+        let radius = ARC_RADIUS_DEFAULT;
+        let direction = end.x > start.x ? 1 : -1;
+        let midline = (start.y + end.y) / 2;
 
-        return `M ${start.x},${start.y} V ${
-          (start.y + end.y) / 2 - r
-        } A ${r},${r},0,0,${d === 1 ? '0' : '1'},${start.x + r * d},${
-          (start.y + end.y) / 2
-        } H ${
-          boundary
-            ? ` ${end.x - r * d} A ${r},${r},0,0,${d === 1 ? '1' : '0'},${
-                end.x
-              },${(start.y + end.y) / 2 + r}`
-            : end.x
-        } V ${end.y}`;
+        switch (boundary) {
+          case 'start':
+            return `M ${start.x},${start.y} V ${
+              midline - radius
+            } A ${radius},${radius},0,0,${direction === 1 ? '0' : '1'},${
+              start.x + radius * direction
+            },${midline} H ${
+              end.x - radius * direction
+            } A ${radius},${radius},0,0,${direction === 1 ? '1' : '0'},${
+              end.x
+            },${midline + radius} V ${end.y}`;
+
+          case 'end':
+            return `M ${start.x},${
+              midline - radius
+            } A ${radius},${radius},0,0,${direction === 1 ? '0' : '1'},${
+              start.x + radius * direction
+            },${midline} H ${
+              end.x - radius * direction
+            } A ${radius},${radius},0,0,${direction === 1 ? '1' : '0'},${
+              end.x
+            },${midline + radius} V ${end.y}`;
+
+          default:
+            return `M ${end.x},${midline} V ${end.y}`;
+        }
       }}
     />
   );
