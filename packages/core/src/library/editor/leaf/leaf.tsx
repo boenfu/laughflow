@@ -1,14 +1,11 @@
 import {Trash} from '@magicflow/icons';
 import Tooltip from 'rc-tooltip';
-import React, {FC} from 'react';
+import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
 import {MenuPopup, transition} from '../../components';
-import {LeafMetadata, LeafType} from '../../core';
-
-import {DoneLeaf} from './@done';
-import {TerminateLeaf} from './@terminate';
-import {WormholeLeaf} from './@wormhole';
+import {LeafMetadata} from '../../core';
+import {EditorContext} from '../context';
 
 export interface LeafProps {
   leaf: LeafMetadata;
@@ -51,15 +48,15 @@ const LeafActionIcon = styled.div`
 const LeafAction = styled(MenuPopup)<{delay: number}>`
   @keyframes leaf-transform {
     0% {
-      transform: translate(
-        ${props => `-${Math.abs(props.delay) * 14}px, ${props.delay * 2}px`}
+      transform: translate3D(
+        ${props => `-${Math.abs(props.delay) * 14}px, ${props.delay * 2}px, 0`}
       );
       opacity: 0;
     }
 
     100% {
       opacity: 1;
-      transform: translate(0, 0);
+      transform: translate3D(0, 0, 0);
     }
   }
 
@@ -77,18 +74,15 @@ const LeafAction = styled(MenuPopup)<{delay: number}>`
   }
 `;
 
-const LEAF_COMPONENTS: Partial<
-  {[key in LeafType]: FC<{leaf: LeafMetadata}>}
-> = {
-  done: DoneLeaf,
-  terminate: TerminateLeaf,
-  wormhole: WormholeLeaf,
-};
-
 export const Leaf: FC<LeafProps> = ({leaf}) => {
-  let Leaf = LEAF_COMPONENTS[leaf.type]!;
+  const {leavesMap} = useContext(EditorContext);
 
-  let actions = Array(Math.round(Math.random() * 6)).fill(undefined);
+  let actions = [undefined];
+  let Component = leavesMap.get(leaf.type)?.render;
+
+  if (!Component) {
+    return <></>;
+  }
 
   return (
     <Wrapper>
@@ -110,9 +104,7 @@ export const Leaf: FC<LeafProps> = ({leaf}) => {
           </LeafActionWrapper>
         }
       >
-        <LeafContent>
-          <Leaf leaf={leaf} />
-        </LeafContent>
+        <LeafContent>{createElement(Component, {leaf})}</LeafContent>
       </Tooltip>
     </Wrapper>
   );

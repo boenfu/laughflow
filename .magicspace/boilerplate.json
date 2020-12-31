@@ -65,6 +65,10 @@
               {
                 "package": "@magicflow/core",
                 "project": "library"
+              },
+              {
+                "package": "@magicflow/icons",
+                "project": "library"
               }
             ]
           },

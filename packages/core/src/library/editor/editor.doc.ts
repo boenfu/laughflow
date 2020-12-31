@@ -5,6 +5,7 @@ import {
   Procedure,
   ProcedureDefinition,
 } from '../core';
+import {IPlugin} from '../plugin';
 
 export interface EditorProps {
   definition: ProcedureDefinition;
@@ -16,4 +17,5 @@ export interface EditorProps {
       metadata: Partial<LeafMetadata>;
     },
   ): boolean | Partial<LeafMetadata>;
+  plugins?: IPlugin<string>[];
 }

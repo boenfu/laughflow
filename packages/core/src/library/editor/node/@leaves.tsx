@@ -1,15 +1,9 @@
-import {
-  CheckCircleSolid,
-  ConnectNode,
-  More,
-  PlusCircleSolid as _PlusCircleSolid,
-  TimesCircleSolid,
-} from '@magicflow/icons';
-import React, {FC, useCallback, useContext} from 'react';
+import {More, PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
+import React, {FC, createElement, useCallback, useContext} from 'react';
 import styled from 'styled-components';
 
 import {MenuPopup, transition} from '../../components';
-import {LeafType, NodeId} from '../../core';
+import {LeafMetadata, LeafType, NodeId} from '../../core';
 import {EditorContext} from '../context';
 
 export interface LeavesProps {
@@ -34,26 +28,30 @@ const Menus = styled(MenuPopup)`
   pointer-events: none;
   transform: translate(0, 28px);
   ${transition(['transform', 'opacity'])}
+`;
 
-  svg {
-    cursor: pointer;
+const MenuItem = styled.div`
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+  cursor: pointer;
 
-    & + & {
-      margin-left: 4px;
-    }
-
-    &:hover {
-      transform: translateY(-2px);
-      opacity: 0.8;
-    }
-
-    &.disabled {
-      transform: translateY(0);
-      opacity: 0.3;
-    }
-
-    ${transition(['transform', 'opacity'])}
+  & + & {
+    margin-left: 4px;
   }
+
+  &:hover {
+    transform: translateY(-2px);
+    opacity: 0.8;
+  }
+
+  &.disabled {
+    transform: translateY(0);
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  ${transition(['transform', 'opacity'])}
 `;
 
 const Wrapper = styled.div`
@@ -83,11 +81,11 @@ const PlusCircleSolid = styled(_PlusCircleSolid)`
 `;
 
 export const Leaves: FC<LeavesProps> = ({node}) => {
-  const {procedure} = useContext(EditorContext);
+  const {procedure, leavesMap: leavesDefinitionMap} = useContext(EditorContext);
 
   const getOnCreateLeaf = useCallback(
-    (type: LeafType) => {
-      return () => procedure.addLeaf(node, type);
+    (type: string) => {
+      return () => procedure.addLeaf(node, type as LeafType);
     },
     [procedure, node],
   );
@@ -98,32 +96,36 @@ export const Leaves: FC<LeavesProps> = ({node}) => {
 
   const leaves = procedure.getNodeLeaves(node);
 
-  const leavesMap = new Map(leaves.map(leaf => [leaf.type, leaf]));
+  const leavesMap = new Map<string, LeafMetadata>(
+    leaves.map(leaf => [leaf.type, leaf]),
+  );
 
   return (
     <Wrapper>
       <MoreButton />
       <Menus>
-        <CheckCircleSolid
-          {...(leavesMap.has('done')
-            ? {
-                className: 'disabled',
-              }
-            : {
-                onClick: getOnCreateLeaf('done'),
-              })}
-        />
-        <TimesCircleSolid
-          {...(leavesMap.has('terminate')
-            ? {
-                className: 'disabled',
-              }
-            : {
-                onClick: getOnCreateLeaf('terminate'),
-              })}
-        />
-        <ConnectNode onClick={getOnCreateLeaf('wormhole')} />
-        <PlusCircleSolid onClick={onCreateNode} />
+        {[...leavesDefinitionMap.values()].map(
+          ({type, multiple, selectorRender}) => {
+            return (
+              <MenuItem
+                key={type}
+                {...(leavesMap.has(type) && !multiple
+                  ? {
+                      className: 'disabled',
+                    }
+                  : {
+                      onClick: getOnCreateLeaf(type),
+                    })}
+              >
+                {createElement(selectorRender)}
+              </MenuItem>
+            );
+          },
+        )}
+
+        <MenuItem>
+          <PlusCircleSolid onClick={onCreateNode} />
+        </MenuItem>
       </Menus>
     </Wrapper>
   );

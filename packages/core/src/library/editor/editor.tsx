@@ -1,6 +1,6 @@
 import {enableAllPlugins} from 'immer';
-import {groupBy, sortBy} from 'lodash-es';
-import React, {FC, Fragment, ReactNode, useState} from 'react';
+import {castArray, groupBy, sortBy} from 'lodash-es';
+import React, {FC, Fragment, ReactNode, useEffect, useState} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
 
 import {THEME_DEFAULT} from '../components';
@@ -10,6 +10,7 @@ import {
   ProcedureEdge,
   ProcedureNodeEdge,
 } from '../core';
+import {ILeafPlugin} from '../plugin';
 
 import {
   ConnectionLine,
@@ -18,7 +19,7 @@ import {
 } from './connection-line';
 import {EditorContext} from './context';
 import {EditorProps} from './editor.doc';
-import {Leaf} from './leaf';
+import {Leaf, doneLeaf, terminateLeaf} from './leaf';
 import {Node} from './node';
 
 enableAllPlugins();
@@ -42,6 +43,31 @@ export const Editor: FC<EditorProps> = props => {
     props.definition,
   );
 
+  const [plugins, setPlugins] = useState<{leavesMap: any}>({
+    leavesMap: new Map(),
+  });
+
+  useEffect(() => {
+    let leavesMap = new Map<string, ILeafPlugin<string>>([
+      ['done', doneLeaf],
+      ['terminate', terminateLeaf],
+    ]);
+
+    for (let plugin of castArray(props.plugins)) {
+      if (plugin?.leaves?.length) {
+        for (let leaf of plugin.leaves) {
+          leavesMap.set(leaf.type, leaf);
+        }
+      }
+    }
+
+    leavesMap = new Map(
+      sortBy([...leavesMap.entries()], ([, {selectorOrder}]) => selectorOrder),
+    );
+
+    setPlugins({leavesMap});
+  }, []);
+
   const {edges, nodes, leaves} = definition;
 
   const fromMap = groupBy<ProcedureEdge>(edges, edge => edge.from);
@@ -58,7 +84,7 @@ export const Editor: FC<EditorProps> = props => {
     let edges = fromMap[node] || [];
 
     return (
-      <EditorContext.Provider value={{props, procedure}}>
+      <EditorContext.Provider value={{props, procedure, ...plugins}}>
         {node !== 'start' ? (
           <ConnectionLine type="node" edge={nodeEdge} boundary={boundary} />
         ) : undefined}

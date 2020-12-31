@@ -26,7 +26,7 @@ const Header = styled.div`
   height: 42px;
   align-items: center;
   font-size: 14px;
-  color: ${props => props.theme['text-color']};
+  color: ${props => props.theme['text-primary']};
   background-color: ${props => props.theme.background};
   border-bottom: 1px solid ${props => props.theme.border};
   border-top-left-radius: 4px;
@@ -46,14 +46,14 @@ const Wrapper = styled.div`
 
   &.active {
     ${Header} {
-      color: ${props => props.theme['text-color-inverse']};
+      color: ${props => props.theme['text-primary-inverse']};
       background-color: ${props => props.theme.primary};
     }
   }
 
   &:hover {
     ${Header}:hover {
-      color: ${props => props.theme['text-color-inverse']};
+      color: ${props => props.theme['text-primary-inverse']};
       background-color: ${props => props.theme.secondary};
     }
   }

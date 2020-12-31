@@ -3,9 +3,25 @@
   "version": "0.0.0",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "source": "src/library/index.ts",
+  "main": "bld/library/index.js",
+  "module": "bld/library/index.js",
+  "types": "bld/library/index.d.ts",
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
   "dependencies": {
     "@magicflow/core": "*",
     "@magicflow/icons": "*",
+    "styled-components": "^5.2.1",
     "tslib": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/styled-components": "^5.1.5",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
   }
 }

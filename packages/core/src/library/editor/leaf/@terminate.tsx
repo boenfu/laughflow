@@ -2,11 +2,7 @@ import {TimesSolid} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {LeafMetadata} from '../../core';
-
-export interface TerminateLeafProps {
-  leaf: LeafMetadata;
-}
+export interface TerminateLeafProps {}
 
 const Content = styled.div`
   width: 32px;
@@ -21,9 +17,9 @@ const Content = styled.div`
   background-color: #e55a3a;
 `;
 
-export const TerminateLeaf: FC<TerminateLeafProps> = ({leaf}) => {
+export const TerminateLeaf: FC<TerminateLeafProps> = () => {
   return (
-    <Content className={leaf.type}>
+    <Content>
       <TimesSolid />
     </Content>
   );

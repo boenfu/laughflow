@@ -1,6 +1,7 @@
 export const THEME_DEFAULT = {
-  'text-color': rgba(51, 51, 51, 1),
-  'text-color-inverse': rgba(255, 255, 255, 1),
+  'text-primary': rgba(51, 51, 51, 1),
+  'text-secondary': rgba(51, 51, 51, 1),
+  'text-primary-inverse': rgba(255, 255, 255, 1),
   background: rgba(247, 247, 247, 1),
   primary: rgba(41, 109, 255, 1),
   secondary: rgba(91, 110, 149, 1),

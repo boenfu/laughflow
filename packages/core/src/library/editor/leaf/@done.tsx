@@ -2,11 +2,7 @@ import {CheckSolid} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {LeafMetadata} from '../../core';
-
-export interface DoneLeafProps {
-  leaf: LeafMetadata;
-}
+export interface DoneLeafProps {}
 
 const Content = styled.div`
   width: 32px;
@@ -21,9 +17,9 @@ const Content = styled.div`
   background-color: #81cb5f;
 `;
 
-export const DoneLeaf: FC<DoneLeafProps> = ({leaf}) => {
+export const DoneLeaf: FC<DoneLeafProps> = () => {
   return (
-    <Content className={leaf.type}>
+    <Content>
       <CheckSolid />
     </Content>
   );
