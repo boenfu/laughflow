@@ -51,7 +51,9 @@ export class Procedure {
     });
   }
 
-  addNode(edgeOrNode: ProcedureEdge | NodeId): void {
+  addNode(edge: ProcedureEdge): void;
+  addNode(node: NodeId, migrateChildren?: boolean): void;
+  addNode(edgeOrNode: ProcedureEdge | NodeId, migrateChildren = false): void {
     this.update(definition => {
       let id = createId<NodeId>();
 
@@ -76,6 +78,19 @@ export class Procedure {
           edgeAfter,
         );
       } else {
+        if (migrateChildren) {
+          definition.edges = definition.edges.map(edge => {
+            if (edge.from !== edgeOrNode) {
+              return edge;
+            }
+
+            return {
+              ...edge,
+              from: id,
+            };
+          });
+        }
+
         definition.edges.push({from: edgeOrNode, to: id});
       }
     });

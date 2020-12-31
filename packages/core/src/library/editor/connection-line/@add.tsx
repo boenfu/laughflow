@@ -14,6 +14,8 @@ import {transition} from '../../components';
 import {ProcedureEdge} from '../../core';
 import {EditorContext} from '../context';
 
+import {LINE_HEIGHT_DEFAULT} from './connection-line';
+
 const MarkWrapper = styled.div`
   position: relative;
   display: flex;
@@ -60,14 +62,20 @@ const PlusCircleSolid = styled(_PlusCircleSolid)`
 const AddMark: FC<{
   active: boolean;
   edge: ProcedureEdge;
+  position: BezierPoint | undefined;
   onMouseEnter: MouseEventHandler;
   onMouseLeave: MouseEventHandler;
-}> = ({active, edge, onMouseEnter, onMouseLeave}) => {
+}> = ({active, edge, position, onMouseEnter, onMouseLeave}) => {
   const {procedure} = useContext(EditorContext);
+  const migrateChildren = position && position.y < LINE_HEIGHT_DEFAULT / 2;
 
   const onClick = useCallback(() => {
-    procedure.addNode(edge);
-  }, [edge, procedure]);
+    if (migrateChildren) {
+      procedure.addNode(edge.from, migrateChildren);
+    } else {
+      procedure.addNode(edge);
+    }
+  }, [edge, procedure, migrateChildren]);
 
   if (!active) {
     return <></>;
@@ -87,37 +95,22 @@ const AddMark: FC<{
 export function useAddMark(edge: ProcedureEdge): [Mark] {
   const [position, setPosition] = useState<BezierPoint | undefined>(undefined);
 
-  const [active, dispatch] = useReducer((active: number, action: number) => {
-    return active + action;
-  }, 0);
-
-  const onMouseEnter = useCallback(
-    point => {
-      dispatch(1);
-      setPosition(point);
-    },
-    [dispatch],
+  const [active, dispatch] = useReducer(
+    (active: number, action: number) => active + action,
+    0,
   );
+
+  const onMouseEnter = useCallback(() => {
+    dispatch(1);
+  }, []);
 
   const onMouseMove = useCallback(point => {
     setPosition(point);
   }, []);
 
-  const onMouseLeave = useCallback(
-    point => {
-      setPosition(point);
-      dispatch(-1);
-    },
-    [dispatch],
-  );
-
-  const onMarkEnter = useCallback(() => {
-    dispatch(1);
-  }, [dispatch]);
-
-  const onMarkLeave = useCallback(() => {
+  const onMouseLeave = useCallback(() => {
     dispatch(-1);
-  }, [dispatch]);
+  }, []);
 
   return [
     {
@@ -126,9 +119,10 @@ export function useAddMark(edge: ProcedureEdge): [Mark] {
       render: (
         <AddMark
           edge={edge}
+          position={position}
           active={!!(active > 0 && position)}
-          onMouseEnter={onMarkEnter}
-          onMouseLeave={onMarkLeave}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
         />
       ),
       onMouseEnter,

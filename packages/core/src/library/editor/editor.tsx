@@ -11,7 +11,11 @@ import {
   ProcedureNodeEdge,
 } from '../core';
 
-import {ConnectionLine, ConnectionLineBoundary} from './connection-line';
+import {
+  ConnectionLine,
+  ConnectionLineBoundary,
+  LINE_HEIGHT_DEFAULT,
+} from './connection-line';
 import {EditorContext} from './context';
 import {EditorProps} from './editor.doc';
 import {Leaf} from './leaf';
@@ -29,7 +33,7 @@ const Wrapper = styled.div`
 `;
 
 const Row = styled.div`
-  padding-top: 68px;
+  padding-top: ${LINE_HEIGHT_DEFAULT}px;
   text-align: center;
 `;
 

@@ -6,6 +6,8 @@ import {ProcedureChildrenType, ProcedureEdge} from '../../core';
 
 import {useAddMark} from './@add';
 
+export const LINE_HEIGHT_DEFAULT = 68;
+
 const STROKE_DEFAULT: BezierStroke = {color: '#C8CDD8', width: 1};
 
 const ARC_RADIUS_DEFAULT = 8;
