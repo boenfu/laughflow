@@ -7,6 +7,9 @@
   "references": [
     {
       "path": "../../../core/src/library"
+    },
+    {
+      "path": "../../../icons/src/library"
     }
   ]
 }
