@@ -19,10 +19,6 @@
       "extends": ["plugin:@mufan/override-dev"]
     },
     {
-      "files": ["packages/makeflow/src/test/**/*.{ts,tsx}"],
-      "extends": ["plugin:@mufan/override-dev"]
-    },
-    {
       "files": ["packages/condition/src/test/**/*.{ts,tsx}"],
       "extends": ["plugin:@mufan/override-dev"]
     },
