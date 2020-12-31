@@ -14,7 +14,6 @@
   },
   "workspaces": [
     "packages/core",
-    "packages/makeflow",
     "packages/condition",
     "packages/converter",
     "packages/utils",

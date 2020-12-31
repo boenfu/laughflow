@@ -7,12 +7,6 @@
       "path": "packages/core/src/test"
     },
     {
-      "path": "packages/makeflow/src/library"
-    },
-    {
-      "path": "packages/makeflow/src/test"
-    },
-    {
       "path": "packages/condition/src/library"
     },
     {
