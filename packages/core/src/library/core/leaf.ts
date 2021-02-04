@@ -1,6 +1,6 @@
 import {Nominal} from 'tslang';
 
-export type LeafType = 'done' | 'terminate' | 'wormhole';
+export type LeafType = 'done' | 'terminate';
 
 export type LeafId = Nominal<string, 'leaf:id'>;
 

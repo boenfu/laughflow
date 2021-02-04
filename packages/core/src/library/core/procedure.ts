@@ -36,7 +36,7 @@ export interface ProcedureDefinition {
 
 export class Procedure {
   constructor(
-    private definition: ProcedureDefinition,
+    readonly definition: ProcedureDefinition,
     private setDefinition: (definition: ProcedureDefinition) => void,
     private plugins: IPlugin<string>[] = [],
   ) {}
@@ -182,5 +182,5 @@ export class Procedure {
 }
 
 function createId<TId>(): TId {
-  return (nanoid(10) as unknown) as TId;
+  return (nanoid(8) as unknown) as TId;
 }

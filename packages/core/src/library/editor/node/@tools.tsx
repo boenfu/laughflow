@@ -1,6 +1,5 @@
 import {
   CheckCircleSolid,
-  ConnectNode,
   More,
   PlusCircleSolid as _PlusCircleSolid,
   TimesCircleSolid,
@@ -122,7 +121,6 @@ export const Leaves: FC<LeavesProps> = ({node}) => {
                 onClick: getOnCreateLeaf('terminate'),
               })}
         />
-        <ConnectNode onClick={getOnCreateLeaf('wormhole')} />
         <PlusCircleSolid onClick={onCreateNode} />
       </Menus>
     </Wrapper>
