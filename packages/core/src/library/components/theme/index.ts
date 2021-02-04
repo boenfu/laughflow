@@ -6,6 +6,7 @@ export const THEME_DEFAULT = {
   primary: rgba(41, 109, 255, 1),
   secondary: rgba(91, 110, 149, 1),
   shadow: rgba(0, 0, 0, 0.08),
+  'shadow-solid': rgba(58, 69, 92, 0.16),
   border: rgba(16, 42, 100, 0.08),
 } as const;
 

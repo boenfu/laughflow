@@ -3,6 +3,8 @@ import {cloneDeep, compact, isEqual} from 'lodash-es';
 import {nanoid} from 'nanoid';
 import {Nominal} from 'tslang';
 
+import {IPlugin, PluginEventHandler} from '../plugin';
+
 import {LeafId, LeafMetadata, LeafType} from './leaf';
 import {NodeId, NodeMetadata} from './node';
 
@@ -36,19 +38,72 @@ export class Procedure {
   constructor(
     private definition: ProcedureDefinition,
     private setDefinition: (definition: ProcedureDefinition) => void,
+    private plugins: IPlugin<string>[] = [],
   ) {}
 
-  addLeaf(node: NodeId, type: LeafType): void {
-    this.update(definition => {
+  addLeaf(
+    node: NodeId,
+    type: LeafType,
+    partial: Partial<LeafMetadata> = {},
+  ): void {
+    this.update(async definition => {
       let id = createId<LeafId>();
-
-      definition.leaves.push({
+      let metadata = {
+        ...partial,
         id,
         type,
-      });
+      };
 
+      let handlers = this.plugins
+        .reduce<[PluginEventHandler[], PluginEventHandler[]]>(
+          ([leafHandler, pluginHandler], plugin) => {
+            leafHandler.push(
+              ...compact(
+                plugin.leaves?.map(leaf => leaf.type === type && leaf.onCreate),
+              ),
+            );
+
+            if (plugin.onLeafCreate) {
+              pluginHandler.push(plugin.onLeafCreate);
+            }
+
+            return [leafHandler, pluginHandler];
+          },
+          [[], []],
+        )
+        .flat();
+
+      let toPropagation = true;
+      let toPush = true;
+
+      let stopPropagation = (): void => {
+        toPropagation = false;
+      };
+      let preventDefault = (): void => {
+        toPush = false;
+      };
+
+      for (let handler of handlers) {
+        if (!toPropagation) {
+          break;
+        }
+
+        await handler({
+          metadata,
+          definition,
+          target: node,
+          stopPropagation,
+          preventDefault,
+        });
+      }
+
+      if (!toPush) {
+        return;
+      }
+
+      definition.leaves.push(metadata);
       definition.edges.push({from: node, leaf: id});
-    });
+    }).catch(console.error);
   }
 
   addNode(edge: ProcedureEdge): void;
@@ -93,7 +148,7 @@ export class Procedure {
 
         definition.edges.push({from: edgeOrNode, to: id});
       }
-    });
+    }).catch(console.error);
   }
 
   getNodeLeaves(node: NodeId): LeafMetadata[] {
@@ -107,8 +162,22 @@ export class Procedure {
     return this.definition.leaves.filter(leaf => leavesSet.has(leaf.id));
   }
 
-  private update(handler: (definition: ProcedureDefinition) => void): void {
-    this.setDefinition(produce(this.definition, handler));
+  private async update(
+    handler: (definition: ProcedureDefinition) => Promise<void> | void,
+  ): Promise<void> {
+    let definition = await produce(
+      this.definition,
+      handler,
+      (patches, inversePatches) => {
+        console.log(patches, inversePatches);
+      },
+    );
+
+    if (definition === this.definition) {
+      return;
+    }
+
+    this.setDefinition(definition);
   }
 }
 

@@ -45,6 +45,8 @@ const Wrapper = styled.div`
   background-color: #fff;
 
   &.active {
+    box-shadow: 0 6px 12px ${props => props.theme['shadow-solid']};
+
     ${Header} {
       color: ${props => props.theme['text-primary-inverse']};
       background-color: ${props => props.theme.primary};
