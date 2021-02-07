@@ -45,18 +45,16 @@ const LeafActionIcon = styled.div`
   margin-right: 6px;
 `;
 
-const LeafAction = styled(MenuPopup)<{delay: number}>`
+const LeafAction = styled(MenuPopup)`
   @keyframes leaf-transform {
     0% {
-      transform: translate3D(
-        ${props => `-${Math.abs(props.delay) * 14}px, ${props.delay * 2}px, 0`}
-      );
+      transform: translate3D(-12px, 0, 0);
       opacity: 0;
     }
 
     100% {
-      opacity: 1;
       transform: translate3D(0, 0, 0);
+      opacity: 1;
     }
   }
 
@@ -66,8 +64,7 @@ const LeafAction = styled(MenuPopup)<{delay: number}>`
   height: 28px;
   line-height: 28px;
   color: #333;
-  animation: leaf-transform 0.2s ${props => `${Math.abs(props.delay) * 0.2}s`}
-    linear both;
+  animation: leaf-transform 0.2s linear both;
 
   & + & {
     margin-top: 8px;
@@ -75,13 +72,15 @@ const LeafAction = styled(MenuPopup)<{delay: number}>`
 `;
 
 export const Leaf: FC<LeafProps> = ({leaf}) => {
-  const {leavesMap} = useContext(EditorContext);
+  const {procedure, leavesMap} = useContext(EditorContext);
 
   let renderDescriptor = leavesMap.get(leaf.type);
 
   if (!renderDescriptor) {
     return <></>;
   }
+
+  const onDelete = (): void => procedure.deleteLeaf(leaf.id);
 
   let {render: Component, actions} = renderDescriptor;
 
@@ -95,12 +94,10 @@ export const Leaf: FC<LeafProps> = ({leaf}) => {
         overlay={
           <LeafActionWrapper>
             {actions.map(({label}, index) => (
-              <LeafAction key={index} delay={(actions.length - 1) / 2 - index}>
-                {label}
-              </LeafAction>
+              <LeafAction key={index}>{label}</LeafAction>
             ))}
 
-            <LeafAction key="delete" delay={(actions.length - 1) / 2 - 0}>
+            <LeafAction key="delete" onClick={onDelete}>
               <LeafActionIcon>
                 <Trash />
               </LeafActionIcon>

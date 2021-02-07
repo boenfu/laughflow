@@ -2,22 +2,22 @@ import {ComponentType} from 'react';
 
 import {LeafMetadata, LeafType, NodeId, ProcedureDefinition} from '../core';
 
-export interface PluginLeafElementProps {
-  leaf: LeafMetadata;
-}
-
-export type PluginEvent = PluginEventContextPartial & PluginEventProcessPartial;
-
-export interface PluginEventContextPartial {
-  metadata: LeafMetadata;
+export interface IPluginEvent {
   definition: ProcedureDefinition;
-  target: NodeId;
-}
 
-export interface PluginEventProcessPartial {
   stopPropagation(): void;
   preventDefault(): void;
 }
+
+export type PluginLeafEventType = 'create' | 'delete';
+
+export interface PluginLeafEvent extends IPluginEvent {
+  type: PluginLeafEventType;
+  node: NodeId;
+  metadata: LeafMetadata;
+}
+
+export type PluginEvent = PluginLeafEvent;
 
 export type PluginEventHandler = (event: PluginEvent) => Promise<void> | void;
 
@@ -44,7 +44,16 @@ export interface ILeafSelector {
   multiple?: boolean;
 }
 
-export interface ILeafPlugin {
+export interface ILeafPluginEventHandlers {
+  onCreate?: PluginEventHandler;
+  onDelete?: PluginEventHandler;
+}
+
+export interface PluginLeafElementProps {
+  leaf: LeafMetadata;
+}
+
+export interface ILeafPlugin extends ILeafPluginEventHandlers {
   /**
    * `type` 相同的 LeafPlugin:
    * 仅 最后一个 `render` 与 `selector` 生效
@@ -55,13 +64,13 @@ export interface ILeafPlugin {
   render?: ComponentType<PluginLeafElementProps>;
   selector?: ILeafSelector;
   actions?: ILeafAction[];
-
-  onCreate?: PluginEventHandler;
-  onDelete?: PluginEventHandler;
 }
 
-export interface IPlugin {
-  leaves?: ILeafPlugin[];
+export interface IPluginEventHandlers {
   onLeafCreate?: PluginEventHandler;
   onLeafDelete?: PluginEventHandler;
+}
+
+export interface IPlugin extends IPluginEventHandlers {
+  leaves?: ILeafPlugin[];
 }

@@ -3,7 +3,13 @@ import {cloneDeep, compact, isEqual} from 'lodash-es';
 import {nanoid} from 'nanoid';
 import {Nominal} from 'tslang';
 
-import {IPlugin, PluginEventHandler} from '../plugin';
+import {
+  ILeafPluginEventHandlers,
+  IPlugin,
+  IPluginEventHandlers,
+  PluginEventHandler,
+  PluginLeafEventType,
+} from '../plugin';
 
 import {LeafId, LeafMetadata, LeafType} from './leaf';
 import {NodeId, NodeMetadata} from './node';
@@ -54,55 +60,49 @@ export class Procedure {
         type,
       };
 
-      let handlers = this.plugins
-        .reduce<[PluginEventHandler[], PluginEventHandler[]]>(
-          ([leafHandler, pluginHandler], plugin) => {
-            leafHandler.push(
-              ...compact(
-                plugin.leaves?.map(leaf => leaf.type === type && leaf.onCreate),
-              ),
-            );
-
-            if (plugin.onLeafCreate) {
-              pluginHandler.push(plugin.onLeafCreate);
-            }
-
-            return [leafHandler, pluginHandler];
-          },
-          [[], []],
-        )
-        .flat();
-
-      let toPropagation = true;
-      let toPush = true;
-
-      let stopPropagation = (): void => {
-        toPropagation = false;
-      };
-      let preventDefault = (): void => {
-        toPush = false;
-      };
-
-      for (let handler of handlers) {
-        if (!toPropagation) {
-          break;
-        }
-
-        await handler({
-          metadata,
-          definition,
-          target: node,
-          stopPropagation,
-          preventDefault,
-        });
-      }
-
-      if (!toPush) {
+      if (
+        !(await leafHandler('create', definition, this.plugins, node, metadata))
+      ) {
         return;
       }
 
       definition.leaves.push(metadata);
       definition.edges.push({from: node, leaf: id});
+    }).catch(console.error);
+  }
+
+  deleteLeaf(leafId: LeafId): void {
+    this.update(async definition => {
+      let leafIndex = definition.leaves.findIndex(leaf => leaf.id === leafId);
+      let leafEdgeIndex = definition.edges.findIndex(edge =>
+        'leaf' in edge ? edge.leaf === leafId : false,
+      );
+
+      if (leafIndex === -1) {
+        if (leafEdgeIndex !== -1) {
+          definition.edges.splice(leafEdgeIndex, 1);
+        }
+
+        return;
+      }
+
+      let leaf = definition.leaves[leafIndex];
+      let edge = definition.edges[leafEdgeIndex];
+
+      if (
+        !(await leafHandler(
+          'delete',
+          definition,
+          this.plugins,
+          edge.from,
+          leaf,
+        ))
+      ) {
+        return;
+      }
+
+      definition.leaves.splice(leafIndex, 1);
+      definition.edges.splice(leafEdgeIndex, 1);
     }).catch(console.error);
   }
 
@@ -183,4 +183,72 @@ export class Procedure {
 
 function createId<TId>(): TId {
   return (nanoid(8) as unknown) as TId;
+}
+
+const LEAF_EVENT_TYPE_TO_KEY_DICT: {
+  [key in PluginLeafEventType]: [
+    keyof IPluginEventHandlers,
+    keyof ILeafPluginEventHandlers,
+  ];
+} = {
+  create: ['onLeafCreate', 'onCreate'],
+  delete: ['onLeafDelete', 'onDelete'],
+};
+
+async function leafHandler(
+  type: PluginLeafEventType,
+  definition: ProcedureDefinition,
+  plugins: IPlugin[],
+  parent: NodeId,
+  metadata: LeafMetadata,
+): Promise<boolean> {
+  let [globalEventKey, leafEventKey] = LEAF_EVENT_TYPE_TO_KEY_DICT[type];
+
+  let handlers = plugins
+    .reduce<[PluginEventHandler[], PluginEventHandler[]]>(
+      ([leafHandler, pluginHandler], plugin) => {
+        leafHandler.push(
+          ...compact(
+            plugin.leaves?.map(
+              leaf => leaf.type === metadata.type && leaf[leafEventKey],
+            ),
+          ),
+        );
+
+        if (plugin[globalEventKey]) {
+          pluginHandler.push(plugin[globalEventKey]!);
+        }
+
+        return [leafHandler, pluginHandler];
+      },
+      [[], []],
+    )
+    .flat();
+
+  let toPropagation = true;
+  let toExecuteDefault = true;
+
+  let stopPropagation = (): void => {
+    toPropagation = false;
+  };
+  let preventDefault = (): void => {
+    toExecuteDefault = false;
+  };
+
+  for (let handler of handlers) {
+    if (!toPropagation) {
+      break;
+    }
+
+    await handler({
+      type,
+      definition,
+      metadata,
+      node: parent,
+      stopPropagation,
+      preventDefault,
+    });
+  }
+
+  return toExecuteDefault;
 }
