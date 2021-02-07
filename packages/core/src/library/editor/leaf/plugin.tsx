@@ -5,18 +5,22 @@ import {ILeafPlugin} from '../../plugin';
 import {DoneLeaf} from './@done';
 import {TerminateLeaf} from './@terminate';
 
-export const doneLeaf: ILeafPlugin<'done'> = {
+export const doneLeaf: ILeafPlugin = {
   type: 'done',
   render: DoneLeaf,
-  selectorRender: CheckCircleSolid,
-  selectorOrder: 0,
-  multiple: false,
+  selector: {
+    order: 0,
+    multiple: false,
+    render: CheckCircleSolid,
+  },
 };
 
-export const terminateLeaf: ILeafPlugin<'terminate'> = {
+export const terminateLeaf: ILeafPlugin = {
   type: 'terminate',
   render: TerminateLeaf,
-  selectorRender: TimesCircleSolid,
-  selectorOrder: 1,
-  multiple: false,
+  selector: {
+    order: 1,
+    multiple: false,
+    render: TimesCircleSolid,
+  },
 };

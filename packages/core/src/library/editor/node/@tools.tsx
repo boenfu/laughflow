@@ -1,15 +1,9 @@
-import {
-  CheckCircleSolid,
-  More,
-  PlusCircleSolid as _PlusCircleSolid,
-  TimesCircleSolid,
-} from '@magicflow/icons';
-import React, {FC, useCallback, useContext} from 'react';
+import {More, PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
+import React, {FC} from 'react';
 import styled from 'styled-components';
 
 import {MenuPopup, transition} from '../../components';
-import {LeafType, NodeId} from '../../core';
-import {EditorContext} from '../context';
+import {NodeId} from '../../core';
 
 export interface LeavesProps {
   node: NodeId;
@@ -77,52 +71,11 @@ const Wrapper = styled.div`
   }
 `;
 
-const PlusCircleSolid = styled(_PlusCircleSolid)`
-  color: #9ba0ab;
-`;
-
-export const Leaves: FC<LeavesProps> = ({node}) => {
-  const {procedure} = useContext(EditorContext);
-
-  const getOnCreateLeaf = useCallback(
-    (type: LeafType) => {
-      return () => procedure.addLeaf(node, type);
-    },
-    [procedure, node],
-  );
-
-  const onCreateNode = useCallback(() => {
-    procedure.addNode(node);
-  }, [procedure, node]);
-
-  const leaves = procedure.getNodeLeaves(node);
-
-  const leavesMap = new Map(leaves.map(leaf => [leaf.type, leaf]));
-
+export const Leaves: FC<LeavesProps> = () => {
   return (
     <Wrapper>
       <MoreButton />
-      <Menus>
-        <CheckCircleSolid
-          {...(leavesMap.has('done')
-            ? {
-                className: 'disabled',
-              }
-            : {
-                onClick: getOnCreateLeaf('done'),
-              })}
-        />
-        <TimesCircleSolid
-          {...(leavesMap.has('terminate')
-            ? {
-                className: 'disabled',
-              }
-            : {
-                onClick: getOnCreateLeaf('terminate'),
-              })}
-        />
-        <PlusCircleSolid onClick={onCreateNode} />
-      </Menus>
+      <Menus>1</Menus>
     </Wrapper>
   );
 };

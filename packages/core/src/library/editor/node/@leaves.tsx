@@ -105,7 +105,7 @@ export const Leaves: FC<LeavesProps> = ({node}) => {
       <MoreButton />
       <Menus>
         {[...leavesDefinitionMap.values()].map(
-          ({type, multiple, selectorRender}) => {
+          ({type, selector: {multiple, render}}) => {
             return (
               <MenuItem
                 key={type}
@@ -117,7 +117,7 @@ export const Leaves: FC<LeavesProps> = ({node}) => {
                       onClick: getOnCreateLeaf(type),
                     })}
               >
-                {createElement(selectorRender)}
+                {createElement(render)}
               </MenuItem>
             );
           },

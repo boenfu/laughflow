@@ -1,6 +1,6 @@
-import {ComponentType, ReactNode} from 'react';
+import {ComponentType} from 'react';
 
-import {LeafMetadata, NodeId, ProcedureDefinition} from '../core';
+import {LeafMetadata, LeafType, NodeId, ProcedureDefinition} from '../core';
 
 export interface PluginLeafElementProps {
   leaf: LeafMetadata;
@@ -22,37 +22,46 @@ export interface PluginEventProcessPartial {
 export type PluginEventHandler = (event: PluginEvent) => Promise<void> | void;
 
 export interface ILeafAction {
-  render: ReactNode;
+  label: string;
+  icon?: ComponentType;
+
   /**
    * 操作所处顺序 (升序)
    */
-  actionOrder?: number;
+  order?: number;
 }
 
-export interface ILeafPlugin<TLeafType extends string> {
-  type: TLeafType;
-  render: ComponentType<PluginLeafElementProps>;
-  selectorRender: ComponentType;
+export interface ILeafSelector {
+  render: ComponentType;
 
   /**
    * 选择器所处顺序 (升序)
    */
-  selectorOrder?: number;
+  order?: number;
   /**
    * 是否支持多次添加
    */
   multiple?: boolean;
+}
+
+export interface ILeafPlugin {
   /**
-   *
+   * `type` 相同的 LeafPlugin:
+   * 仅 最后一个 `render` 与 `selector` 生效
+   * `actions` 将合并
    */
+  type: LeafType;
+
+  render?: ComponentType<PluginLeafElementProps>;
+  selector?: ILeafSelector;
   actions?: ILeafAction[];
 
   onCreate?: PluginEventHandler;
   onDelete?: PluginEventHandler;
 }
 
-export interface IPlugin<TLeafType extends string> {
-  leaves?: ILeafPlugin<TLeafType>[];
+export interface IPlugin {
+  leaves?: ILeafPlugin[];
   onLeafCreate?: PluginEventHandler;
   onLeafDelete?: PluginEventHandler;
 }

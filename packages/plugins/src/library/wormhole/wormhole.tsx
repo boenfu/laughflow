@@ -3,6 +3,7 @@ import 'rc-dropdown/assets/index.css';
 import {
   ILeafPlugin,
   IPlugin,
+  LeafPluginType,
   NodeId,
   PluginEvent,
   PluginEventHandler,
@@ -19,23 +20,24 @@ declare module '@magicflow/core' {
   }
 }
 
-export class WormholePlugin<TLeaf extends string = 'wormhole'>
-  implements IPlugin<TLeaf> {
+export class WormholePlugin implements IPlugin {
   private selectingState:
     | ({
         resolver: () => void;
       } & PluginEvent)
     | undefined;
 
-  leaves: ILeafPlugin<TLeaf>[];
+  leaves: ILeafPlugin[];
 
   constructor() {
     this.leaves = [
       {
-        type: 'wormhole' as TLeaf,
+        type: 'wormhole' as LeafPluginType,
         render: WormholeLeaf,
-        multiple: true,
-        selectorRender: this.selectorRender,
+        selector: {
+          multiple: true,
+          render: this.selectorRender,
+        },
         onCreate: this.onCreate,
       },
     ];

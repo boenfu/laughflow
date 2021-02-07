@@ -38,7 +38,7 @@ export class Procedure {
   constructor(
     readonly definition: ProcedureDefinition,
     private setDefinition: (definition: ProcedureDefinition) => void,
-    private plugins: IPlugin<string>[] = [],
+    private plugins: IPlugin[] = [],
   ) {}
 
   addLeaf(

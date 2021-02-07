@@ -77,12 +77,13 @@ const LeafAction = styled(MenuPopup)<{delay: number}>`
 export const Leaf: FC<LeafProps> = ({leaf}) => {
   const {leavesMap} = useContext(EditorContext);
 
-  let actions = [undefined];
-  let Component = leavesMap.get(leaf.type)?.render;
+  let renderDescriptor = leavesMap.get(leaf.type);
 
-  if (!Component) {
+  if (!renderDescriptor) {
     return <></>;
   }
+
+  let {render: Component, actions} = renderDescriptor;
 
   return (
     <Wrapper>
@@ -93,14 +94,18 @@ export const Leaf: FC<LeafProps> = ({leaf}) => {
         destroyTooltipOnHide={true}
         overlay={
           <LeafActionWrapper>
-            {actions.map((_, index) => (
+            {actions.map(({label}, index) => (
               <LeafAction key={index} delay={(actions.length - 1) / 2 - index}>
-                <LeafActionIcon>
-                  <Trash />
-                </LeafActionIcon>
-                删除
+                {label}
               </LeafAction>
             ))}
+
+            <LeafAction key="delete" delay={(actions.length - 1) / 2 - 0}>
+              <LeafActionIcon>
+                <Trash />
+              </LeafActionIcon>
+              删除
+            </LeafAction>
           </LeafActionWrapper>
         }
       >

@@ -48,21 +48,45 @@ export const Editor: FC<EditorProps> = props => {
   });
 
   useEffect(() => {
-    let leavesMap = new Map<string, ILeafPlugin<string>>([
+    let leavesMap = new Map<string, ILeafPlugin>([
       ['done', doneLeaf],
       ['terminate', terminateLeaf],
     ]);
 
     for (let plugin of castArray(props.plugins)) {
       if (plugin?.leaves?.length) {
-        for (let leaf of plugin.leaves) {
-          leavesMap.set(leaf.type, leaf);
+        for (let {type, render, selector, actions = []} of plugin.leaves) {
+          let {
+            render: lastRender,
+            selector: lastSelector,
+            actions: lastActions = [],
+          } = leavesMap.get(type) || {};
+
+          leavesMap.set(type, {
+            type,
+            render: render || lastRender,
+            selector: selector || lastSelector,
+            actions: [...lastActions, ...actions],
+          });
         }
       }
     }
 
+    for (let [type, plugin] of leavesMap) {
+      if (!plugin.selector || !plugin.render) {
+        leavesMap.delete(type);
+
+        continue;
+      }
+
+      leavesMap.set(type, {
+        ...plugin,
+        actions: sortBy(plugin.actions, ({order}) => order),
+      });
+    }
+
     leavesMap = new Map(
-      sortBy([...leavesMap.entries()], ([, {selectorOrder}]) => selectorOrder),
+      sortBy([...leavesMap.entries()], ([, {selector}]) => selector?.order),
     );
 
     setPlugins({leavesMap});
