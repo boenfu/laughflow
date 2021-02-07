@@ -43,10 +43,9 @@ export class WormholePlugin implements IPlugin {
     ];
   }
 
-  // eslint-disable-next-line @typescript-eslint/member-ordering
-  private selectorRender: FC = React.memo(() => (
+  private selectorRender: FC = () => (
     <Selector onSelect={this.onSelect} onVisibleChange={this.onVisibleChange} />
-  ));
+  );
 
   private onCreate: PluginEventHandler = event => {
     return new Promise(resolve => {

@@ -41,7 +41,7 @@ export const Selector: FC<{
   onSelect: MenuProps['onSelect'];
   onVisibleChange: (visible: boolean) => void;
 }> = ({onSelect, onVisibleChange}) => {
-  let {procedure} = useContext(EditorContext);
+  const {procedure} = useContext(EditorContext);
 
   return (
     <Dropdown

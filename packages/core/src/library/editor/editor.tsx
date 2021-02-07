@@ -92,13 +92,13 @@ export const Editor: FC<EditorProps> = props => {
     setPlugins({leavesMap});
   }, [props.plugins]);
 
-  const {edges, nodes, leaves} = definition;
+  let {edges, nodes, leaves} = definition;
 
-  const fromMap = groupBy<ProcedureEdge>(edges, edge => edge.from);
-  const nodeMap = new Map(nodes.map(node => [node.id, node]));
-  const leafMap = new Map(leaves.map(leaf => [leaf.id, leaf]));
+  let fromMap = groupBy<ProcedureEdge>(edges, edge => edge.from);
+  let nodeMap = new Map(nodes.map(node => [node.id, node]));
+  let leafMap = new Map(leaves.map(leaf => [leaf.id, leaf]));
 
-  const procedure = new Procedure(definition, setDefinition, props.plugins);
+  let procedure = new Procedure(definition, setDefinition, props.plugins);
 
   function renderNode(
     nodeEdge: ProcedureNodeEdge,

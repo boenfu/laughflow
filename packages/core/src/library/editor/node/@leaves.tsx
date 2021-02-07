@@ -1,4 +1,5 @@
 import {More, PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
+import {useBoolean} from 'ahooks';
 import React, {FC, createElement, useCallback, useContext} from 'react';
 import styled from 'styled-components';
 
@@ -81,6 +82,8 @@ const PlusCircleSolid = styled(_PlusCircleSolid)`
 `;
 
 export const Leaves: FC<LeavesProps> = ({node}) => {
+  const [initialized, {setTrue}] = useBoolean(false);
+
   const {procedure, leavesMap: leavesDefinitionMap} = useContext(EditorContext);
 
   const getOnCreateLeaf = useCallback(
@@ -94,17 +97,17 @@ export const Leaves: FC<LeavesProps> = ({node}) => {
     procedure.addNode(node);
   }, [procedure, node]);
 
-  const leaves = procedure.getNodeLeaves(node);
+  let leaves = procedure.getNodeLeaves(node);
 
-  const leavesMap = new Map<string, LeafMetadata>(
+  let leavesMap = new Map<string, LeafMetadata>(
     leaves.map(leaf => [leaf.type, leaf]),
   );
 
   return (
-    <Wrapper>
+    <Wrapper onMouseOverCapture={setTrue}>
       <MoreButton />
       <Menus>
-        {[...leavesDefinitionMap.values()].map(
+        {[...(initialized ? leavesDefinitionMap.values() : [])].map(
           ({type, selector: {multiple, render}}) => {
             return (
               <MenuItem

@@ -100,17 +100,9 @@ export function useAddMark(edge: ProcedureEdge): [Mark] {
     0,
   );
 
-  const onMouseEnter = useCallback(() => {
-    dispatch(1);
-  }, []);
-
-  const onMouseMove = useCallback(point => {
-    setPosition(point);
-  }, []);
-
-  const onMouseLeave = useCallback(() => {
-    dispatch(-1);
-  }, []);
+  const onMouseEnter = (): void => dispatch(1);
+  const onMouseMove = (point: BezierPoint): void => setPosition(point);
+  const onMouseLeave = (): void => dispatch(-1);
 
   return [
     {

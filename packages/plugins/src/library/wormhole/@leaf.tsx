@@ -11,6 +11,7 @@ export interface WormholeLeafProps {
 const Content = styled.div`
   width: 64px;
   height: 32px;
+  font-size: 12px;
   line-height: 32px;
   display: inline-flex;
   align-items: center;
@@ -23,7 +24,8 @@ const Content = styled.div`
 `;
 
 export const WormholeLeaf: FC<WormholeLeafProps> = ({leaf}) => {
-  let {procedure} = useContext(EditorContext);
+  const {procedure} = useContext(EditorContext);
+
   let node = procedure.definition.nodes.find(node => node.id === leaf.target);
 
   return (
