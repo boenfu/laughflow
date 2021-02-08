@@ -1,5 +1,5 @@
 import Eventemitter from 'eventemitter3';
-import {produce} from 'immer';
+import {Patch, applyPatches, produce} from 'immer';
 import {castArray, cloneDeep, compact, isEqual, sortBy} from 'lodash-es';
 import {nanoid} from 'nanoid';
 import {ComponentType} from 'react';
@@ -70,9 +70,18 @@ export interface IProcedure {
   updateNode(node: NodeMetadata): void;
 
   getNodeLeaves(node: NodeId): LeafMetadata[];
+
+  undo(): void;
+  redo(): void;
 }
 
 type ProcedureEventType = 'update';
+
+interface ProcedureActionStack {
+  undoes: Patch[][];
+  redoes: Patch[][];
+  cursor: number;
+}
 
 export class Procedure
   extends Eventemitter<ProcedureEventType>
@@ -81,6 +90,12 @@ export class Procedure
   private plugins: IPlugin[] = [];
 
   private leafRenderDescriptors: Map<string, LeafRenderDescriptors> = new Map();
+
+  private actionStack: ProcedureActionStack = {
+    undoes: [],
+    redoes: [],
+    cursor: -1,
+  };
 
   get definition(): ProcedureDefinition {
     return this._definition;
@@ -94,6 +109,34 @@ export class Procedure
     if (plugins) {
       this.setPlugins(plugins);
     }
+  }
+
+  undo(): void {
+    let actionStack = this.actionStack;
+
+    if (actionStack.cursor === actionStack.redoes.length - 1) {
+      return;
+    }
+
+    actionStack.cursor += 1;
+
+    this.setDefinition(
+      applyPatches(this._definition, actionStack.undoes[actionStack.cursor]),
+    );
+  }
+
+  redo(): void {
+    let actionStack = this.actionStack;
+
+    if (actionStack.cursor === -1) {
+      return;
+    }
+
+    this.setDefinition(
+      applyPatches(this._definition, actionStack.redoes[actionStack.cursor]),
+    );
+
+    actionStack.cursor -= 1;
   }
 
   setPlugins(plugins: IPlugin[]): void {
@@ -143,6 +186,7 @@ export class Procedure
 
   setDefinition(definition: ProcedureDefinition): void {
     this._definition = definition;
+    this.emit('update');
   }
 
   getLeafRenderDescriptors(): LeafRenderDescriptors[] {
@@ -287,7 +331,11 @@ export class Procedure
       this._definition,
       handler,
       (patches, inversePatches) => {
-        console.log(patches, inversePatches);
+        let actionStack = this.actionStack;
+        let size = actionStack.cursor + 1;
+        actionStack.undoes.splice(0, size, inversePatches);
+        actionStack.redoes.splice(0, size, patches);
+        actionStack.cursor = -1;
       },
     );
 
@@ -295,8 +343,7 @@ export class Procedure
       return;
     }
 
-    this._definition = definition;
-    this.emit('update');
+    this.setDefinition(definition);
   }
 }
 

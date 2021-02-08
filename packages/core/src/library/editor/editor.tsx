@@ -37,6 +37,8 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
   const procedure = useCreation(() => new Procedure(definition, plugins), []);
   const reRender = useUpdate();
 
+  console.log(procedure);
+
   useEffect(() => {
     procedure.on('update', reRender);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -101,6 +103,8 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
   return (
     <ThemeProvider theme={THEME_DEFAULT}>
       <Wrapper>
+        <button onClick={() => procedure.undo()}>undo</button>
+        <button onClick={() => procedure.redo()}>redo</button>
         {renderNode({from: '', to: 'start'} as ProcedureNodeEdge)}
       </Wrapper>
     </ThemeProvider>
