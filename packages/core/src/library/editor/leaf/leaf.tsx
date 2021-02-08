@@ -72,9 +72,9 @@ const LeafAction = styled(MenuPopup)`
 `;
 
 export const Leaf: FC<LeafProps> = ({leaf}) => {
-  const {procedure, leavesMap} = useContext(EditorContext);
+  const {procedure} = useContext(EditorContext);
 
-  let renderDescriptor = leavesMap.get(leaf.type);
+  let renderDescriptor = procedure.getLeafRenderDescriptor(leaf.type);
 
   if (!renderDescriptor) {
     return <></>;

@@ -1,13 +1,20 @@
+import Eventemitter from 'eventemitter3';
 import {produce} from 'immer';
-import {cloneDeep, compact, isEqual} from 'lodash-es';
+import {castArray, cloneDeep, compact, isEqual, sortBy} from 'lodash-es';
 import {nanoid} from 'nanoid';
+import {ComponentType} from 'react';
 import {Nominal} from 'tslang';
 
+import {doneLeaf, terminateLeaf} from '../editor';
 import {
+  ILeafAction,
+  ILeafPlugin,
   ILeafPluginEventHandlers,
+  ILeafSelector,
   IPlugin,
   IPluginEventHandlers,
   PluginEventHandler,
+  PluginLeafElementProps,
   PluginLeafEventType,
 } from '../plugin';
 
@@ -40,12 +47,111 @@ export interface ProcedureDefinition {
   edges: ProcedureEdge[];
 }
 
-export class Procedure {
-  constructor(
-    readonly definition: ProcedureDefinition,
-    private setDefinition: (definition: ProcedureDefinition) => void,
-    private plugins: IPlugin[] = [],
-  ) {}
+export interface LeafRenderDescriptors {
+  type: LeafType;
+  render: ComponentType<PluginLeafElementProps>;
+  selector: ILeafSelector;
+  actions: ILeafAction[];
+}
+
+export interface IProcedure {
+  definition: ProcedureDefinition;
+
+  setPlugins(plugins: IPlugin[]): void;
+  setDefinition(definition: ProcedureDefinition): void;
+
+  getLeafRenderDescriptors(): LeafRenderDescriptors[];
+  getLeafRenderDescriptor(type: LeafType): LeafRenderDescriptors | undefined;
+
+  addLeaf(node: NodeId, type: LeafType, partial?: Partial<LeafMetadata>): void;
+  deleteLeaf(leafId: LeafId): void;
+
+  addNode(edgeOrNode: ProcedureEdge | NodeId, migrateChildren?: boolean): void;
+  updateNode(node: NodeMetadata): void;
+
+  getNodeLeaves(node: NodeId): LeafMetadata[];
+}
+
+type ProcedureEventType = 'update';
+
+export class Procedure
+  extends Eventemitter<ProcedureEventType>
+  implements IProcedure {
+  private _definition: ProcedureDefinition;
+  private plugins: IPlugin[] = [];
+
+  private leafRenderDescriptors: Map<string, LeafRenderDescriptors> = new Map();
+
+  get definition(): ProcedureDefinition {
+    return this._definition;
+  }
+
+  constructor(definition: ProcedureDefinition, plugins?: IPlugin[]) {
+    super();
+
+    this._definition = cloneDeep(definition);
+
+    if (plugins) {
+      this.setPlugins(plugins);
+    }
+  }
+
+  setPlugins(plugins: IPlugin[]): void {
+    this.plugins = plugins;
+
+    let leavesMap = new Map<string, ILeafPlugin>([
+      ['done', doneLeaf],
+      ['terminate', terminateLeaf],
+    ]);
+
+    for (let plugin of castArray(plugins)) {
+      if (plugin?.leaves?.length) {
+        for (let {type, render, selector, actions = []} of plugin.leaves) {
+          let {
+            render: lastRender,
+            selector: lastSelector,
+            actions: lastActions = [],
+          } = leavesMap.get(type) || {};
+
+          leavesMap.set(type, {
+            type,
+            render: render || lastRender,
+            selector: selector || lastSelector,
+            actions: [...lastActions, ...actions],
+          });
+        }
+      }
+    }
+
+    for (let [type, plugin] of leavesMap) {
+      if (!plugin.selector || !plugin.render) {
+        leavesMap.delete(type);
+
+        continue;
+      }
+
+      leavesMap.set(type, {
+        ...plugin,
+        actions: sortBy(plugin.actions, ({order}) => order),
+      });
+    }
+
+    this.leafRenderDescriptors = new Map(
+      sortBy([...leavesMap.entries()], ([, {selector}]) => selector?.order),
+    ) as Map<string, LeafRenderDescriptors>;
+  }
+
+  setDefinition(definition: ProcedureDefinition): void {
+    this._definition = definition;
+  }
+
+  getLeafRenderDescriptors(): LeafRenderDescriptors[] {
+    return [...this.leafRenderDescriptors.values()];
+  }
+
+  getLeafRenderDescriptor(type: LeafType): LeafRenderDescriptors | undefined {
+    return this.leafRenderDescriptors.get(type);
+  }
 
   addLeaf(
     node: NodeId,
@@ -166,30 +272,31 @@ export class Procedure {
   getNodeLeaves(node: NodeId): LeafMetadata[] {
     let leavesSet = new Set(
       compact(
-        this.definition.edges.map(edge =>
+        this._definition.edges.map(edge =>
           edge.from === node && 'leaf' in edge ? edge.leaf : undefined,
         ),
       ),
     );
-    return this.definition.leaves.filter(leaf => leavesSet.has(leaf.id));
+    return this._definition.leaves.filter(leaf => leavesSet.has(leaf.id));
   }
 
   private async update(
     handler: (definition: ProcedureDefinition) => Promise<void> | void,
   ): Promise<void> {
     let definition = await produce(
-      this.definition,
+      this._definition,
       handler,
       (patches, inversePatches) => {
         console.log(patches, inversePatches);
       },
     );
 
-    if (definition === this.definition) {
+    if (definition === this._definition) {
       return;
     }
 
-    this.setDefinition(definition);
+    this._definition = definition;
+    this.emit('update');
   }
 }
 

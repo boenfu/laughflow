@@ -84,7 +84,7 @@ const PlusCircleSolid = styled(_PlusCircleSolid)`
 export const Leaves: FC<LeavesProps> = ({node}) => {
   const [initialized, {setTrue}] = useBoolean(false);
 
-  const {procedure, leavesMap: leavesDefinitionMap} = useContext(EditorContext);
+  const {procedure} = useContext(EditorContext);
 
   const getOnCreateLeaf = useCallback(
     (type: string) => {
@@ -107,7 +107,7 @@ export const Leaves: FC<LeavesProps> = ({node}) => {
     <Wrapper onMouseOverCapture={setTrue}>
       <MoreButton />
       <Menus>
-        {[...(initialized ? leavesDefinitionMap.values() : [])].map(
+        {[...(initialized ? procedure.getLeafRenderDescriptors() : [])].map(
           ({type, selector: {multiple, render}}) => {
             return (
               <MenuItem

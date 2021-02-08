@@ -1,16 +1,11 @@
+import {useCreation, useUpdate} from 'ahooks';
 import {enableAllPlugins} from 'immer';
-import {castArray, groupBy, sortBy} from 'lodash-es';
-import React, {FC, Fragment, ReactNode, useEffect, useState} from 'react';
+import {groupBy, sortBy} from 'lodash-es';
+import React, {FC, Fragment, ReactNode, useEffect} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
 
 import {THEME_DEFAULT} from '../components';
-import {
-  Procedure,
-  ProcedureDefinition,
-  ProcedureEdge,
-  ProcedureNodeEdge,
-} from '../core';
-import {ILeafPlugin} from '../plugin';
+import {Procedure, ProcedureEdge, ProcedureNodeEdge} from '../core';
 
 import {
   ConnectionLine,
@@ -19,7 +14,7 @@ import {
 } from './connection-line';
 import {EditorContext} from './context';
 import {EditorProps} from './editor.doc';
-import {Leaf, doneLeaf, terminateLeaf} from './leaf';
+import {Leaf} from './leaf';
 import {Node} from './node';
 
 enableAllPlugins();
@@ -38,67 +33,20 @@ const Row = styled.div`
   text-align: center;
 `;
 
-export const Editor: FC<EditorProps> = props => {
-  const [definition, setDefinition] = useState<ProcedureDefinition>(
-    props.definition,
-  );
-
-  const [plugins, setPlugins] = useState<{leavesMap: any}>({
-    leavesMap: new Map(),
-  });
+export const Editor: FC<EditorProps> = ({definition, plugins}) => {
+  const procedure = useCreation(() => new Procedure(definition, plugins), []);
+  const reRender = useUpdate();
 
   useEffect(() => {
-    let leavesMap = new Map<string, ILeafPlugin>([
-      ['done', doneLeaf],
-      ['terminate', terminateLeaf],
-    ]);
+    procedure.on('update', reRender);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    for (let plugin of castArray(props.plugins)) {
-      if (plugin?.leaves?.length) {
-        for (let {type, render, selector, actions = []} of plugin.leaves) {
-          let {
-            render: lastRender,
-            selector: lastSelector,
-            actions: lastActions = [],
-          } = leavesMap.get(type) || {};
-
-          leavesMap.set(type, {
-            type,
-            render: render || lastRender,
-            selector: selector || lastSelector,
-            actions: [...lastActions, ...actions],
-          });
-        }
-      }
-    }
-
-    for (let [type, plugin] of leavesMap) {
-      if (!plugin.selector || !plugin.render) {
-        leavesMap.delete(type);
-
-        continue;
-      }
-
-      leavesMap.set(type, {
-        ...plugin,
-        actions: sortBy(plugin.actions, ({order}) => order),
-      });
-    }
-
-    leavesMap = new Map(
-      sortBy([...leavesMap.entries()], ([, {selector}]) => selector?.order),
-    );
-
-    setPlugins({leavesMap});
-  }, [props.plugins]);
-
-  let {edges, nodes, leaves} = definition;
+  let {edges, nodes, leaves} = procedure.definition;
 
   let fromMap = groupBy<ProcedureEdge>(edges, edge => edge.from);
   let nodeMap = new Map(nodes.map(node => [node.id, node]));
   let leafMap = new Map(leaves.map(leaf => [leaf.id, leaf]));
-
-  let procedure = new Procedure(definition, setDefinition, props.plugins);
 
   function renderNode(
     nodeEdge: ProcedureNodeEdge,
@@ -108,7 +56,7 @@ export const Editor: FC<EditorProps> = props => {
     let edges = fromMap[node] || [];
 
     return (
-      <EditorContext.Provider value={{props, procedure, ...plugins}}>
+      <EditorContext.Provider value={{procedure}}>
         {node !== 'start' ? (
           <ConnectionLine type="node" edge={nodeEdge} boundary={boundary} />
         ) : undefined}
