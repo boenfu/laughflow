@@ -1,4 +1,4 @@
-import React, {CSSProperties, FC, ReactNode, useContext} from 'react';
+import React, {CSSProperties, FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../../components';
@@ -13,12 +13,6 @@ export interface NodeProps {
   className?: string;
   readOnly?: boolean;
   style?: CSSProperties;
-  beforeRender?: ReactNode | ((node: NodeMetadata) => ReactNode);
-  afterRender?: ReactNode | ((node: NodeMetadata) => ReactNode);
-  headLeftRender?: ReactNode | ((node: NodeMetadata) => ReactNode);
-  headRightRender?: ReactNode | ((node: NodeMetadata) => ReactNode);
-  bodyRender?: ReactNode | ((node: NodeMetadata) => ReactNode);
-  footerRender?: ReactNode | ((node: NodeMetadata) => ReactNode);
 }
 
 const Container = styled.div`
@@ -86,38 +80,44 @@ export const Node: FC<NodeProps> = ({
   className,
   style,
   node,
-  beforeRender,
-  afterRender,
-  headLeftRender,
-  headRightRender,
-  bodyRender,
-  footerRender,
+
   children,
 }) => {
   const {procedure} = useContext(EditorContext);
+
+  let {
+    before,
+    after,
+    headLeft,
+    headRight,
+    footer,
+    body,
+  } = procedure.getNodeRenderDescriptor(node);
 
   const onNodeChange = (node: NodeMetadata): void => procedure.updateNode(node);
 
   return (
     <Container style={style}>
-      {beforeRender}
+      {before && createElement(before, {node})}
       <Wrapper className={className}>
         <Header>
-          {headLeftRender ? (
-            <HeaderExtra>{headLeftRender}</HeaderExtra>
-          ) : undefined}
+          {headLeft && (
+            <HeaderExtra>{createElement(headLeft, {node})}</HeaderExtra>
+          )}
+
           <DisplayName node={node} onChange={onNodeChange} />
-          {headRightRender ? (
-            <HeaderExtra>{headRightRender}</HeaderExtra>
-          ) : undefined}
+          {headRight && (
+            <HeaderExtra>{createElement(headRight, {node})}</HeaderExtra>
+          )}
+          {before && createElement(before, {node})}
         </Header>
-        <Body>{bodyRender}</Body>
+        <Body>{body && createElement(body, {node})}</Body>
         <Footer>
           <Leaves node={node.id} />
-          {footerRender}
+          {footer && createElement(footer, {node})}
         </Footer>
       </Wrapper>
-      {afterRender}
+      {after && createElement(after, {node})}
       {children}
     </Container>
   );

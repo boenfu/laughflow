@@ -1,20 +1,20 @@
 import Eventemitter from 'eventemitter3';
 import {Patch, applyPatches, produce} from 'immer';
-import {castArray, cloneDeep, compact, isEqual, sortBy} from 'lodash-es';
+import {castArray, cloneDeep, compact, isEqual, merge, sortBy} from 'lodash-es';
 import {nanoid} from 'nanoid';
-import {ComponentType} from 'react';
 import {Nominal} from 'tslang';
 
 import {doneLeaf, terminateLeaf} from '../editor';
 import {
-  ILeafAction,
   ILeafPlugin,
   ILeafPluginEventHandlers,
-  ILeafSelector,
   IPlugin,
   IPluginEventHandlers,
+  LeafAction,
+  LeafPluginComponent,
+  LeafSelector,
+  NodePluginComponentRender,
   PluginEventHandler,
-  PluginLeafElementProps,
   PluginLeafEventType,
 } from '../plugin';
 
@@ -47,12 +47,14 @@ export interface ProcedureDefinition {
   edges: ProcedureEdge[];
 }
 
-export interface LeafRenderDescriptors {
+export interface LeafRenderDescriptor {
   type: LeafType;
-  render: ComponentType<PluginLeafElementProps>;
-  selector: ILeafSelector;
-  actions: ILeafAction[];
+  render: LeafPluginComponent;
+  selector: LeafSelector;
+  actions: LeafAction[];
 }
+
+export type NodeRenderDescriptor = NodePluginComponentRender;
 
 export interface IProcedure {
   definition: ProcedureDefinition;
@@ -60,8 +62,10 @@ export interface IProcedure {
   setPlugins(plugins: IPlugin[]): void;
   setDefinition(definition: ProcedureDefinition): void;
 
-  getLeafRenderDescriptors(): LeafRenderDescriptors[];
-  getLeafRenderDescriptor(type: LeafType): LeafRenderDescriptors | undefined;
+  getLeafRenderDescriptors(): LeafRenderDescriptor[];
+  getLeafRenderDescriptor(type: LeafType): LeafRenderDescriptor | undefined;
+
+  getNodeRenderDescriptor(node: NodeMetadata): NodeRenderDescriptor;
 
   addLeaf(node: NodeId, type: LeafType, partial?: Partial<LeafMetadata>): void;
   deleteLeaf(leafId: LeafId): void;
@@ -89,7 +93,15 @@ export class Procedure
   private _definition: ProcedureDefinition;
   private plugins: IPlugin[] = [];
 
-  private leafRenderDescriptors: Map<string, LeafRenderDescriptors> = new Map();
+  private leafRenderDescriptors: Map<string, LeafRenderDescriptor> = new Map();
+
+  private nodeRenderDescriptor: {
+    descriptor: NodeRenderDescriptor;
+    fns: ((node: NodeMetadata) => NodeRenderDescriptor)[];
+  } = {
+    descriptor: {},
+    fns: [],
+  };
 
   private actionStack: ProcedureActionStack = {
     undoes: [],
@@ -142,6 +154,8 @@ export class Procedure
   setPlugins(plugins: IPlugin[]): void {
     this.plugins = plugins;
 
+    // leaf
+
     let leavesMap = new Map<string, ILeafPlugin>([
       ['done', doneLeaf],
       ['terminate', terminateLeaf],
@@ -181,7 +195,31 @@ export class Procedure
 
     this.leafRenderDescriptors = new Map(
       sortBy([...leavesMap.entries()], ([, {selector}]) => selector?.order),
-    ) as Map<string, LeafRenderDescriptors>;
+    ) as Map<string, LeafRenderDescriptor>;
+
+    // node
+
+    let descriptor = {};
+    let fns = [];
+
+    for (let plugin of castArray(plugins)) {
+      if (!plugin?.nodes?.length) {
+        continue;
+      }
+
+      for (let node of plugin.nodes) {
+        if (typeof node.render === 'function') {
+          fns.push(node.render);
+        } else {
+          merge(descriptor, node.render);
+        }
+      }
+    }
+
+    this.nodeRenderDescriptor = {
+      descriptor,
+      fns,
+    };
   }
 
   setDefinition(definition: ProcedureDefinition): void {
@@ -189,12 +227,19 @@ export class Procedure
     this.emit('update');
   }
 
-  getLeafRenderDescriptors(): LeafRenderDescriptors[] {
+  getLeafRenderDescriptors(): LeafRenderDescriptor[] {
     return [...this.leafRenderDescriptors.values()];
   }
 
-  getLeafRenderDescriptor(type: LeafType): LeafRenderDescriptors | undefined {
+  getLeafRenderDescriptor(type: LeafType): LeafRenderDescriptor | undefined {
     return this.leafRenderDescriptors.get(type);
+  }
+
+  getNodeRenderDescriptor(node: NodeMetadata): NodeRenderDescriptor {
+    return merge(
+      this.nodeRenderDescriptor.descriptor,
+      ...this.nodeRenderDescriptor.fns.map(fn => fn(node)),
+    );
   }
 
   addLeaf(

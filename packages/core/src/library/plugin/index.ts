@@ -1,6 +1,12 @@
 import {ComponentType} from 'react';
 
-import {LeafMetadata, LeafType, NodeId, ProcedureDefinition} from '../core';
+import {
+  LeafMetadata,
+  LeafType,
+  NodeId,
+  NodeMetadata,
+  ProcedureDefinition,
+} from '../core';
 
 export interface IPluginEvent {
   definition: ProcedureDefinition;
@@ -21,7 +27,7 @@ export type PluginEvent = PluginLeafEvent;
 
 export type PluginEventHandler = (event: PluginEvent) => Promise<void> | void;
 
-export interface ILeafAction {
+export interface LeafAction {
   label: string;
   icon?: ComponentType;
 
@@ -31,7 +37,7 @@ export interface ILeafAction {
   order?: number;
 }
 
-export interface ILeafSelector {
+export interface LeafSelector {
   render: ComponentType;
 
   /**
@@ -49,9 +55,11 @@ export interface ILeafPluginEventHandlers {
   onDelete?: PluginEventHandler;
 }
 
-export interface PluginLeafElementProps {
+export interface LeafPluginComponentProps {
   leaf: LeafMetadata;
 }
+
+export type LeafPluginComponent = ComponentType<LeafPluginComponentProps>;
 
 export interface ILeafPlugin extends ILeafPluginEventHandlers {
   /**
@@ -61,9 +69,9 @@ export interface ILeafPlugin extends ILeafPluginEventHandlers {
    */
   type: LeafType;
 
-  render?: ComponentType<PluginLeafElementProps>;
-  selector?: ILeafSelector;
-  actions?: ILeafAction[];
+  render?: LeafPluginComponent;
+  selector?: LeafSelector;
+  actions?: LeafAction[];
 }
 
 export interface IPluginEventHandlers {
@@ -71,6 +79,32 @@ export interface IPluginEventHandlers {
   onLeafDelete?: PluginEventHandler;
 }
 
+export interface NodePluginComponentProps {
+  node: NodeMetadata;
+}
+
+export type NodePluginComponent = ComponentType<NodePluginComponentProps>;
+
+export interface NodePluginComponentRender {
+  before?: NodePluginComponent;
+  after?: NodePluginComponent;
+
+  headLeft?: NodePluginComponent;
+  headRight?: NodePluginComponent;
+
+  body?: NodePluginComponent;
+  bodyAppend?: boolean;
+
+  footer?: NodePluginComponent;
+}
+
+export interface INodePlugin {
+  render:
+    | NodePluginComponentRender
+    | ((node: NodeMetadata) => NodePluginComponentRender);
+}
+
 export interface IPlugin extends IPluginEventHandlers {
+  nodes?: INodePlugin[];
   leaves?: ILeafPlugin[];
 }

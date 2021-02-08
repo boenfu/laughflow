@@ -1,12 +1,8 @@
-import {EditorContext, LeafMetadata} from '@magicflow/core';
+import {EditorContext, LeafPluginComponentProps} from '@magicflow/core';
 import React, {FC, useContext} from 'react';
 import styled from 'styled-components';
 
 import {getNodeDisplayName} from './@utils';
-
-export interface WormholeLeafProps {
-  leaf: LeafMetadata;
-}
 
 const Content = styled.div`
   width: 64px;
@@ -23,7 +19,7 @@ const Content = styled.div`
   background-color: #fff;
 `;
 
-export const WormholeLeaf: FC<WormholeLeafProps> = ({leaf}) => {
+export const WormholeLeaf: FC<LeafPluginComponentProps> = ({leaf}) => {
   const {procedure} = useContext(EditorContext);
 
   let node = procedure.definition.nodes.find(node => node.id === leaf.target);
