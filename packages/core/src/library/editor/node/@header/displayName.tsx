@@ -1,5 +1,5 @@
 import {useDebounceFn} from 'ahooks';
-import React, {ChangeEvent, FC, MouseEvent, useRef} from 'react';
+import React, {ChangeEvent, FC, MouseEvent, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
 import {NodeMetadata} from '../../../core';
@@ -63,7 +63,17 @@ export interface HeaderProps {
 }
 
 export const DisplayName: FC<HeaderProps> = ({node, readOnly, onChange}) => {
-  const initializeDisplayName = useRef(node.displayName || '');
+  // eslint-disable-next-line no-null/no-null
+  const inputRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let displayName = node.displayName || '';
+    let input = inputRef.current!;
+
+    if (input.textContent !== displayName) {
+      input.textContent = displayName;
+    }
+  }, [node.displayName]);
 
   const {run: onInputChange} = useDebounceFn(
     ({nativeEvent: {target}}: ChangeEvent<HTMLInputElement>): void => {
@@ -111,11 +121,12 @@ export const DisplayName: FC<HeaderProps> = ({node, readOnly, onChange}) => {
   return (
     <Wrapper className={readOnly ? 'readOnly' : ''} onClick={onWrapperClick}>
       <DisplayNameInput
+        ref={inputRef}
         contentEditable={!readOnly}
         onInput={onInputChange}
         suppressContentEditableWarning
       >
-        {readOnly ? node.displayName : initializeDisplayName.current}
+        {readOnly ? node.displayName : ''}
       </DisplayNameInput>
     </Wrapper>
   );
