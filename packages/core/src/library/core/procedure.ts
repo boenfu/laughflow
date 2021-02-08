@@ -151,6 +151,18 @@ export class Procedure {
     }).catch(console.error);
   }
 
+  updateNode(node: NodeMetadata): void {
+    this.update(definition => {
+      let nodeIndex = definition.nodes.findIndex(({id}) => id === node.id);
+
+      if (nodeIndex === -1) {
+        return;
+      }
+
+      definition.nodes.splice(nodeIndex, 1, node);
+    }).catch(console.error);
+  }
+
   getNodeLeaves(node: NodeId): LeafMetadata[] {
     let leavesSet = new Set(
       compact(
