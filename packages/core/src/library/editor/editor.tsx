@@ -37,8 +37,6 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
   const procedure = useCreation(() => new Procedure(definition, plugins), []);
   const reRender = useUpdate();
 
-  console.log(procedure);
-
   useEffect(() => {
     procedure.on('update', reRender);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,7 +56,7 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
     let edges = fromMap[node] || [];
 
     return (
-      <EditorContext.Provider value={{procedure}}>
+      <Fragment>
         {node !== 'start' ? (
           <ConnectionLine type="node" edge={nodeEdge} boundary={boundary} />
         ) : undefined}
@@ -96,16 +94,18 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
             })}
           </Row>
         </Node>
-      </EditorContext.Provider>
+      </Fragment>
     );
   }
 
   return (
     <ThemeProvider theme={THEME_DEFAULT}>
       <Wrapper>
-        <button onClick={() => procedure.undo()}>undo</button>
-        <button onClick={() => procedure.redo()}>redo</button>
-        {renderNode({from: '', to: 'start'} as ProcedureNodeEdge)}
+        <EditorContext.Provider value={{procedure}}>
+          <button onClick={() => procedure.undo()}>undo</button>
+          <button onClick={() => procedure.redo()}>redo</button>
+          {renderNode({from: '', to: 'start'} as ProcedureNodeEdge)}
+        </EditorContext.Provider>
       </Wrapper>
     </ThemeProvider>
   );
