@@ -1,11 +1,11 @@
 import {useCreation, useUpdate} from 'ahooks';
 import {enableAllPlugins} from 'immer';
-import {groupBy, sortBy} from 'lodash-es';
+import {sortBy} from 'lodash-es';
 import React, {FC, Fragment, ReactNode, useEffect} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
 
 import {THEME_DEFAULT} from '../components';
-import {Procedure, ProcedureEdge, ProcedureNodeEdge} from '../core';
+import {LeafId, NodeId, Procedure, ProcedureNodeEdge} from '../core';
 
 import {
   ConnectionLine,
@@ -42,9 +42,8 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  let {edges, nodes, leaves} = procedure.definition;
+  let {nodes, leaves} = procedure.definition;
 
-  let fromMap = groupBy<ProcedureEdge>(edges, edge => edge.from);
   let nodeMap = new Map(nodes.map(node => [node.id, node]));
   let leafMap = new Map(leaves.map(leaf => [leaf.id, leaf]));
 
@@ -53,33 +52,35 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
     boundary?: ConnectionLineBoundary,
   ): ReactNode {
     let node = nodeEdge.to;
-    let edges = fromMap[node] || [];
+    let nodeMetadata = nodeMap.get(node)! || {id: node};
 
     return (
       <Fragment>
         {node !== 'start' ? (
           <ConnectionLine type="node" edge={nodeEdge} boundary={boundary} />
         ) : undefined}
-        <Node
-          className={node === 'start' ? 'active' : ''}
-          node={nodeMap.get(node)! || {id: node}}
-        >
+        <Node className={node === 'start' ? 'active' : ''} node={nodeMetadata}>
           <Row>
-            {sortBy(edges, edge => +!('leaf' in edge)).map((edge, index) => {
+            {sortBy(
+              nodeMetadata.nexts || [],
+              ({type}) => +!(type === 'leaf'),
+            ).map(({type, id}, index) => {
               let boundary: ConnectionLineBoundary | undefined =
                 index === 0
                   ? 'start'
-                  : index === edges.length - 1
+                  : index === nodeMetadata.nexts!.length - 1
                   ? 'end'
                   : undefined;
 
-              if ('leaf' in edge) {
+              if (type === 'leaf') {
+                let leafId = id as LeafId;
+
                 return (
-                  <Fragment key={`leaf:${edge.from}-${edge.leaf}`}>
-                    <Leaf leaf={leafMap.get(edge.leaf)!} />
+                  <Fragment key={`leaf:${nodeMetadata.id}-${leafId}`}>
+                    <Leaf leaf={leafMap.get(leafId)!} />
                     <ConnectionLine
                       type="leaf"
-                      edge={edge}
+                      edge={{from: nodeMetadata.id, leaf: leafId}}
                       boundary={boundary}
                     />
                   </Fragment>
@@ -87,8 +88,11 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
               }
 
               return (
-                <Fragment key={`node:${edge.from}-${edge.to}`}>
-                  {renderNode(edge, boundary)}
+                <Fragment key={`node:${nodeMetadata.id}-${id}`}>
+                  {renderNode(
+                    {from: nodeMetadata.id, to: id as NodeId},
+                    boundary,
+                  )}
                 </Fragment>
               );
             })}

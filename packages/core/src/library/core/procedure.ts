@@ -1,6 +1,6 @@
 import Eventemitter from 'eventemitter3';
 import {Patch, applyPatches, produce} from 'immer';
-import {castArray, cloneDeep, compact, isEqual, merge, sortBy} from 'lodash-es';
+import {castArray, cloneDeep, compact, merge, sortBy} from 'lodash-es';
 import {nanoid} from 'nanoid';
 import {Nominal} from 'tslang';
 
@@ -44,7 +44,6 @@ export interface ProcedureDefinition {
   metadata: ProcedureMetadata;
   leaves: LeafMetadata[];
   nodes: NodeMetadata[];
-  edges: ProcedureEdge[];
 }
 
 export interface LeafRenderDescriptor {
@@ -247,7 +246,13 @@ export class Procedure
     type: LeafType,
     partial: Partial<LeafMetadata> = {},
   ): void {
-    this.update(async definition => {
+    void this.update(async definition => {
+      let nodeMetadata = definition.nodes.find(({id}) => id === node);
+
+      if (!nodeMetadata) {
+        throw Error(`Not found node metadata by id '${node}'`);
+      }
+
       let id = createId<LeafId>();
       let metadata = {
         ...partial,
@@ -261,35 +266,42 @@ export class Procedure
         return;
       }
 
+      nodeMetadata.nexts = nodeMetadata.nexts || [];
+
+      nodeMetadata.nexts.push({type: 'leaf', id});
       definition.leaves.push(metadata);
-      definition.edges.push({from: node, leaf: id});
-    }).catch(console.error);
+    });
   }
 
   deleteLeaf(leafId: LeafId): void {
-    this.update(async definition => {
+    void this.update(async definition => {
       let leafIndex = definition.leaves.findIndex(leaf => leaf.id === leafId);
-      let leafEdgeIndex = definition.edges.findIndex(edge =>
-        'leaf' in edge ? edge.leaf === leafId : false,
+      let nodeMetadata = definition.nodes.find(({nexts}) =>
+        nexts?.some(({type, id}) => type === 'leaf' && id === leafId),
       );
 
+      if (!nodeMetadata) {
+        throw Error(`Not found node metadata by leaf '${leafId}'`);
+      }
+
       if (leafIndex === -1) {
-        if (leafEdgeIndex !== -1) {
-          definition.edges.splice(leafEdgeIndex, 1);
+        if (nodeMetadata) {
+          nodeMetadata.nexts = nodeMetadata.nexts?.filter(
+            ({type, id}) => type !== 'leaf' || id !== leafId,
+          );
         }
 
         return;
       }
 
       let leaf = definition.leaves[leafIndex];
-      let edge = definition.edges[leafEdgeIndex];
 
       if (
         !(await leafHandler(
           'delete',
           definition,
           this.plugins,
-          edge.from,
+          nodeMetadata.id,
           leaf,
         ))
       ) {
@@ -297,57 +309,65 @@ export class Procedure
       }
 
       definition.leaves.splice(leafIndex, 1);
-      definition.edges.splice(leafEdgeIndex, 1);
-    }).catch(console.error);
+      nodeMetadata.nexts = nodeMetadata.nexts?.filter(
+        ({type, id}) => type !== 'leaf' || id !== leafId,
+      );
+    });
   }
 
   addNode(edge: ProcedureEdge): void;
   addNode(node: NodeId, migrateChildren?: boolean): void;
   addNode(edgeOrNode: ProcedureEdge | NodeId, migrateChildren = false): void {
-    this.update(definition => {
+    void this.update(definition => {
       let id = createId<NodeId>();
 
-      definition.nodes.push({
-        id,
-      });
+      let newNodeMetadata: NodeMetadata = {id};
 
       if (typeof edgeOrNode === 'object') {
         let edge = edgeOrNode as ProcedureEdge;
 
-        let edgeIndex = definition.edges.findIndex(edge =>
-          isEqual(edge, edgeOrNode),
-        );
+        let nodeMetadata = definition.nodes.find(({id}) => id === edge.from);
 
-        let edgeAfter = cloneDeep(edge);
-        edgeAfter.from = id;
-
-        definition.edges.splice(
-          edgeIndex,
-          1,
-          {from: edge.from, to: id},
-          edgeAfter,
-        );
-      } else {
-        if (migrateChildren) {
-          definition.edges = definition.edges.map(edge => {
-            if (edge.from !== edgeOrNode) {
-              return edge;
-            }
-
-            return {
-              ...edge,
-              from: id,
-            };
-          });
+        if (!nodeMetadata) {
+          throw Error(`Not found node metadata by id '${edge.from}'`);
         }
 
-        definition.edges.push({from: edgeOrNode, to: id});
+        let nextMetadataIndex = nodeMetadata.nexts?.findIndex(({type, id}) =>
+          'to' in edge
+            ? type === 'node' && id === edge.to
+            : type === 'leaf' && id === edge.leaf,
+        );
+
+        if (!nextMetadataIndex || nextMetadataIndex === -1) {
+          throw Error('Not found node next metadata !');
+        }
+
+        newNodeMetadata.nexts = [nodeMetadata.nexts?.[nextMetadataIndex]!];
+
+        nodeMetadata.nexts?.splice(nextMetadataIndex, 1, {type: 'node', id});
+      } else {
+        let nodeMetadata = definition.nodes.find(({id}) => id === edgeOrNode);
+
+        if (!nodeMetadata) {
+          throw Error(`Not found node metadata by id '${edgeOrNode}'`);
+        }
+
+        if (migrateChildren) {
+          newNodeMetadata.nexts = nodeMetadata.nexts;
+          nodeMetadata.nexts = [];
+        }
+
+        nodeMetadata.nexts = nodeMetadata.nexts || [];
+
+        nodeMetadata.nexts.push({type: 'node', id});
       }
-    }).catch(console.error);
+
+      definition.nodes.push(newNodeMetadata);
+    });
   }
 
   updateNode(node: NodeMetadata): void {
-    this.update(definition => {
+    void this.update(definition => {
       let nodeIndex = definition.nodes.findIndex(({id}) => id === node.id);
 
       if (nodeIndex === -1) {
@@ -355,40 +375,51 @@ export class Procedure
       }
 
       definition.nodes.splice(nodeIndex, 1, node);
-    }).catch(console.error);
+    });
   }
 
   getNodeLeaves(node: NodeId): LeafMetadata[] {
-    let leavesSet = new Set(
-      compact(
-        this._definition.edges.map(edge =>
-          edge.from === node && 'leaf' in edge ? edge.leaf : undefined,
-        ),
-      ),
+    let leavesMap = new Map(
+      this._definition.leaves.map(leaf => [leaf.id, leaf]),
     );
-    return this._definition.leaves.filter(leaf => leavesSet.has(leaf.id));
+
+    return compact(
+      this._definition.nodes
+        .find(({id}) => id === node)
+        ?.nexts?.map(({type, id}) =>
+          type === 'leaf' ? leavesMap.get(id as LeafId) : undefined,
+        ),
+    );
   }
 
   private async update(
     handler: (definition: ProcedureDefinition) => Promise<void> | void,
   ): Promise<void> {
-    let definition = await produce(
-      this._definition,
-      handler,
-      (patches, inversePatches) => {
-        let actionStack = this.actionStack;
-        let size = actionStack.cursor + 1;
-        actionStack.undoes.splice(0, size, inversePatches);
-        actionStack.redoes.splice(0, size, patches);
-        actionStack.cursor = -1;
-      },
-    );
+    try {
+      let definition = await produce(
+        this._definition,
+        handler,
+        (patches, inversePatches) => {
+          if (!patches.length) {
+            return;
+          }
 
-    if (definition === this._definition) {
-      return;
+          let actionStack = this.actionStack;
+          let size = actionStack.cursor + 1;
+          actionStack.undoes.splice(0, size, inversePatches);
+          actionStack.redoes.splice(0, size, patches);
+          actionStack.cursor = -1;
+        },
+      );
+
+      if (definition === this._definition) {
+        return;
+      }
+
+      this.setDefinition(definition);
+    } catch (error) {
+      console.error(error);
     }
-
-    this.setDefinition(definition);
   }
 }
 

@@ -76,13 +76,7 @@ const Footer = styled.div`
   height: 40px;
 `;
 
-export const Node: FC<NodeProps> = ({
-  className,
-  style,
-  node,
-
-  children,
-}) => {
+export const Node: FC<NodeProps> = ({className, style, node, children}) => {
   const {procedure} = useContext(EditorContext);
 
   let {
