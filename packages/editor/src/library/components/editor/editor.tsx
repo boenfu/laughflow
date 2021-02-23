@@ -1,19 +1,12 @@
-import {LeafId, NodeId} from '@magicflow/core';
 import {useCreation, useUpdate} from 'ahooks';
-import {enableAllPlugins} from 'immer';
-import {sortBy} from 'lodash-es';
 import React, {FC, Fragment, ReactNode, useEffect} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
 
 import {EditorContext} from '../../context';
-import {Editor} from '../../editor';
+import {Editor, ProcedureTreeNode} from '../../editor';
 import {THEME_DEFAULT} from '../theme';
 
-import {
-  ConnectionLine,
-  ConnectionLineBoundary,
-  LINE_HEIGHT_DEFAULT,
-} from './connection-line';
+import {ConnectionLine, LINE_HEIGHT_DEFAULT} from './connection-line';
 import {EditorProps} from './editor.doc';
 import {Leaf} from './leaf';
 import {Node} from './node';
@@ -23,8 +16,6 @@ declare module '@magicflow/core' {
     displayName?: string;
   }
 }
-
-enableAllPlugins();
 
 const Wrapper = styled.div`
   height: 100%;
@@ -49,52 +40,63 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  let {nodes, leaves} = editor.procedure.definition;
-
-  let nodeMap = new Map(nodes.map(node => [node.id, node]));
-  let leafMap = new Map(leaves.map(leaf => [leaf.id, leaf]));
-
-  function renderNode(node: NodeId): ReactNode {
-    let nodeMetadata = nodeMap.get(node)! || {id: node};
+  function renderNode({
+    metadata,
+    leaves,
+    nodes,
+    links,
+  }: ProcedureTreeNode): ReactNode {
+    let nodeId = metadata.id;
 
     return (
       <Fragment>
-        <Node className={node === 'start' ? 'active' : ''} node={nodeMetadata}>
+        <Node node={metadata}>
           <Row>
-            {sortBy(
-              nodeMetadata.nexts || [],
-              ({type}) => +!(type === 'leaf'),
-            ).map((next, index) => {
-              let {type, id} = next;
-              let boundary: ConnectionLineBoundary | undefined =
-                index === 0
-                  ? 'start'
-                  : index === nodeMetadata.nexts!.length - 1
-                  ? 'end'
-                  : undefined;
+            {leaves.map((leaf, index) => (
+              <Fragment key={`leaf:${nodeId}-${leaf.id}`}>
+                <ConnectionLine
+                  node={nodeId}
+                  next={{type: 'leaf', id: leaf.id}}
+                  left={leaves[index - 1]?.id}
+                  right={
+                    leaves[index + 1]?.id ||
+                    nodes[0]?.metadata.id ||
+                    links[0]?.id
+                  }
+                />
+                <Leaf leaf={leaf} />
+              </Fragment>
+            ))}
 
-              if (type === 'leaf') {
-                let leafId = id as LeafId;
+            {nodes.map((treeNode, index) => (
+              <Fragment key={`node:${nodeId}-${treeNode.metadata.id}`}>
+                <ConnectionLine
+                  node={nodeId}
+                  next={{type: 'node', id: treeNode.metadata.id}}
+                  left={
+                    nodes[index - 1]?.metadata.id ||
+                    leaves[leaves.length - 1]?.id
+                  }
+                  right={nodes[index + 1]?.metadata.id || links[0]?.id}
+                />
+                {renderNode(treeNode)}
+              </Fragment>
+            ))}
 
-                return (
-                  <Fragment key={`leaf:${nodeMetadata.id}-${leafId}`}>
-                    <Leaf leaf={leafMap.get(leafId)!} />
-                    <ConnectionLine
-                      node={node}
-                      next={next}
-                      boundary={boundary}
-                    />
-                  </Fragment>
-                );
-              }
-
-              return (
-                <Fragment key={`node:${nodeMetadata.id}-${id}`}>
-                  {renderNode(id as NodeId)}
-                  <ConnectionLine node={node} next={next} boundary={boundary} />
-                </Fragment>
-              );
-            })}
+            {links.map((linkNode, index) => (
+              <Fragment key={`node:${nodeId}-${linkNode.id}`}>
+                <div>??{linkNode.displayName}??</div>
+                <ConnectionLine
+                  node={nodeId}
+                  next={{type: 'node', id: linkNode.id}}
+                  left={
+                    links[index - 1]?.id ||
+                    nodes[leaves.length - 1]?.metadata.id
+                  }
+                  right={links[index + 1]?.id}
+                />
+              </Fragment>
+            ))}
           </Row>
         </Node>
       </Fragment>
@@ -107,7 +109,7 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
         <EditorContext.Provider value={{editor}}>
           <button onClick={() => editor.procedure.undo()}>undo</button>
           <button onClick={() => editor.procedure.redo()}>redo</button>
-          {renderNode('start' as NodeId)}
+          {renderNode(editor.procedureTreeNode)}
         </EditorContext.Provider>
       </Wrapper>
     </ThemeProvider>

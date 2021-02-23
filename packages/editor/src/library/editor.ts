@@ -1,8 +1,14 @@
-import {LeafMetadata, LeafType, NodeId, NodeMetadata} from '@magicflow/core';
+import {
+  LeafId,
+  LeafMetadata,
+  LeafType,
+  NodeId,
+  NodeMetadata,
+  ProcedureDefinition,
+} from '@magicflow/core';
 import {Procedure} from '@magicflow/procedure';
 import Eventemitter from 'eventemitter3';
 import {castArray, compact, merge, sortBy} from 'lodash-es';
-import {Nominal} from 'tslang';
 
 import {doneLeaf, terminateLeaf} from './components';
 import {
@@ -18,15 +24,11 @@ import {
   PluginLeafEventType,
 } from './plugin';
 
-export type Id = Nominal<string, 'procedure:id'>;
-
-export interface ProcedureMetadata {}
-
-export interface ProcedureDefinition {
-  id: Id;
-  metadata: ProcedureMetadata;
+export interface ProcedureTreeNode {
+  metadata: NodeMetadata;
+  nodes: ProcedureTreeNode[];
   leaves: LeafMetadata[];
-  nodes: NodeMetadata[];
+  links: NodeMetadata[];
 }
 
 export interface LeafRenderDescriptor {
@@ -43,6 +45,11 @@ type ProcedureEventType = 'update';
 export class Editor extends Eventemitter<ProcedureEventType> {
   readonly procedure: Procedure;
   plugins: IPlugin[] = [];
+
+  procedureTreeNode!: ProcedureTreeNode;
+
+  nodesMap!: Map<NodeId, NodeMetadata>;
+  leavesMap!: Map<LeafId, LeafMetadata>;
 
   private leafRenderDescriptors: Map<string, LeafRenderDescriptor> = new Map();
 
@@ -61,8 +68,10 @@ export class Editor extends Eventemitter<ProcedureEventType> {
       this.setPlugins(plugins);
     }
 
+    this.buildTreeNode(definition);
     this.procedure = new Procedure(definition, {
-      afterDefinitionChange: () => {
+      afterDefinitionChange: definition => {
+        this.buildTreeNode(definition);
         this.emit('update');
       },
       async beforeLeafCreate(definition, node, leaf) {
@@ -166,6 +175,64 @@ export class Editor extends Eventemitter<ProcedureEventType> {
       this.nodeRenderDescriptor.descriptor,
       ...this.nodeRenderDescriptor.fns.map(fn => fn(node)),
     );
+  }
+
+  buildTreeNode(definition: ProcedureDefinition): void {
+    let nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
+    let leavesMap = new Map(definition.leaves.map(leaf => [leaf.id, leaf]));
+
+    this.nodesMap = nodesMap;
+    this.leavesMap = leavesMap;
+
+    this.procedureTreeNode = buildTreeNode('start' as NodeId);
+
+    function buildTreeNode(
+      node: NodeId,
+      visitedNodeSet: Set<NodeId> = new Set(),
+    ): ProcedureTreeNode {
+      let metadata = nodesMap.get(node);
+
+      if (!metadata) {
+        throw Error(`Not found node metadata by id '${node}'`);
+      }
+
+      let nodes: ProcedureTreeNode[] = [];
+      let leaves: LeafMetadata[] = [];
+      let links: NodeMetadata[] = [];
+
+      for (let next of metadata.nexts || []) {
+        if (next.type === 'leaf') {
+          if (!leavesMap.has(next.id)) {
+            console.warn(`Not found leaf metadata by id '${next.id}'`);
+            continue;
+          }
+
+          leaves.push(leavesMap.get(next.id)!);
+        } else {
+          let nextNodeMetadata = nodesMap.get(next.id);
+
+          if (!nextNodeMetadata) {
+            console.warn(`Not found node metadata by id '${next.id}'`);
+            continue;
+          }
+
+          if (!visitedNodeSet.has(next.id)) {
+            visitedNodeSet.add(next.id);
+
+            nodes.push(buildTreeNode(next.id, visitedNodeSet));
+          } else {
+            links.push(nextNodeMetadata);
+          }
+        }
+      }
+
+      return {
+        metadata,
+        nodes,
+        leaves,
+        links,
+      };
+    }
   }
 }
 

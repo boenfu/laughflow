@@ -7,9 +7,11 @@ import {
   NodeMetadata,
   ProcedureDefinition,
 } from '@magicflow/core';
-import {Patch, applyPatches, produce} from 'immer';
+import {Patch, applyPatches, enableAllPlugins, produce} from 'immer';
 import {cloneDeep, isEqual} from 'lodash-es';
 import {nanoid} from 'nanoid';
+
+enableAllPlugins();
 
 type ProcedureBeforeListenerReturnType =
   | void

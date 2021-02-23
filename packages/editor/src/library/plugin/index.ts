@@ -1,8 +1,12 @@
-import {LeafMetadata, LeafType, NodeId, NodeMetadata} from '@magicflow/core';
+import {
+  LeafMetadata,
+  LeafType,
+  NodeId,
+  NodeMetadata,
+  ProcedureDefinition,
+} from '@magicflow/core';
 import {ComponentType} from 'react';
 import {Nominal} from 'tslang';
-
-import {ProcedureDefinition} from '../editor';
 
 export type LeafPluginType = Nominal<string, ['leaf-plugin-type']>;
 

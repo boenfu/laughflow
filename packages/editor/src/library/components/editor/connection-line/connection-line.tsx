@@ -1,4 +1,4 @@
-import {NextMetadata, NodeId} from '@magicflow/core';
+import {LeafId, NextMetadata, NodeId} from '@magicflow/core';
 import {Bezier, BezierStroke} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
@@ -20,21 +20,21 @@ const Wrapper = styled(Bezier)`
   }
 `;
 
-export type ConnectionLineBoundary = 'start' | 'end';
-
 export interface ConnectionLineProps {
   node: NodeId;
   next: NextMetadata;
   /**
-   * 只有边际的两个元素才会绘制向下的圆弧
+   * 边际的两个元素会绘制向下的圆弧
    */
-  boundary?: ConnectionLineBoundary;
+  left: NodeId | LeafId | undefined;
+  right: NodeId | LeafId | undefined;
 }
 
 export const ConnectionLine: FC<ConnectionLineProps> = ({
   node,
   next,
-  boundary,
+  left,
+  right,
 }) => {
   const [Mark] = useAddMark(node, next);
 
@@ -43,7 +43,6 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
       className="connection-line"
       stroke={STROKE_DEFAULT}
       startNode={['parent', 'previousSibling']}
-      endNode="previousSibling"
       marks={[Mark]}
       generatePath={points => {
         let start = points[0];
@@ -57,32 +56,29 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
         let direction = end.x > start.x ? 1 : -1;
         let midline = (start.y + end.y) / 2;
 
-        switch (boundary) {
-          case 'start':
-            return `M ${start.x},${start.y} V ${
-              midline - radius
-            } A ${radius},${radius},0,0,${direction === 1 ? '0' : '1'},${
-              start.x + radius * direction
-            },${midline} H ${
-              end.x - radius * direction
-            } A ${radius},${radius},0,0,${direction === 1 ? '1' : '0'},${
-              end.x
-            },${midline + radius} V ${end.y}`;
-
-          case 'end':
-            return `M ${start.x},${
-              midline - radius
-            } A ${radius},${radius},0,0,${direction === 1 ? '0' : '1'},${
-              start.x + radius * direction
-            },${midline} H ${
-              end.x - radius * direction
-            } A ${radius},${radius},0,0,${direction === 1 ? '1' : '0'},${
-              end.x
-            },${midline + radius} V ${end.y}`;
-
-          default:
-            return `M ${end.x},${midline} V ${end.y}`;
+        if (!left) {
+          return `M ${start.x},${start.y} V ${
+            midline - radius
+          } A ${radius},${radius},0,0,${direction === 1 ? '0' : '1'},${
+            start.x + radius * direction
+          },${midline} H ${
+            end.x - radius * direction
+          } A ${radius},${radius},0,0,${direction === 1 ? '1' : '0'},${end.x},${
+            midline + radius
+          } V ${end.y}`;
         }
+
+        if (!right) {
+          return `M ${start.x},${midline - radius} A ${radius},${radius},0,0,${
+            direction === 1 ? '0' : '1'
+          },${start.x + radius * direction},${midline} H ${
+            end.x - radius * direction
+          } A ${radius},${radius},0,0,${direction === 1 ? '1' : '0'},${end.x},${
+            midline + radius
+          } V ${end.y}`;
+        }
+
+        return `M ${end.x},${midline} V ${end.y}`;
       }}
     />
   );
