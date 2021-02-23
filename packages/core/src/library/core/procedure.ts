@@ -1,6 +1,6 @@
 import Eventemitter from 'eventemitter3';
 import {Patch, applyPatches, produce} from 'immer';
-import {castArray, cloneDeep, compact, merge, sortBy} from 'lodash-es';
+import {castArray, cloneDeep, compact, isEqual, merge, sortBy} from 'lodash-es';
 import {nanoid} from 'nanoid';
 import {Nominal} from 'tslang';
 
@@ -19,25 +19,11 @@ import {
 } from '../plugin';
 
 import {LeafId, LeafMetadata, LeafType} from './leaf';
-import {NodeId, NodeMetadata} from './node';
+import {NextMetadata, NodeId, NodeMetadata} from './node';
 
 export type Id = Nominal<string, 'procedure:id'>;
 
 export interface ProcedureMetadata {}
-
-export type ProcedureEdge = ProcedureNodeEdge | ProcedureLeafEdge;
-
-export type ProcedureChildrenType = 'node' | 'leaf';
-
-export interface ProcedureNodeEdge {
-  from: NodeId;
-  to: NodeId;
-}
-
-export interface ProcedureLeafEdge {
-  from: NodeId;
-  leaf: LeafId;
-}
 
 export interface ProcedureDefinition {
   id: Id;
@@ -69,7 +55,7 @@ export interface IProcedure {
   addLeaf(node: NodeId, type: LeafType, partial?: Partial<LeafMetadata>): void;
   deleteLeaf(leafId: LeafId): void;
 
-  addNode(edgeOrNode: ProcedureEdge | NodeId, migrateChildren?: boolean): void;
+  addNode(node: NodeId, next?: NextMetadata | true): void;
   updateNode(node: NodeMetadata): void;
 
   getNodeLeaves(node: NodeId): LeafMetadata[];
@@ -315,44 +301,40 @@ export class Procedure
     });
   }
 
-  addNode(edge: ProcedureEdge): void;
-  addNode(node: NodeId, migrateChildren?: boolean): void;
-  addNode(edgeOrNode: ProcedureEdge | NodeId, migrateChildren = false): void {
+  /**
+   *
+   * @param node
+   * @param next
+   * next = undefined, 创建节点 node 的新子节点分支
+   * next = true, 创建新节点并转移节点 node 所有子节点到新节点
+   * next = NextMetadata, 创建新节点插入至节点 node 与 next 之间
+   */
+  addNode(node: NodeId, next?: NextMetadata | true): void {
     void this.update(definition => {
+      let nodeMetadata = definition.nodes.find(({id}) => id === node);
+
+      if (!nodeMetadata) {
+        throw Error(`Not found node metadata by id '${node}'`);
+      }
+
       let id = createId<NodeId>();
 
       let newNodeMetadata: NodeMetadata = {id};
 
-      if (typeof edgeOrNode === 'object') {
-        let edge = edgeOrNode as ProcedureEdge;
-
-        let nodeMetadata = definition.nodes.find(({id}) => id === edge.from);
-
-        if (!nodeMetadata) {
-          throw Error(`Not found node metadata by id '${edge.from}'`);
-        }
-
-        let nextMetadataIndex = nodeMetadata.nexts?.findIndex(({type, id}) =>
-          'to' in edge
-            ? type === 'node' && id === edge.to
-            : type === 'leaf' && id === edge.leaf,
+      if (typeof next === 'object') {
+        let nextMetadataIndex = nodeMetadata.nexts?.findIndex(item =>
+          isEqual(item, next),
         );
 
-        if (!nextMetadataIndex || nextMetadataIndex === -1) {
-          throw Error('Not found node next metadata !');
+        if (nextMetadataIndex === undefined || nextMetadataIndex === -1) {
+          throw Error(`Not found node next by ${JSON.stringify(next)}`);
         }
 
         newNodeMetadata.nexts = [nodeMetadata.nexts?.[nextMetadataIndex]!];
 
         nodeMetadata.nexts?.splice(nextMetadataIndex, 1, {type: 'node', id});
       } else {
-        let nodeMetadata = definition.nodes.find(({id}) => id === edgeOrNode);
-
-        if (!nodeMetadata) {
-          throw Error(`Not found node metadata by id '${edgeOrNode}'`);
-        }
-
-        if (migrateChildren) {
+        if (next === true) {
           newNodeMetadata.nexts = nodeMetadata.nexts;
           nodeMetadata.nexts = [];
         }

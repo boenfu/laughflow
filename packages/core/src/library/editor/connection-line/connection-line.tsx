@@ -2,7 +2,7 @@ import {Bezier, BezierStroke} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {ProcedureChildrenType, ProcedureEdge} from '../../core';
+import {NextMetadata, NodeId} from '../../core';
 
 import {useAddMark} from './@add';
 
@@ -24,8 +24,8 @@ const Wrapper = styled(Bezier)`
 export type ConnectionLineBoundary = 'start' | 'end';
 
 export interface ConnectionLineProps {
-  type: ProcedureChildrenType;
-  edge: ProcedureEdge;
+  node: NodeId;
+  next: NextMetadata;
   /**
    * 只有边际的两个元素才会绘制向下的圆弧
    */
@@ -33,20 +33,18 @@ export interface ConnectionLineProps {
 }
 
 export const ConnectionLine: FC<ConnectionLineProps> = ({
-  type,
-  edge,
+  node,
+  next,
   boundary,
 }) => {
-  const [Mark] = useAddMark(edge);
+  const [Mark] = useAddMark(node, next);
 
   return (
     <Wrapper
       className="connection-line"
       stroke={STROKE_DEFAULT}
       startNode={['parent', 'previousSibling']}
-      endNode={
-        type === 'node' ? ['nextSibling', 'firstChild'] : 'previousSibling'
-      }
+      endNode="previousSibling"
       marks={[Mark]}
       generatePath={points => {
         let start = points[0];

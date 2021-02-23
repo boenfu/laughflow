@@ -3,7 +3,6 @@ import {Bezier as _Bezier, BezierPoint, Mark} from 'rc-bezier';
 import React, {
   FC,
   MouseEventHandler,
-  useCallback,
   useContext,
   useReducer,
   useState,
@@ -11,7 +10,7 @@ import React, {
 import styled from 'styled-components';
 
 import {transition} from '../../components';
-import {ProcedureEdge} from '../../core';
+import {NextMetadata, NodeId} from '../../core';
 import {EditorContext} from '../context';
 
 import {LINE_HEIGHT_DEFAULT} from './connection-line';
@@ -61,21 +60,16 @@ const PlusCircleSolid = styled(_PlusCircleSolid)`
 
 const AddMark: FC<{
   active: boolean;
-  edge: ProcedureEdge;
+  node: NodeId;
+  next: NextMetadata;
   position: BezierPoint | undefined;
   onMouseEnter: MouseEventHandler;
   onMouseLeave: MouseEventHandler;
-}> = ({active, edge, position, onMouseEnter, onMouseLeave}) => {
+}> = ({active, node, next, position, onMouseEnter, onMouseLeave}) => {
   const {procedure} = useContext(EditorContext);
   const migrateChildren = position && position.y < LINE_HEIGHT_DEFAULT / 2;
 
-  const onClick = useCallback(() => {
-    if (migrateChildren) {
-      procedure.addNode(edge.from, migrateChildren);
-    } else {
-      procedure.addNode(edge);
-    }
-  }, [edge, procedure, migrateChildren]);
+  const onClick = (): void => procedure.addNode(node, migrateChildren || next);
 
   if (!active) {
     return <></>;
@@ -92,7 +86,7 @@ const AddMark: FC<{
   );
 };
 
-export function useAddMark(edge: ProcedureEdge): [Mark] {
+export function useAddMark(node: NodeId, next: NextMetadata): [Mark] {
   const [position, setPosition] = useState<BezierPoint | undefined>(undefined);
 
   const [active, dispatch] = useReducer(
@@ -110,7 +104,8 @@ export function useAddMark(edge: ProcedureEdge): [Mark] {
       position,
       render: (
         <AddMark
-          edge={edge}
+          node={node}
+          next={next}
           position={position}
           active={!!(active > 0 && position)}
           onMouseEnter={onMouseEnter}

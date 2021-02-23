@@ -5,7 +5,7 @@ import React, {FC, Fragment, ReactNode, useEffect} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
 
 import {THEME_DEFAULT} from '../components';
-import {LeafId, NodeId, Procedure, ProcedureNodeEdge} from '../core';
+import {LeafId, NodeId, Procedure} from '../core';
 
 import {
   ConnectionLine,
@@ -47,24 +47,18 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
   let nodeMap = new Map(nodes.map(node => [node.id, node]));
   let leafMap = new Map(leaves.map(leaf => [leaf.id, leaf]));
 
-  function renderNode(
-    nodeEdge: ProcedureNodeEdge,
-    boundary?: ConnectionLineBoundary,
-  ): ReactNode {
-    let node = nodeEdge.to;
+  function renderNode(node: NodeId): ReactNode {
     let nodeMetadata = nodeMap.get(node)! || {id: node};
 
     return (
       <Fragment>
-        {node !== 'start' ? (
-          <ConnectionLine type="node" edge={nodeEdge} boundary={boundary} />
-        ) : undefined}
         <Node className={node === 'start' ? 'active' : ''} node={nodeMetadata}>
           <Row>
             {sortBy(
               nodeMetadata.nexts || [],
               ({type}) => +!(type === 'leaf'),
-            ).map(({type, id}, index) => {
+            ).map((next, index) => {
+              let {type, id} = next;
               let boundary: ConnectionLineBoundary | undefined =
                 index === 0
                   ? 'start'
@@ -79,8 +73,8 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
                   <Fragment key={`leaf:${nodeMetadata.id}-${leafId}`}>
                     <Leaf leaf={leafMap.get(leafId)!} />
                     <ConnectionLine
-                      type="leaf"
-                      edge={{from: nodeMetadata.id, leaf: leafId}}
+                      node={node}
+                      next={next}
                       boundary={boundary}
                     />
                   </Fragment>
@@ -89,10 +83,8 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
 
               return (
                 <Fragment key={`node:${nodeMetadata.id}-${id}`}>
-                  {renderNode(
-                    {from: nodeMetadata.id, to: id as NodeId},
-                    boundary,
-                  )}
+                  {renderNode(id as NodeId)}
+                  <ConnectionLine node={node} next={next} boundary={boundary} />
                 </Fragment>
               );
             })}
@@ -108,7 +100,7 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
         <EditorContext.Provider value={{procedure}}>
           <button onClick={() => procedure.undo()}>undo</button>
           <button onClick={() => procedure.redo()}>redo</button>
-          {renderNode({from: '', to: 'start'} as ProcedureNodeEdge)}
+          {renderNode('start')}
         </EditorContext.Provider>
       </Wrapper>
     </ThemeProvider>
