@@ -13,8 +13,9 @@
     "test": "yarn lint-prettier && yarn build && yarn lint"
   },
   "workspaces": [
-    "packages/procedure",
     "packages/core",
+    "packages/procedure",
+    "packages/editor",
     "packages/condition",
     "packages/converter",
     "packages/utils",

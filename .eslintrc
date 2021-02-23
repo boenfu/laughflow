@@ -15,11 +15,15 @@
       }
     },
     {
+      "files": ["packages/core/src/test/**/*.{ts,tsx}"],
+      "extends": ["plugin:@mufan/override-dev"]
+    },
+    {
       "files": ["packages/procedure/src/test/**/*.{ts,tsx}"],
       "extends": ["plugin:@mufan/override-dev"]
     },
     {
-      "files": ["packages/core/src/test/**/*.{ts,tsx}"],
+      "files": ["packages/editor/src/test/**/*.{ts,tsx}"],
       "extends": ["plugin:@mufan/override-dev"]
     },
     {

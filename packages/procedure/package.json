@@ -4,6 +4,7 @@
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "dependencies": {
+    "@magicflow/core": "*",
     "immer": "^8.0.0",
     "lodash-es": "^4.17.20",
     "nanoid": "^3.1.20",

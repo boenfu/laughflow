@@ -8,10 +8,5 @@
     "downlevelIteration": true,
 
     "outDir": "../../bld/library"
-  },
-  "references": [
-    {
-      "path": "../../../icons/src/library"
-    }
-  ]
+  }
 }

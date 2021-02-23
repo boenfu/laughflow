@@ -6,7 +6,7 @@
     "author": "Chengdu Mufan Technology Co., Ltd.",
     "packages": [
       {
-        "name": "@magicflow/procedure",
+        "name": "@magicflow/core",
         "tsProjects": [
           {
             "name": "library"
@@ -18,11 +18,33 @@
         ]
       },
       {
-        "name": "@magicflow/core",
+        "name": "@magicflow/procedure",
         "tsProjects": [
           {
             "name": "library",
             "references": [
+              {
+                "package": "@magicflow/core",
+                "project": "library"
+              }
+            ]
+          },
+          {
+            "name": "test",
+            "references": ["library"]
+          }
+        ]
+      },
+      {
+        "name": "@magicflow/editor",
+        "tsProjects": [
+          {
+            "name": "library",
+            "references": [
+              {
+                "package": "@magicflow/procedure",
+                "project": "library"
+              },
               {
                 "package": "@magicflow/icons",
                 "project": "library"
@@ -75,7 +97,7 @@
             "name": "library",
             "references": [
               {
-                "package": "@magicflow/core",
+                "package": "@magicflow/editor",
                 "project": "library"
               },
               {
