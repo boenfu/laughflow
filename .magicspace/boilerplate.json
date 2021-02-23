@@ -42,6 +42,10 @@
             "name": "library",
             "references": [
               {
+                "package": "@magicflow/core",
+                "project": "library"
+              },
+              {
                 "package": "@magicflow/procedure",
                 "project": "library"
               },

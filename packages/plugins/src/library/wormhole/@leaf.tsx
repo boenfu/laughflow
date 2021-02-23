@@ -1,6 +1,7 @@
-import {EditorContext, LeafPluginComponentProps} from '@magicflow/core';
 import React, {FC, useContext} from 'react';
 import styled from 'styled-components';
+
+import {EditorContext, LeafPluginComponentProps} from '@magicflow/editor';
 
 import {getNodeDisplayName} from './@utils';
 

@@ -1,21 +1,6 @@
 import {Patch, applyPatches, produce} from 'immer';
 import {cloneDeep, isEqual} from 'lodash-es';
 import {nanoid} from 'nanoid';
-import {Nominal} from 'tslang';
-
-import {LeafId, LeafMetadata, LeafType} from './leaf';
-import {NextMetadata, NodeId, NodeMetadata} from './node';
-
-export type Id = Nominal<string, 'procedure:id'>;
-
-export interface ProcedureMetadata {}
-
-export interface ProcedureDefinition {
-  id: Id;
-  metadata: ProcedureMetadata;
-  leaves: LeafMetadata[];
-  nodes: NodeMetadata[];
-}
 
 type ProcedureBeforeListenerReturnType =
   | void

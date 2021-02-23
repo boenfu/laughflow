@@ -1,9 +1,10 @@
-import {IPlugin} from '@magicflow/core';
+// import {IPlugin} from '@magicflow/core';
 
-declare module '@magicflow/core' {
-  interface LeafMetadata {
-    approval?: boolean;
-  }
-}
+// declare module '@magicflow/core' {
+//   interface LeafMetadata {
+//     approval?: boolean;
+//   }
+// }
 
-export class ApprovalPlugin implements IPlugin {}
+// export class ApprovalPlugin implements IPlugin {}
+export class ApprovalPlugin {}
