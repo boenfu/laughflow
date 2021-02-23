@@ -1,16 +1,22 @@
 {
   "references": [
     {
+      "path": "packages/core/src/library"
+    },
+    {
+      "path": "packages/core/src/test"
+    },
+    {
       "path": "packages/procedure/src/library"
     },
     {
       "path": "packages/procedure/src/test"
     },
     {
-      "path": "packages/core/src/library"
+      "path": "packages/editor/src/library"
     },
     {
-      "path": "packages/core/src/test"
+      "path": "packages/editor/src/test"
     },
     {
       "path": "packages/condition/src/library"
