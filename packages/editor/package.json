@@ -12,6 +12,7 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
+    "@magicflow/core": "*",
     "@magicflow/icons": "*",
     "@magicflow/procedure": "*",
     "ahooks": "^2.9.6",
