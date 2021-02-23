@@ -1,6 +1,6 @@
 import {CheckCircleSolid, TimesCircleSolid} from '@magicflow/icons';
 
-import {ILeafPlugin} from '../../plugin';
+import {ILeafPlugin} from '../../../plugin';
 
 import {DoneLeaf} from './@done';
 import {TerminateLeaf} from './@terminate';

@@ -4,8 +4,8 @@ import Tooltip from 'rc-tooltip';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {MenuPopup, transition} from '../../components';
-import {EditorContext} from '../context';
+import {EditorContext} from '../../../context';
+import {MenuPopup, transition} from '../../common';
 
 export interface LeafProps {
   leaf: LeafMetadata;
@@ -72,15 +72,15 @@ const LeafAction = styled(MenuPopup)`
 `;
 
 export const Leaf: FC<LeafProps> = ({leaf}) => {
-  const {procedure} = useContext(EditorContext);
+  const {editor} = useContext(EditorContext);
 
-  let renderDescriptor = procedure.getLeafRenderDescriptor(leaf.type);
+  let renderDescriptor = editor.getLeafRenderDescriptor(leaf.type);
 
   if (!renderDescriptor) {
     return <></>;
   }
 
-  const onDelete = (): void => procedure.deleteLeaf(leaf.id);
+  const onDelete = (): void => editor.procedure.deleteLeaf(leaf.id);
 
   let {render: Component, actions} = renderDescriptor;
 

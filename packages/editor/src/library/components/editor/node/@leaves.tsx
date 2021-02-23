@@ -4,8 +4,8 @@ import {useBoolean} from 'ahooks';
 import React, {FC, createElement, useCallback, useContext} from 'react';
 import styled from 'styled-components';
 
-import {MenuPopup, transition} from '../../components';
-import {EditorContext} from '../context';
+import {EditorContext} from '../../../context';
+import {MenuPopup, transition} from '../../common';
 
 export interface LeavesProps {
   node: NodeId;
@@ -84,20 +84,21 @@ const PlusCircleSolid = styled(_PlusCircleSolid)`
 export const Leaves: FC<LeavesProps> = ({node}) => {
   const [initialized, {setTrue}] = useBoolean(false);
 
-  const {procedure} = useContext(EditorContext);
+  const {editor} = useContext(EditorContext);
 
   const getOnCreateLeaf = useCallback(
     (type: string) => {
-      return () => procedure.addLeaf(node, type as LeafType);
+      return () => editor.procedure.createLeaf(node, type as LeafType);
     },
-    [procedure, node],
+    [editor, node],
   );
 
   const onCreateNode = useCallback(() => {
-    procedure.addNode(node);
-  }, [procedure, node]);
+    editor.procedure.createNode(node);
+  }, [editor, node]);
 
-  let leaves = procedure.getNodeLeaves(node);
+  // let leaves = editor.procedure.getNodeLeaves(node);
+  let leaves: any[] = [];
 
   let leavesMap = new Map<string, LeafMetadata>(
     leaves.map(leaf => [leaf.type, leaf]),
@@ -107,7 +108,7 @@ export const Leaves: FC<LeavesProps> = ({node}) => {
     <Wrapper onMouseOverCapture={setTrue}>
       <MoreButton />
       <Menus>
-        {[...(initialized ? procedure.getLeafRenderDescriptors() : [])].map(
+        {[...(initialized ? editor.getLeafRenderDescriptors() : [])].map(
           ({type, selector: {multiple, render}}) => {
             return (
               <MenuItem

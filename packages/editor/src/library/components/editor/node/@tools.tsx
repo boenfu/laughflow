@@ -2,7 +2,7 @@ import {More, PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {MenuPopup, transition} from '../../components';
+import {MenuPopup, transition} from '../../common';
 
 export interface LeavesProps {}
 

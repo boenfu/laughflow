@@ -1,7 +1,7 @@
 import {createContext} from 'react';
 
-import {Procedure} from '../core';
+import {Editor} from './editor';
 
 export const EditorContext = createContext<{
-  procedure: Procedure;
+  editor: Editor;
 }>(undefined!);

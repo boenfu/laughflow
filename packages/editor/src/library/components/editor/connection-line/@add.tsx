@@ -10,8 +10,8 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 
-import {transition} from '../../components';
-import {EditorContext} from '../context';
+import {EditorContext} from '../../../context';
+import {transition} from '../../common';
 
 import {LINE_HEIGHT_DEFAULT} from './connection-line';
 
@@ -66,10 +66,11 @@ const AddMark: FC<{
   onMouseEnter: MouseEventHandler;
   onMouseLeave: MouseEventHandler;
 }> = ({active, node, next, position, onMouseEnter, onMouseLeave}) => {
-  const {procedure} = useContext(EditorContext);
+  const {editor} = useContext(EditorContext);
   const migrateChildren = position && position.y < LINE_HEIGHT_DEFAULT / 2;
 
-  const onClick = (): void => procedure.addNode(node, migrateChildren || next);
+  const onClick = (): void =>
+    editor.procedure.createNode(node, migrateChildren ? 'next' : next);
 
   if (!active) {
     return <></>;

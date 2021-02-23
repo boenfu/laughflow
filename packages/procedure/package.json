@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "source": "src/library/index.ts",
+  "main": "bld/library/index.js",
+  "module": "bld/library/index.js",
+  "types": "bld/library/index.d.ts",
   "dependencies": {
     "@magicflow/core": "*",
     "immer": "^8.0.0",

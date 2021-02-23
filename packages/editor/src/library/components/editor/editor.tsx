@@ -5,15 +5,15 @@ import {sortBy} from 'lodash-es';
 import React, {FC, Fragment, ReactNode, useEffect} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
 
-import {THEME_DEFAULT} from '../components';
-import {Procedure} from '../core';
+import {EditorContext} from '../../context';
+import {Editor} from '../../editor';
+import {THEME_DEFAULT} from '../theme';
 
 import {
   ConnectionLine,
   ConnectionLineBoundary,
   LINE_HEIGHT_DEFAULT,
 } from './connection-line';
-import {EditorContext} from './context';
 import {EditorProps} from './editor.doc';
 import {Leaf} from './leaf';
 import {Node} from './node';
@@ -40,16 +40,16 @@ const Row = styled.div`
   text-align: center;
 `;
 
-export const Editor: FC<EditorProps> = ({definition, plugins}) => {
-  const procedure = useCreation(() => new Procedure(definition, plugins), []);
+export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
+  const editor = useCreation(() => new Editor(definition, plugins), []);
   const reRender = useUpdate();
 
   useEffect(() => {
-    procedure.on('update', reRender);
+    editor.on('update', reRender);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  let {nodes, leaves} = procedure.definition;
+  let {nodes, leaves} = editor.procedure.definition;
 
   let nodeMap = new Map(nodes.map(node => [node.id, node]));
   let leafMap = new Map(leaves.map(leaf => [leaf.id, leaf]));
@@ -104,9 +104,9 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
   return (
     <ThemeProvider theme={THEME_DEFAULT}>
       <Wrapper>
-        <EditorContext.Provider value={{procedure}}>
-          <button onClick={() => procedure.undo()}>undo</button>
-          <button onClick={() => procedure.redo()}>redo</button>
+        <EditorContext.Provider value={{editor}}>
+          <button onClick={() => editor.procedure.undo()}>undo</button>
+          <button onClick={() => editor.procedure.redo()}>redo</button>
           {renderNode('start' as NodeId)}
         </EditorContext.Provider>
       </Wrapper>

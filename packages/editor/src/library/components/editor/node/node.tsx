@@ -2,8 +2,8 @@ import {NodeMetadata} from '@magicflow/core';
 import React, {CSSProperties, FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {transition} from '../../components';
-import {EditorContext} from '../context';
+import {EditorContext} from '../../../context';
+import {transition} from '../../common';
 
 import {DisplayName} from './@header';
 import {Leaves} from './@leaves';
@@ -77,7 +77,7 @@ const Footer = styled.div`
 `;
 
 export const Node: FC<NodeProps> = ({className, style, node, children}) => {
-  const {procedure} = useContext(EditorContext);
+  const {editor} = useContext(EditorContext);
 
   let {
     before,
@@ -86,9 +86,10 @@ export const Node: FC<NodeProps> = ({className, style, node, children}) => {
     headRight,
     footer,
     body,
-  } = procedure.getNodeRenderDescriptor(node);
+  } = editor.getNodeRenderDescriptor(node);
 
-  const onNodeChange = (node: NodeMetadata): void => procedure.updateNode(node);
+  const onNodeChange = (node: NodeMetadata): void =>
+    editor.procedure.updateNode(node);
 
   return (
     <Container style={style}>
