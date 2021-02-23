@@ -1,6 +1,12 @@
 {
   "references": [
     {
+      "path": "packages/procedure/src/library"
+    },
+    {
+      "path": "packages/procedure/src/test"
+    },
+    {
       "path": "packages/core/src/library"
     },
     {

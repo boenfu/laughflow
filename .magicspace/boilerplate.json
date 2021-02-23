@@ -6,6 +6,18 @@
     "author": "Chengdu Mufan Technology Co., Ltd.",
     "packages": [
       {
+        "name": "@magicflow/procedure",
+        "tsProjects": [
+          {
+            "name": "library"
+          },
+          {
+            "name": "test",
+            "references": ["library"]
+          }
+        ]
+      },
+      {
         "name": "@magicflow/core",
         "tsProjects": [
           {
