@@ -1,8 +1,7 @@
+import {NextMetadata, NodeId} from '@magicflow/core';
 import {Bezier, BezierStroke} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
-
-import {NextMetadata, NodeId} from '../../core';
 
 import {useAddMark} from './@add';
 

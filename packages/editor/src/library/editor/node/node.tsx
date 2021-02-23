@@ -1,8 +1,8 @@
+import {NodeMetadata} from '@magicflow/core';
 import React, {CSSProperties, FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../../components';
-import {NodeMetadata} from '../../core';
 import {EditorContext} from '../context';
 
 import {DisplayName} from './@header';

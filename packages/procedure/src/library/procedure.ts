@@ -1,3 +1,12 @@
+import {
+  LeafId,
+  LeafMetadata,
+  LeafType,
+  NextMetadata,
+  NodeId,
+  NodeMetadata,
+  ProcedureDefinition,
+} from '@magicflow/core';
 import {Patch, applyPatches, produce} from 'immer';
 import {cloneDeep, isEqual} from 'lodash-es';
 import {nanoid} from 'nanoid';

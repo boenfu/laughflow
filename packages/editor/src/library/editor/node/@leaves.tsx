@@ -1,10 +1,10 @@
+import {LeafMetadata, LeafType, NodeId} from '@magicflow/core';
 import {More, PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
 import {useBoolean} from 'ahooks';
 import React, {FC, createElement, useCallback, useContext} from 'react';
 import styled from 'styled-components';
 
 import {MenuPopup, transition} from '../../components';
-import {LeafMetadata, LeafType, NodeId} from '../../core';
 import {EditorContext} from '../context';
 
 export interface LeavesProps {

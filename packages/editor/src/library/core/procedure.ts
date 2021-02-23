@@ -1,3 +1,11 @@
+import {
+  LeafId,
+  LeafMetadata,
+  LeafType,
+  NextMetadata,
+  NodeId,
+  NodeMetadata,
+} from '@magicflow/core';
 import Eventemitter from 'eventemitter3';
 import {Patch, applyPatches, produce} from 'immer';
 import {castArray, cloneDeep, compact, isEqual, merge, sortBy} from 'lodash-es';
@@ -17,9 +25,6 @@ import {
   PluginEventHandler,
   PluginLeafEventType,
 } from '../plugin';
-
-import {LeafId, LeafMetadata, LeafType} from './leaf';
-import {NextMetadata, NodeId, NodeMetadata} from './node';
 
 export type Id = Nominal<string, 'procedure:id'>;
 

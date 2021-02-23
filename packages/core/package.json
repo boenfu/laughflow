@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "main": "bld/library/index.js",
+  "types": "bld/library/index.d.ts",
   "dependencies": {
     "tslang": "^0.1.23",
     "tslib": "^2.1.0"

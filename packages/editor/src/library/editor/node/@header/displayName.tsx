@@ -1,8 +1,7 @@
+import {NodeMetadata} from '@magicflow/core';
 import {useDebounceFn} from 'ahooks';
 import React, {ChangeEvent, FC, MouseEvent, useEffect, useRef} from 'react';
 import styled from 'styled-components';
-
-import {NodeMetadata} from '../../../core';
 
 const Wrapper = styled.div`
   flex: 1;

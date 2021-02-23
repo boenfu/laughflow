@@ -1,3 +1,4 @@
+import {NextMetadata, NodeId} from '@magicflow/core';
 import {PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
 import {Bezier as _Bezier, BezierPoint, Mark} from 'rc-bezier';
 import React, {
@@ -10,7 +11,6 @@ import React, {
 import styled from 'styled-components';
 
 import {transition} from '../../components';
-import {NextMetadata, NodeId} from '../../core';
 import {EditorContext} from '../context';
 
 import {LINE_HEIGHT_DEFAULT} from './connection-line';

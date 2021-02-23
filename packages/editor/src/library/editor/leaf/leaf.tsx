@@ -1,10 +1,10 @@
+import {LeafMetadata} from '@magicflow/core';
 import {Trash} from '@magicflow/icons';
 import Tooltip from 'rc-tooltip';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
 import {MenuPopup, transition} from '../../components';
-import {LeafMetadata} from '../../core';
 import {EditorContext} from '../context';
 
 export interface LeafProps {

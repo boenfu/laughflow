@@ -3,11 +3,8 @@ import React, {FC} from 'react';
 import styled from 'styled-components';
 
 import {MenuPopup, transition} from '../../components';
-import {NodeId} from '../../core';
 
-export interface LeavesProps {
-  node: NodeId;
-}
+export interface LeavesProps {}
 
 const MoreButton = styled(More)`
   font-size: 18px;

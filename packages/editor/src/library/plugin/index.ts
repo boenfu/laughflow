@@ -1,12 +1,7 @@
+import {LeafMetadata, LeafType, NodeId, NodeMetadata} from '@magicflow/core';
 import {ComponentType} from 'react';
 
-import {
-  LeafMetadata,
-  LeafType,
-  NodeId,
-  NodeMetadata,
-  ProcedureDefinition,
-} from '../core';
+import {ProcedureDefinition} from '../core';
 
 export interface IPluginEvent {
   definition: ProcedureDefinition;

@@ -1,3 +1,4 @@
+import {LeafId, NodeId} from '@magicflow/core';
 import {useCreation, useUpdate} from 'ahooks';
 import {enableAllPlugins} from 'immer';
 import {sortBy} from 'lodash-es';
@@ -5,7 +6,7 @@ import React, {FC, Fragment, ReactNode, useEffect} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
 
 import {THEME_DEFAULT} from '../components';
-import {LeafId, NodeId, Procedure} from '../core';
+import {Procedure} from '../core';
 
 import {
   ConnectionLine,
@@ -16,6 +17,12 @@ import {EditorContext} from './context';
 import {EditorProps} from './editor.doc';
 import {Leaf} from './leaf';
 import {Node} from './node';
+
+declare module '@magicflow/core' {
+  interface NodeMetadata {
+    displayName?: string;
+  }
+}
 
 enableAllPlugins();
 
@@ -100,7 +107,7 @@ export const Editor: FC<EditorProps> = ({definition, plugins}) => {
         <EditorContext.Provider value={{procedure}}>
           <button onClick={() => procedure.undo()}>undo</button>
           <button onClick={() => procedure.redo()}>redo</button>
-          {renderNode('start')}
+          {renderNode('start' as NodeId)}
         </EditorContext.Provider>
       </Wrapper>
     </ThemeProvider>
