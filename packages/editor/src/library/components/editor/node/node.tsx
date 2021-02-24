@@ -6,7 +6,7 @@ import {EditorContext} from '../../../context';
 import {transition} from '../../common';
 
 import {DisplayName} from './@header';
-import {Leaves} from './@leaves';
+import {Selectors} from './@selectors';
 
 export interface NodeProps {
   node: NodeMetadata;
@@ -108,7 +108,7 @@ export const Node: FC<NodeProps> = ({className, style, node, children}) => {
         </Header>
         <Body>{body && createElement(body, {node})}</Body>
         <Footer>
-          <Leaves node={node.id} />
+          <Selectors node={node.id} />
           {footer && createElement(footer, {node})}
         </Footer>
       </Wrapper>

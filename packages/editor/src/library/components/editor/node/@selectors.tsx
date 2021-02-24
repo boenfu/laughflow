@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import {EditorContext} from '../../../context';
 import {MenuPopup, transition} from '../../common';
 
-export interface LeavesProps {
+export interface SelectorsProps {
   node: NodeId;
 }
 
@@ -81,7 +81,7 @@ const PlusCircleSolid = styled(_PlusCircleSolid)`
   color: #9ba0ab;
 `;
 
-export const Leaves: FC<LeavesProps> = ({node}) => {
+export const Selectors: FC<SelectorsProps> = ({node}) => {
   const [initialized, {setTrue}] = useBoolean(false);
 
   const {editor} = useContext(EditorContext);

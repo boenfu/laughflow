@@ -1,4 +1,5 @@
-import {useDocumentEvent, useNamedState} from './hooks';
+import {useEventListener} from 'ahooks';
+import {useState} from 'react';
 
 const DRAGGABLE_ELEMENT = 'draggable_element';
 const DRAGGABLE_HANDLE = 'draggable_handle';
@@ -7,12 +8,11 @@ export function useRelativeDrag(): [
   typeof DRAGGABLE_ELEMENT,
   typeof DRAGGABLE_HANDLE,
 ] {
-  const {moving, setMoving} = useNamedState<
-    'moving',
+  const [moving, setMoving] = useState<
     {ele: HTMLElement; offset: {x: number; y: number}} | false
-  >('moving', false);
+  >(false);
 
-  useDocumentEvent('mousedown', (e: MouseEvent): void => {
+  useEventListener('mousedown', (e: MouseEvent): void => {
     let ele = e.target as HTMLElement;
 
     if (!ele.classList.contains(DRAGGABLE_HANDLE)) {
@@ -22,7 +22,7 @@ export function useRelativeDrag(): [
     setMoving({ele, offset: {x: e.offsetX, y: e.offsetY}});
   });
 
-  useDocumentEvent('mousemove', (e: MouseEvent): void => {
+  useEventListener('mousemove', (e: MouseEvent): void => {
     if (!moving) {
       return;
     }
@@ -48,7 +48,7 @@ export function useRelativeDrag(): [
     );
   });
 
-  useDocumentEvent('mouseup', () => setMoving(false));
+  useEventListener('mouseup', () => setMoving(false));
 
   return [DRAGGABLE_ELEMENT, DRAGGABLE_HANDLE];
 }

@@ -64,11 +64,9 @@ export class Editor extends Eventemitter<ProcedureEventType> {
   constructor(definition: ProcedureDefinition, plugins: IPlugin[] = []) {
     super();
 
-    if (plugins.length) {
-      this.setPlugins(plugins);
-    }
-
+    this.setPlugins(plugins);
     this.buildTreeNode(definition);
+
     this.procedure = new Procedure(definition, {
       afterDefinitionChange: definition => {
         this.buildTreeNode(definition);
