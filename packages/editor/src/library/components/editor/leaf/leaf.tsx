@@ -1,11 +1,10 @@
 import {LeafMetadata} from '@magicflow/core';
 import {Trash} from '@magicflow/icons';
-import Tooltip from 'rc-tooltip';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
 import {EditorContext} from '../../../context';
-import {MenuPopup, transition} from '../../common';
+import {TooltipActions, transition} from '../../common';
 
 export interface LeafProps {
   leaf: LeafMetadata;
@@ -29,48 +28,6 @@ const LeafContent = styled.div`
   display: inline-flex;
 `;
 
-const LeafActionWrapper = styled.div`
-  padding-left: 6px;
-  font-size: 12px;
-  cursor: pointer;
-`;
-
-const LeafActionIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  font-size: 16px;
-  margin-right: 6px;
-`;
-
-const LeafAction = styled(MenuPopup)`
-  @keyframes leaf-transform {
-    0% {
-      transform: translate3D(-12px, 0, 0);
-      opacity: 0;
-    }
-
-    100% {
-      transform: translate3D(0, 0, 0);
-      opacity: 1;
-    }
-  }
-
-  opacity: 0;
-  width: 78px;
-  max-width: 156px;
-  height: 28px;
-  line-height: 28px;
-  color: #333;
-  animation: leaf-transform 0.2s linear both;
-
-  & + & {
-    margin-top: 8px;
-  }
-`;
-
 export const Leaf: FC<LeafProps> = ({leaf}) => {
   const {editor} = useContext(EditorContext);
 
@@ -82,32 +39,22 @@ export const Leaf: FC<LeafProps> = ({leaf}) => {
 
   const onDelete = (): void => editor.procedure.deleteLeaf(leaf.id);
 
-  let {render: Component, actions} = renderDescriptor;
+  let {render: Component} = renderDescriptor;
 
   return (
     <Wrapper>
-      <Tooltip
-        overlayStyle={{width: 200}}
-        placement="right"
-        trigger={['hover']}
-        destroyTooltipOnHide={true}
-        overlay={
-          <LeafActionWrapper>
-            {actions.map(({label}, index) => (
-              <LeafAction key={index}>{label}</LeafAction>
-            ))}
-
-            <LeafAction key="delete" onClick={onDelete}>
-              <LeafActionIcon>
-                <Trash />
-              </LeafActionIcon>
-              删除
-            </LeafAction>
-          </LeafActionWrapper>
-        }
+      <TooltipActions
+        actions={[
+          {
+            name: 'delete',
+            icon: <Trash />,
+            content: '删除',
+            onAction: onDelete,
+          },
+        ]}
       >
         <LeafContent>{createElement(Component, {leaf})}</LeafContent>
-      </Tooltip>
+      </TooltipActions>
     </Wrapper>
   );
 };

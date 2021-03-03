@@ -53,6 +53,13 @@ const Wrapper = styled.div`
   box-shadow: 0 2px 4px ${props => props.theme.shadow};
   background-color: #fff;
 
+  .tools {
+    opacity: 0;
+    pointer-events: none;
+
+    ${transition(['opacity'])}
+  }
+
   &.active {
     box-shadow: 0 6px 12px ${props => props.theme['shadow-solid']};
 
@@ -66,6 +73,11 @@ const Wrapper = styled.div`
     ${Header}:hover {
       color: ${props => props.theme['text-primary-inverse']};
       background-color: ${props => props.theme.secondary};
+    }
+
+    .tools {
+      opacity: 1;
+      pointer-events: unset;
     }
   }
 `;
@@ -97,7 +109,7 @@ export const Node: FC<NodeProps> = ({className, style, node, children}) => {
     <Container style={style}>
       {before && createElement(before, {node})}
       <Wrapper className={className}>
-        <Tools node={node} />
+        <Tools className="tools" node={node} />
         <Header>
           {headLeft && (
             <HeaderExtra>{createElement(headLeft, {node})}</HeaderExtra>

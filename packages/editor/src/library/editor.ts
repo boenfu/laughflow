@@ -188,7 +188,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
 
     function buildTreeNode(
       node: NodeId,
-      visitedNodeSet: Set<NodeId> = new Set(),
+      visitedNodeSet: Set<NodeId> = new Set([node]),
     ): ProcedureTreeNode {
       let metadata = nodesMap.get(node);
 

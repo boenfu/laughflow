@@ -1,8 +1,13 @@
-import {NodeMetadata} from '@magicflow/core';
-import React, {CSSProperties, FC} from 'react';
+import {NodeId, NodeMetadata} from '@magicflow/core';
+import {Trash} from '@magicflow/icons';
+import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
 
+import {EditorContext} from '../../../context';
+import {TooltipActions} from '../../common';
+
 export interface LinkNodeProps {
+  beforeNode: NodeId;
   node: NodeMetadata;
   className?: string;
   readOnly?: boolean;
@@ -14,6 +19,7 @@ const Container = styled.div`
   text-align: center;
   white-space: nowrap;
   vertical-align: top;
+  margin: 0 16px;
 `;
 
 const Content = styled.div`
@@ -31,15 +37,34 @@ const Content = styled.div`
   background-color: #fff;
 `;
 
-export const LinkNode: FC<LinkNodeProps> = ({className, style, node}) => {
-  // const {editor} = useContext(EditorContext);
+export const LinkNode: FC<LinkNodeProps> = ({
+  className,
+  style,
+  node,
+  beforeNode,
+}) => {
+  const {editor} = useContext(EditorContext);
 
-  // const onNodeChange = (node: NodeMetadata): void =>
-  //   editor.procedure.updateNode(node);
+  const onDisconnectNode = (): void =>
+    editor.procedure.disconnectNode(beforeNode, {
+      type: 'node',
+      id: node.id,
+    });
 
   return (
-    <Container style={style}>
-      <Content className={className}>{node?.displayName || '-'}</Content>
-    </Container>
+    <TooltipActions
+      actions={[
+        {
+          name: 'delete',
+          icon: <Trash />,
+          content: '删除',
+          onAction: onDisconnectNode,
+        },
+      ]}
+    >
+      <Container style={style}>
+        <Content className={className}>{node?.displayName || '-'}</Content>
+      </Container>
+    </TooltipActions>
   );
 };

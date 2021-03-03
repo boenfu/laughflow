@@ -3,7 +3,7 @@ import 'rc-dropdown/assets/index.css';
 import Dropdown from 'rc-dropdown';
 import {DropdownProps} from 'rc-dropdown/lib/Dropdown';
 import _Menu, {Item, MenuProps} from 'rc-menu';
-import React, {PropsWithChildren, ReactNode} from 'react';
+import React, {PropsWithChildren, ReactElement, ReactNode} from 'react';
 import styled from 'styled-components';
 
 const MenuItem = styled(Item)`
@@ -50,7 +50,7 @@ export function DropdownSelect<T>({
   trigger = ['click'],
   onSelect,
   onVisibleChange,
-}: PropsWithChildren<DropdownSelectProps<T>>): React.ReactElement {
+}: PropsWithChildren<DropdownSelectProps<T>>): ReactElement {
   return (
     <Dropdown
       trigger={trigger}
@@ -68,7 +68,7 @@ export function DropdownSelect<T>({
       animation="slide-up"
       onVisibleChange={onVisibleChange}
     >
-      {children as React.ReactElement}
+      {children as ReactElement}
     </Dropdown>
   );
 }

@@ -97,7 +97,7 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
                   }
                   right={links[index + 1]?.id}
                 />
-                <LinkNode node={linkNode} />
+                <LinkNode beforeNode={nodeId} node={linkNode} />
               </Fragment>
             ))}
           </Row>

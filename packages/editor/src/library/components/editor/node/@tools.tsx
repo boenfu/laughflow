@@ -1,5 +1,10 @@
 import {NodeMetadata} from '@magicflow/core';
-import {PlusCircleSolid as _PlusCircleSolid, Trash} from '@magicflow/icons';
+import {
+  Copy,
+  Cut,
+  PlusCircleSolid as _PlusCircleSolid,
+  Trash,
+} from '@magicflow/icons';
 import React, {FC, useContext} from 'react';
 import styled from 'styled-components';
 
@@ -7,11 +12,11 @@ import {EditorContext} from '../../../context';
 import {MenuPopup, transition} from '../../common';
 
 export interface ToolsProps {
+  className?: string;
   node: NodeMetadata;
 }
 
 const Menus = styled(MenuPopup)`
-  font-size: 24px;
   padding: 2px 10px;
 
   transform: translate(0, 2px);
@@ -41,6 +46,9 @@ const Menus = styled(MenuPopup)`
 const MenuItem = styled.div`
   width: 24px;
   height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   cursor: pointer;
 
@@ -64,17 +72,13 @@ const MenuItem = styled.div`
 
 const Wrapper = styled.div`
   position: absolute;
-  right: 0;
-  top: 0;
+  right: -12px;
+  top: -12px;
   display: flex;
   align-items: center;
-  width: 18px;
-  height: 18px;
-  overflow: visible;
-  padding-left: 14px;
 `;
 
-export const Tools: FC<ToolsProps> = ({node}) => {
+export const Tools: FC<ToolsProps> = ({className, node}) => {
   const {editor} = useContext(EditorContext);
 
   const onDeleteNode = (): void => {
@@ -82,8 +86,14 @@ export const Tools: FC<ToolsProps> = ({node}) => {
   };
 
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <Menus>
+        <MenuItem>
+          <Cut onClick={onDeleteNode} />
+        </MenuItem>
+        <MenuItem>
+          <Copy onClick={onDeleteNode} />
+        </MenuItem>
         <MenuItem>
           <Trash onClick={onDeleteNode} />
         </MenuItem>
