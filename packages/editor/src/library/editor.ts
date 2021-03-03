@@ -44,11 +44,13 @@ type ProcedureEventType = 'update';
 
 export class Editor extends Eventemitter<ProcedureEventType> {
   readonly procedure: Procedure;
+
   plugins: IPlugin[] = [];
 
   procedureTreeNode!: ProcedureTreeNode;
 
   nodesMap!: Map<NodeId, NodeMetadata>;
+
   leavesMap!: Map<LeafId, LeafMetadata>;
 
   private leafRenderDescriptors: Map<string, LeafRenderDescriptor> = new Map();

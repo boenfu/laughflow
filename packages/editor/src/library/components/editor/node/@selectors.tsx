@@ -1,11 +1,15 @@
 import {LeafMetadata, LeafType, NodeId} from '@magicflow/core';
-import {More, PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
+import {
+  ConnectNode,
+  More,
+  PlusCircleSolid as _PlusCircleSolid,
+} from '@magicflow/icons';
 import {useBoolean} from 'ahooks';
 import React, {FC, createElement, useCallback, useContext} from 'react';
 import styled from 'styled-components';
 
 import {EditorContext} from '../../../context';
-import {MenuPopup, transition} from '../../common';
+import {DropdownSelect, MenuPopup, transition} from '../../common';
 
 export interface SelectorsProps {
   node: NodeId;
@@ -93,9 +97,10 @@ export const Selectors: FC<SelectorsProps> = ({node}) => {
     [editor, node],
   );
 
-  const onCreateNode = useCallback(() => {
-    editor.procedure.createNode(node);
-  }, [editor, node]);
+  const onCreateNode = (): void => editor.procedure.createNode(node);
+
+  const onConnectNode = ({key: nextId}: {key: unknown}): void =>
+    editor.procedure.connectNode(node, {type: 'node', id: nextId as NodeId});
 
   // let leaves = editor.procedure.getNodeLeaves(node);
   let leaves: any[] = [];
@@ -126,6 +131,19 @@ export const Selectors: FC<SelectorsProps> = ({node}) => {
             );
           },
         )}
+
+        <DropdownSelect
+          resources={editor.procedure.definition.nodes}
+          selectItem={{
+            key: 'id',
+            render: 'displayName',
+          }}
+          onSelect={onConnectNode}
+        >
+          <MenuItem>
+            <ConnectNode />
+          </MenuItem>
+        </DropdownSelect>
 
         <MenuItem>
           <PlusCircleSolid onClick={onCreateNode} />

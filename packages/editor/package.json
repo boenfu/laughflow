@@ -20,6 +20,8 @@
     "lodash-es": "^4.17.20",
     "nanoid": "^3.1.20",
     "rc-bezier": "^0.2.4",
+    "rc-dropdown": "^3.2.0",
+    "rc-menu": "^8.10.6",
     "rc-tooltip": "^5.0.1",
     "styled-components": "^5.2.1",
     "tslang": "^0.1.23",

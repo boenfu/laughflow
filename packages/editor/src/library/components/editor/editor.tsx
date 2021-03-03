@@ -9,7 +9,7 @@ import {THEME_DEFAULT} from '../theme';
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from './connection-line';
 import {EditorProps} from './editor.doc';
 import {Leaf} from './leaf';
-import {Node} from './node';
+import {LinkNode, Node} from './node';
 
 declare module '@magicflow/core' {
   interface NodeMetadata {
@@ -36,7 +36,10 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
   const reRender = useUpdate();
 
   useEffect(() => {
-    editor.on('update', reRender);
+    editor.on('update', () => {
+      reRender();
+      console.log(editor.procedure);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -85,7 +88,6 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
 
             {links.map((linkNode, index) => (
               <Fragment key={`node:${nodeId}-${linkNode.id}`}>
-                <div>??{linkNode.displayName}??</div>
                 <ConnectionLine
                   node={nodeId}
                   next={{type: 'node', id: linkNode.id}}
@@ -95,6 +97,7 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
                   }
                   right={links[index + 1]?.id}
                 />
+                <LinkNode node={linkNode} />
               </Fragment>
             ))}
           </Row>

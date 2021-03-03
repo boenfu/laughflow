@@ -7,6 +7,7 @@ import {transition} from '../../common';
 
 import {DisplayName} from './@header';
 import {Selectors} from './@selectors';
+import {Tools} from './@tools';
 
 export interface NodeProps {
   node: NodeMetadata;
@@ -43,6 +44,7 @@ const HeaderExtra = styled.div`
 `;
 
 const Wrapper = styled.div`
+  position: relative;
   margin: 0 16px;
   width: 220px;
   display: inline-block;
@@ -95,6 +97,7 @@ export const Node: FC<NodeProps> = ({className, style, node, children}) => {
     <Container style={style}>
       {before && createElement(before, {node})}
       <Wrapper className={className}>
+        <Tools node={node} />
         <Header>
           {headLeft && (
             <HeaderExtra>{createElement(headLeft, {node})}</HeaderExtra>

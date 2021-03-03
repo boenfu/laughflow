@@ -8,7 +8,7 @@ import {
   ProcedureDefinition,
 } from '@magicflow/core';
 import {Patch, applyPatches, enableAllPlugins, produce} from 'immer';
-import {cloneDeep, isEqual} from 'lodash-es';
+import {cloneDeep, compact, isEqual} from 'lodash-es';
 import {nanoid} from 'nanoid';
 
 enableAllPlugins();
@@ -79,6 +79,9 @@ export interface IProcedure {
 
   createNode(node: NodeId, next?: NextMetadata | 'next'): void;
   updateNode(node: NodeMetadata): void;
+  deleteNode(node: NodeId, includeNextNodes?: boolean): void;
+  moveNode(node: NodeId, afterNode: NodeId, includeNextNodes?: boolean): void;
+  copyNode(node: NodeId, afterNode: NodeId, includeNextNodes?: boolean): void;
 
   undo(): void;
   redo(): void;
@@ -278,6 +281,20 @@ export class Procedure implements IProcedure {
     });
   }
 
+  disconnectNode(node: NodeId, next: NextMetadata): void {
+    void this.update(definition => {
+      let nodeMetadata = definition.nodes.find(({id}) => id === node);
+
+      if (!nodeMetadata) {
+        throw Error(`Not found node metadata by id '${node}'`);
+      }
+
+      nodeMetadata.nexts = (nodeMetadata.nexts || []).filter(
+        ({id}) => id !== next.id,
+      );
+    });
+  }
+
   updateNode(metadata: NodeMetadata): void {
     void this.update(definition => {
       let nodeIndex = definition.nodes.findIndex(({id}) => id === metadata.id);
@@ -288,6 +305,88 @@ export class Procedure implements IProcedure {
 
       definition.nodes.splice(nodeIndex, 1, metadata);
     });
+  }
+
+  deleteNode(node: NodeId, includeNexts = false): void {
+    void this.update(definition => {
+      let nodesMap: Map<NodeId, NodeMetadata> = new Map();
+      let nodeBeforeNodesMap: Map<NodeId, NodeId[]> = new Map();
+
+      for (let node of definition.nodes) {
+        nodesMap.set(node.id, node);
+
+        for (let next of node.nexts || []) {
+          if (next.type !== 'node') {
+            continue;
+          }
+
+          nodeBeforeNodesMap.set(next.id, [
+            ...(nodeBeforeNodesMap.get(next.id) || []),
+            node.id,
+          ]);
+        }
+      }
+
+      if (!nodesMap.has(node)) {
+        throw Error(`Not found node metadata by id '${node}'`);
+      }
+
+      let checkingNodes: NodeId[] = [node];
+      let pendingDeleteNodesSet: Set<NodeId> = new Set();
+      let pendingDeleteLeavesSet: Set<LeafId> = new Set();
+
+      while (checkingNodes.length) {
+        let node = checkingNodes.shift()!;
+        let beforeNodesLength = nodeBeforeNodesMap.get(node)?.length || 0;
+
+        if (beforeNodesLength > 1) {
+          throw Error(`'${node}' used multiple times`);
+        }
+
+        let metadata = nodesMap.get(node);
+
+        pendingDeleteNodesSet.add(node);
+
+        if (!metadata || !includeNexts) {
+          continue;
+        }
+
+        for (let next of metadata.nexts || []) {
+          if (next.type === 'leaf') {
+            pendingDeleteLeavesSet.add(next.id);
+            continue;
+          }
+
+          pendingDeleteNodesSet.add(next.id);
+          checkingNodes.push(next.id);
+        }
+      }
+
+      definition.nodes = compact(
+        definition.nodes.map(node => {
+          if (pendingDeleteNodesSet.has(node.id)) {
+            return undefined;
+          }
+
+          node.nexts = node.nexts?.filter(next =>
+            next.type === 'node' ? !pendingDeleteNodesSet.has(next.id) : true,
+          );
+
+          return node;
+        }),
+      );
+      definition.leaves = definition.leaves.filter(
+        node => !pendingDeleteLeavesSet.has(node.id),
+      );
+    });
+  }
+
+  moveNode(node: NodeId, afterNode: NodeId, includeNextNodes?: boolean): void {
+    console.log(node, afterNode, includeNextNodes);
+  }
+
+  copyNode(node: NodeId, afterNode: NodeId, includeNextNodes?: boolean): void {
+    console.log(node, afterNode, includeNextNodes);
   }
 
   async update(
