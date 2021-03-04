@@ -18,6 +18,7 @@ import {EditorContext} from '../../../context';
 import {MenuPopup, transition} from '../../common';
 
 export interface SelectorsProps {
+  prev: NodeId | undefined;
   node: NodeId;
 }
 
@@ -91,7 +92,7 @@ const PlusCircleSolid = styled(_PlusCircleSolid)`
   color: #9ba0ab;
 `;
 
-export const Selectors: FC<SelectorsProps> = ({node}) => {
+export const Selectors: FC<SelectorsProps> = ({prev, node}) => {
   const [initialized, {setTrue}] = useBoolean(false);
 
   const {editor} = useContext(EditorContext);
@@ -106,7 +107,7 @@ export const Selectors: FC<SelectorsProps> = ({node}) => {
   const onCreateNode = (): void => editor.procedure.createNode(node);
 
   const onConnectNode = (event: MouseEvent): void => {
-    editor.setConnectingNode(node);
+    editor.setStatefulNode({prev, node, type: 'connecting'});
     event.stopPropagation();
   };
 

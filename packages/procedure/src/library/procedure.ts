@@ -8,7 +8,7 @@ import {
   ProcedureDefinition,
 } from '@magicflow/core';
 import {Patch, applyPatches, enableAllPlugins, produce} from 'immer';
-import {cloneDeep, compact, isEqual, pullAllBy} from 'lodash-es';
+import {cloneDeep, compact, isEqual} from 'lodash-es';
 import {nanoid} from 'nanoid';
 
 enableAllPlugins();
@@ -84,7 +84,7 @@ export interface IProcedure {
     movingNode: NodeId,
     originNode: NodeId | undefined,
     targeNode: NodeId,
-    targetAfterNode: NodeId | undefined,
+    targetNext: NextMetadata | undefined,
   ): void;
   copyNode(copyingNode: NodeId, targeNode: NodeId): void;
 
@@ -390,7 +390,7 @@ export class Procedure implements IProcedure {
     movingNodeId: NodeId,
     originNodeId: NodeId | undefined,
     targeNodeId: NodeId,
-    targetAfterNodeId: NodeId | undefined,
+    targetNext: NextMetadata | undefined,
   ): void {
     if (movingNodeId === targeNodeId) {
       return;
@@ -403,7 +403,7 @@ export class Procedure implements IProcedure {
       let originNode = originNodeId && nodesMap.get(originNodeId);
       let targeNode = nodesMap.get(targeNodeId);
       let targetAfterNode =
-        targetAfterNodeId && nodesMap.get(targetAfterNodeId);
+        targetNext?.type === 'node' ? nodesMap.get(targetNext.id) : undefined;
 
       console.log(targetAfterNode);
 
@@ -415,13 +415,28 @@ export class Procedure implements IProcedure {
         throw Error(`Not found targeNode metadata by id '${targeNodeId}'`);
       }
 
-      let pendingTransferMovingNodeNexts = movingNode.nexts?.length
-        ? pullAllBy(movingNode.nexts, [{type: 'leaf'}], 'type')
-        : [];
+      let movingNodeNexts = movingNode.nexts || [];
+      let pendingTransferMovingNodeNexts = [];
+
+      movingNode.nexts = [];
+
+      for (let next of movingNodeNexts) {
+        if (next.type === 'leaf') {
+          movingNode.nexts.push(next);
+          continue;
+        }
+
+        pendingTransferMovingNodeNexts.push(next);
+      }
 
       if (originNode) {
         originNode.nexts = originNode.nexts || [];
-        originNode.nexts.push(...pendingTransferMovingNodeNexts);
+
+        originNode.nexts.splice(
+          originNode.nexts.findIndex(next => next.id === movingNodeId),
+          1,
+          ...pendingTransferMovingNodeNexts,
+        );
       }
     });
   }

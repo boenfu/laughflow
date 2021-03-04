@@ -36,8 +36,8 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
   const reRender = useUpdate();
 
   useEventListener('click', () => {
-    if (editor.cuttingNode || editor.copyingNode || editor.connectingNode) {
-      editor.cleanStatefulNode();
+    if (editor.statefulNode) {
+      editor.setStatefulNode(undefined);
     }
   });
 

@@ -78,10 +78,28 @@ const Mark: FC<{
   const migrateChildren = position && position.y < LINE_HEIGHT_DEFAULT / 2;
 
   const onClick = (): void => {
-    if (editor.cuttingNode) {
-      editor.procedure.moveNode(editor.cuttingNode);
-    } else if (editor.copyingNode) {
-      editor.procedure.copyNode(editor.copyingNode, node, false);
+    if (editor.statefulNode) {
+      // editor.procedure.moveNode(editor.cuttingNode);
+      // editor.procedure.copyNode(editor.copyingNode, node, false);
+
+      switch (editor.statefulNode.type) {
+        case 'cutting':
+          editor.procedure.moveNode(
+            editor.statefulNode.node,
+            editor.statefulNode.prev,
+            node,
+            next,
+          );
+          // editor.procedure.moveNode(editor.cuttingNode);
+
+          break;
+
+        case 'copying':
+          break;
+
+        default:
+          break;
+      }
     } else {
       editor.procedure.createNode(node, migrateChildren ? 'next' : next);
     }
@@ -94,7 +112,7 @@ const Mark: FC<{
   let Icon = <PlusCircleSolid />;
   let title = '插入节点';
 
-  if (editor.cuttingNode || editor.copyingNode) {
+  if (editor.statefulNode && editor.statefulNode.type !== 'connecting') {
     Icon = <Paste />;
     title = '粘贴';
   }

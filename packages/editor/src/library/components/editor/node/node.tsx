@@ -148,17 +148,17 @@ export const Node: FC<NodeProps> = ({
   const onNodeChange = (node: NodeMetadata): void =>
     editor.procedure.updateNode(node);
 
+  let statefulNode = editor.statefulNode;
+
   return (
     <Container style={style}>
       {before && createElement(before, {node})}
       <Wrapper
         className={classnames([
           className,
-          {
-            cutting: editor.cuttingNode === node.id,
-            copying: editor.copyingNode === node.id,
-            connecting: editor.connectingNode === node.id,
-          },
+          statefulNode && statefulNode.node === node.id
+            ? statefulNode.type
+            : undefined,
         ])}
       >
         <Tools className="tools" prev={prev} node={node} />
@@ -175,7 +175,7 @@ export const Node: FC<NodeProps> = ({
         </Header>
         <Body>{body && createElement(body, {node})}</Body>
         <Footer>
-          <Selectors node={node.id} />
+          <Selectors prev={prev} node={node.id} />
           {footer && createElement(footer, {node})}
         </Footer>
       </Wrapper>

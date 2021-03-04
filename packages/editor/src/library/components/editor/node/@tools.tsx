@@ -83,12 +83,12 @@ export const Tools: FC<ToolsProps> = ({className, prev, node}) => {
   const {editor} = useContext(EditorContext);
 
   const onCutNode = (event: MouseEvent): void => {
-    editor.setCuttingNode(node.id);
+    editor.setStatefulNode({prev, node: node.id, type: 'cutting'});
     event.stopPropagation();
   };
 
   const onCopyNode = (event: MouseEvent): void => {
-    editor.setCopyingNode(node.id);
+    editor.setStatefulNode({prev, node: node.id, type: 'copying'});
     event.stopPropagation();
   };
 

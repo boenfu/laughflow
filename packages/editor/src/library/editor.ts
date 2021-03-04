@@ -43,6 +43,12 @@ export type NodeRenderDescriptor = NodePluginComponentRender;
 
 type ProcedureEventType = 'update';
 
+interface StatefulNode {
+  prev: NodeId | undefined;
+  node: NodeId;
+  type: 'cutting' | 'copying' | 'connecting';
+}
+
 export class Editor extends Eventemitter<ProcedureEventType> {
   readonly procedure: Procedure;
 
@@ -64,22 +70,10 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     fns: [],
   };
 
-  private statefulNodeDict: {
-    cutting?: NodeId;
-    copying?: NodeId;
-    connecting?: NodeId;
-  } = {};
+  private _statefulNode: StatefulNode | undefined;
 
-  get cuttingNode(): NodeId | undefined {
-    return this.statefulNodeDict.cutting;
-  }
-
-  get copyingNode(): NodeId | undefined {
-    return this.statefulNodeDict.copying;
-  }
-
-  get connectingNode(): NodeId | undefined {
-    return this.statefulNodeDict.connecting;
+  get statefulNode(): StatefulNode | undefined {
+    return this._statefulNode;
   }
 
   constructor(definition: ProcedureDefinition, plugins: IPlugin[] = []) {
@@ -196,23 +190,8 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     );
   }
 
-  setCuttingNode(node: NodeId): void {
-    this.statefulNodeDict = {cutting: node};
-    this.emit('update');
-  }
-
-  setCopyingNode(node: NodeId): void {
-    this.statefulNodeDict = {copying: node};
-    this.emit('update');
-  }
-
-  setConnectingNode(node: NodeId): void {
-    this.statefulNodeDict = {connecting: node};
-    this.emit('update');
-  }
-
-  cleanStatefulNode(): void {
-    this.statefulNodeDict = {};
+  setStatefulNode(statefulNode: StatefulNode | undefined): void {
+    this._statefulNode = statefulNode;
     this.emit('update');
   }
 
