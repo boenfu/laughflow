@@ -1,11 +1,11 @@
-import {NodeMetadata} from '@magicflow/core';
+import {NodeId, NodeMetadata} from '@magicflow/core';
 import {
   Copy,
   Cut,
   PlusCircleSolid as _PlusCircleSolid,
   Trash,
 } from '@magicflow/icons';
-import React, {FC, useContext} from 'react';
+import React, {FC, MouseEvent, useContext} from 'react';
 import styled from 'styled-components';
 
 import {EditorContext} from '../../../context';
@@ -13,6 +13,7 @@ import {MenuPopup, transition} from '../../common';
 
 export interface ToolsProps {
   className?: string;
+  prev: NodeId | undefined;
   node: NodeMetadata;
 }
 
@@ -78,8 +79,18 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-export const Tools: FC<ToolsProps> = ({className, node}) => {
+export const Tools: FC<ToolsProps> = ({className, prev, node}) => {
   const {editor} = useContext(EditorContext);
+
+  const onCutNode = (event: MouseEvent): void => {
+    editor.setCuttingNode(node.id);
+    event.stopPropagation();
+  };
+
+  const onCopyNode = (event: MouseEvent): void => {
+    editor.setCopyingNode(node.id);
+    event.stopPropagation();
+  };
 
   const onDeleteNode = (): void => {
     editor.procedure.deleteNode(node.id, true);
@@ -88,14 +99,14 @@ export const Tools: FC<ToolsProps> = ({className, node}) => {
   return (
     <Wrapper className={className}>
       <Menus>
-        <MenuItem>
-          <Cut onClick={onDeleteNode} />
+        <MenuItem title="剪切" onClick={onCutNode}>
+          <Cut />
         </MenuItem>
-        <MenuItem>
-          <Copy onClick={onDeleteNode} />
+        <MenuItem title="复制" onClick={onCopyNode}>
+          <Copy />
         </MenuItem>
-        <MenuItem>
-          <Trash onClick={onDeleteNode} />
+        <MenuItem title="删除" onClick={onDeleteNode}>
+          <Trash />
         </MenuItem>
       </Menus>
     </Wrapper>

@@ -1,5 +1,5 @@
 import {NextMetadata, NodeId} from '@magicflow/core';
-import {PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
+import {Copy, PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
 import {Bezier as _Bezier, BezierPoint, Mark} from 'rc-bezier';
 import React, {
   FC,
@@ -58,7 +58,15 @@ const PlusCircleSolid = styled(_PlusCircleSolid)`
   ${transition(['opacity'])}
 `;
 
-const AddMark: FC<{
+const Paste = styled(Copy)`
+  font-size: 16px;
+  color: white;
+  background-color: ${props => props.theme.primary};
+  border-radius: 50%;
+  padding: 4px;
+`;
+
+const Mark: FC<{
   active: boolean;
   node: NodeId;
   next: NextMetadata;
@@ -69,25 +77,41 @@ const AddMark: FC<{
   const {editor} = useContext(EditorContext);
   const migrateChildren = position && position.y < LINE_HEIGHT_DEFAULT / 2;
 
-  const onClick = (): void =>
-    editor.procedure.createNode(node, migrateChildren ? 'next' : next);
+  const onClick = (): void => {
+    if (editor.cuttingNode) {
+      editor.procedure.moveNode(editor.cuttingNode);
+    } else if (editor.copyingNode) {
+      editor.procedure.copyNode(editor.copyingNode, node, false);
+    } else {
+      editor.procedure.createNode(node, migrateChildren ? 'next' : next);
+    }
+  };
 
   if (!active) {
     return <></>;
   }
 
+  let Icon = <PlusCircleSolid />;
+  let title = '插入节点';
+
+  if (editor.cuttingNode || editor.copyingNode) {
+    Icon = <Paste />;
+    title = '粘贴';
+  }
+
   return (
     <MarkWrapper
+      title={title}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <PlusCircleSolid />
+      {Icon}
     </MarkWrapper>
   );
 };
 
-export function useAddMark(node: NodeId, next: NextMetadata): [Mark] {
+export function useMark(node: NodeId, next: NextMetadata): [Mark] {
   const [position, setPosition] = useState<BezierPoint | undefined>(undefined);
 
   const [active, dispatch] = useReducer(
@@ -101,10 +125,10 @@ export function useAddMark(node: NodeId, next: NextMetadata): [Mark] {
 
   return [
     {
-      key: 'add',
+      key: 'mark',
       position,
       render: (
-        <AddMark
+        <Mark
           node={node}
           next={next}
           position={position}

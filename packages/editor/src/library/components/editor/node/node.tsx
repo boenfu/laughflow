@@ -1,4 +1,5 @@
-import {NodeMetadata} from '@magicflow/core';
+import {NodeId, NodeMetadata} from '@magicflow/core';
+import classnames from 'classnames';
 import React, {CSSProperties, FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
@@ -10,6 +11,7 @@ import {Selectors} from './@selectors';
 import {Tools} from './@tools';
 
 export interface NodeProps {
+  prev: NodeId | undefined;
   node: NodeMetadata;
   className?: string;
   readOnly?: boolean;
@@ -80,6 +82,41 @@ const Wrapper = styled.div`
       pointer-events: unset;
     }
   }
+
+  &.cutting,
+  &.copying,
+  &.connecting {
+    .tools {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &::before {
+      margin: 0px;
+      height: 100%;
+      transform: scale(1.2);
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      content: '';
+      background-color: rgba(255, 255, 255, 0.61);
+      z-index: 2;
+    }
+  }
+
+  &.cutting::before {
+    border: 1px dashed rgb(217, 217, 217);
+  }
+
+  &.copying::before {
+    border: 1px dashed blue;
+  }
+
+  &.connecting::before {
+    border: 1px dashed blue;
+    background-color: transparent;
+  }
 `;
 
 const Body = styled.div``;
@@ -90,7 +127,13 @@ const Footer = styled.div`
   height: 40px;
 `;
 
-export const Node: FC<NodeProps> = ({className, style, node, children}) => {
+export const Node: FC<NodeProps> = ({
+  className,
+  style,
+  prev,
+  node,
+  children,
+}) => {
   const {editor} = useContext(EditorContext);
 
   let {
@@ -108,8 +151,17 @@ export const Node: FC<NodeProps> = ({className, style, node, children}) => {
   return (
     <Container style={style}>
       {before && createElement(before, {node})}
-      <Wrapper className={className}>
-        <Tools className="tools" node={node} />
+      <Wrapper
+        className={classnames([
+          className,
+          {
+            cutting: editor.cuttingNode === node.id,
+            copying: editor.copyingNode === node.id,
+            connecting: editor.connectingNode === node.id,
+          },
+        ])}
+      >
+        <Tools className="tools" prev={prev} node={node} />
         <Header>
           {headLeft && (
             <HeaderExtra>{createElement(headLeft, {node})}</HeaderExtra>

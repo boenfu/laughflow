@@ -25,6 +25,7 @@ import {
 } from './plugin';
 
 export interface ProcedureTreeNode {
+  prev: NodeId | undefined;
   metadata: NodeMetadata;
   nodes: ProcedureTreeNode[];
   leaves: LeafMetadata[];
@@ -62,6 +63,24 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     descriptor: {},
     fns: [],
   };
+
+  private statefulNodeDict: {
+    cutting?: NodeId;
+    copying?: NodeId;
+    connecting?: NodeId;
+  } = {};
+
+  get cuttingNode(): NodeId | undefined {
+    return this.statefulNodeDict.cutting;
+  }
+
+  get copyingNode(): NodeId | undefined {
+    return this.statefulNodeDict.copying;
+  }
+
+  get connectingNode(): NodeId | undefined {
+    return this.statefulNodeDict.connecting;
+  }
 
   constructor(definition: ProcedureDefinition, plugins: IPlugin[] = []) {
     super();
@@ -177,6 +196,26 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     );
   }
 
+  setCuttingNode(node: NodeId): void {
+    this.statefulNodeDict = {cutting: node};
+    this.emit('update');
+  }
+
+  setCopyingNode(node: NodeId): void {
+    this.statefulNodeDict = {copying: node};
+    this.emit('update');
+  }
+
+  setConnectingNode(node: NodeId): void {
+    this.statefulNodeDict = {connecting: node};
+    this.emit('update');
+  }
+
+  cleanStatefulNode(): void {
+    this.statefulNodeDict = {};
+    this.emit('update');
+  }
+
   buildTreeNode(definition: ProcedureDefinition): void {
     let nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
     let leavesMap = new Map(definition.leaves.map(leaf => [leaf.id, leaf]));
@@ -188,6 +227,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
 
     function buildTreeNode(
       node: NodeId,
+      prev: NodeId | undefined = undefined,
       visitedNodeSet: Set<NodeId> = new Set([node]),
     ): ProcedureTreeNode {
       let metadata = nodesMap.get(node);
@@ -219,7 +259,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
           if (!visitedNodeSet.has(next.id)) {
             visitedNodeSet.add(next.id);
 
-            nodes.push(buildTreeNode(next.id, visitedNodeSet));
+            nodes.push(buildTreeNode(next.id, node, visitedNodeSet));
           } else {
             links.push(nextNodeMetadata);
           }
@@ -227,6 +267,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
       }
 
       return {
+        prev,
         metadata,
         nodes,
         leaves,

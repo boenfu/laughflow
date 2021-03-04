@@ -8,7 +8,7 @@ import {
   ProcedureDefinition,
 } from '@magicflow/core';
 import {Patch, applyPatches, enableAllPlugins, produce} from 'immer';
-import {cloneDeep, compact, isEqual} from 'lodash-es';
+import {cloneDeep, compact, isEqual, pullAllBy} from 'lodash-es';
 import {nanoid} from 'nanoid';
 
 enableAllPlugins();
@@ -80,8 +80,13 @@ export interface IProcedure {
   createNode(node: NodeId, next?: NextMetadata | 'next'): void;
   updateNode(node: NodeMetadata): void;
   deleteNode(node: NodeId, includeNextNodes?: boolean): void;
-  moveNode(node: NodeId, afterNode: NodeId, includeNextNodes?: boolean): void;
-  copyNode(node: NodeId, afterNode: NodeId, includeNextNodes?: boolean): void;
+  moveNode(
+    movingNode: NodeId,
+    originNode: NodeId | undefined,
+    targeNode: NodeId,
+    targetAfterNode: NodeId | undefined,
+  ): void;
+  copyNode(copyingNode: NodeId, targeNode: NodeId): void;
 
   undo(): void;
   redo(): void;
@@ -381,12 +386,56 @@ export class Procedure implements IProcedure {
     });
   }
 
-  moveNode(node: NodeId, afterNode: NodeId, includeNextNodes?: boolean): void {
-    console.log(node, afterNode, includeNextNodes);
+  moveNode(
+    movingNodeId: NodeId,
+    originNodeId: NodeId | undefined,
+    targeNodeId: NodeId,
+    targetAfterNodeId: NodeId | undefined,
+  ): void {
+    if (movingNodeId === targeNodeId) {
+      return;
+    }
+
+    void this.update(definition => {
+      let nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
+
+      let movingNode = nodesMap.get(movingNodeId);
+      let originNode = originNodeId && nodesMap.get(originNodeId);
+      let targeNode = nodesMap.get(targeNodeId);
+      let targetAfterNode =
+        targetAfterNodeId && nodesMap.get(targetAfterNodeId);
+
+      console.log(targetAfterNode);
+
+      if (!movingNode) {
+        throw Error(`Not found movingNode metadata by id '${movingNodeId}'`);
+      }
+
+      if (!targeNode) {
+        throw Error(`Not found targeNode metadata by id '${targeNodeId}'`);
+      }
+
+      let pendingTransferMovingNodeNexts = movingNode.nexts?.length
+        ? pullAllBy(movingNode.nexts, [{type: 'leaf'}], 'type')
+        : [];
+
+      if (originNode) {
+        originNode.nexts = originNode.nexts || [];
+        originNode.nexts.push(...pendingTransferMovingNodeNexts);
+      }
+    });
   }
 
-  copyNode(node: NodeId, afterNode: NodeId, includeNextNodes?: boolean): void {
-    console.log(node, afterNode, includeNextNodes);
+  copyNode(copyingNode: NodeId, targeNode: NodeId): void {
+    console.log(copyingNode, targeNode);
+
+    // void this.update(definition => {
+    //   let nodeIndex = definition.nodes.findIndex(({id}) => id === metadata.id);
+    //   if (nodeIndex === -1) {
+    //     throw Error(`Not found node metadata by id '${metadata.id}'`);
+    //   }
+    //   definition.nodes.splice(nodeIndex, 1, metadata);
+    // });
   }
 
   async update(

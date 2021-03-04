@@ -16,6 +16,7 @@
     "@magicflow/icons": "*",
     "@magicflow/procedure": "*",
     "ahooks": "^2.9.6",
+    "classnames": "^2.2.6",
     "eventemitter3": "^4.0.7",
     "lodash-es": "^4.17.20",
     "nanoid": "^3.1.20",
@@ -28,6 +29,7 @@
     "tslib": "^2.1.0"
   },
   "devDependencies": {
+    "@types/classnames": "^2.2.11",
     "@types/lodash-es": "^4.17.4",
     "@types/nanoid": "^2.1.0",
     "@types/react": "^17.0.0",

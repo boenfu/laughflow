@@ -7,7 +7,7 @@ import {EditorContext} from '../../../context';
 import {TooltipActions} from '../../common';
 
 export interface LinkNodeProps {
-  beforeNode: NodeId;
+  prev: NodeId;
   node: NodeMetadata;
   className?: string;
   readOnly?: boolean;
@@ -37,16 +37,11 @@ const Content = styled.div`
   background-color: #fff;
 `;
 
-export const LinkNode: FC<LinkNodeProps> = ({
-  className,
-  style,
-  node,
-  beforeNode,
-}) => {
+export const LinkNode: FC<LinkNodeProps> = ({className, style, node, prev}) => {
   const {editor} = useContext(EditorContext);
 
   const onDisconnectNode = (): void =>
-    editor.procedure.disconnectNode(beforeNode, {
+    editor.procedure.disconnectNode(prev, {
       type: 'node',
       id: node.id,
     });

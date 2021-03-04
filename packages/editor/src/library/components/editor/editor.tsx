@@ -1,4 +1,4 @@
-import {useCreation, useUpdate} from 'ahooks';
+import {useCreation, useEventListener, useUpdate} from 'ahooks';
 import React, {FC, Fragment, ReactNode, useEffect} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
 
@@ -35,6 +35,12 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
   const editor = useCreation(() => new Editor(definition, plugins), []);
   const reRender = useUpdate();
 
+  useEventListener('click', () => {
+    if (editor.cuttingNode || editor.copyingNode || editor.connectingNode) {
+      editor.cleanStatefulNode();
+    }
+  });
+
   useEffect(() => {
     editor.on('update', () => {
       reRender();
@@ -44,6 +50,7 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
   }, []);
 
   function renderNode({
+    prev,
     metadata,
     leaves,
     nodes,
@@ -53,7 +60,7 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
 
     return (
       <Fragment>
-        <Node node={metadata}>
+        <Node prev={prev} node={metadata}>
           <Row>
             {leaves.map((leaf, index) => (
               <Fragment key={`leaf:${nodeId}-${leaf.id}`}>
@@ -97,7 +104,7 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
                   }
                   right={links[index + 1]?.id}
                 />
-                <LinkNode beforeNode={nodeId} node={linkNode} />
+                <LinkNode prev={nodeId} node={linkNode} />
               </Fragment>
             ))}
           </Row>

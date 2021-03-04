@@ -3,7 +3,7 @@ import {Bezier, BezierStroke} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {useAddMark} from './@add';
+import {useMark} from './@mark';
 
 export const LINE_HEIGHT_DEFAULT = 68;
 
@@ -36,7 +36,7 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
   left,
   right,
 }) => {
-  const [Mark] = useAddMark(node, next);
+  const [Mark] = useMark(node, next);
 
   return (
     <Wrapper

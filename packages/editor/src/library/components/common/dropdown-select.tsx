@@ -3,7 +3,12 @@ import 'rc-dropdown/assets/index.css';
 import Dropdown from 'rc-dropdown';
 import {DropdownProps} from 'rc-dropdown/lib/Dropdown';
 import _Menu, {Item, MenuProps} from 'rc-menu';
-import React, {PropsWithChildren, ReactElement, ReactNode} from 'react';
+import React, {
+  PropsWithChildren,
+  ReactElement,
+  ReactNode,
+  RefObject,
+} from 'react';
 import styled from 'styled-components';
 
 const MenuItem = styled(Item)`
@@ -39,6 +44,7 @@ interface DropdownSelectProps<T> {
   resources: T[];
   selectItem: {key: keyof T; render: string | ((item: T) => ReactNode)};
   trigger?: DropdownProps['trigger'];
+  containerRef?: RefObject<HTMLElement>;
   onSelect?: MenuProps['onSelect'];
   onVisibleChange?: (visible: boolean) => void;
 }
