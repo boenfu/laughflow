@@ -118,40 +118,12 @@ export class Procedure implements IProcedure {
     this.setDefinition(cloneDeep(definition), false);
   }
 
-  undo(): void {
-    let actionStack = this.actionStack;
-
-    if (actionStack.cursor === actionStack.redoes.length - 1) {
-      return;
-    }
-
-    actionStack.cursor += 1;
-
-    this.setDefinition(
-      applyPatches(this._definition, actionStack.undoes[actionStack.cursor]),
-    );
-  }
-
-  redo(): void {
-    let actionStack = this.actionStack;
-
-    if (actionStack.cursor === -1) {
-      return;
-    }
-
-    this.setDefinition(
-      applyPatches(this._definition, actionStack.redoes[actionStack.cursor]),
-    );
-
-    actionStack.cursor -= 1;
-  }
-
-  createLeaf(
+  async createLeaf(
     node: NodeId,
     type: LeafType,
     partial: Partial<LeafMetadata> = {},
-  ): void {
-    void this.update(async definition => {
+  ): Promise<void> {
+    return this.update(async definition => {
       let nodeMetadata = definition.nodes.find(({id}) => id === node);
 
       if (!nodeMetadata) {
@@ -182,24 +154,20 @@ export class Procedure implements IProcedure {
     });
   }
 
-  deleteLeaf(leafId: LeafId): void {
-    void this.update(async definition => {
+  async deleteLeaf(leafId: LeafId): Promise<void> {
+    return this.update(async definition => {
       let leafIndex = definition.leaves.findIndex(leaf => leaf.id === leafId);
+
+      if (leafIndex === -1) {
+        throw Error(`Not found leaf metadata by leaf '${leafId}'`);
+      }
+
       let nodeMetadata = definition.nodes.find(({nexts}) =>
         nexts?.some(({type, id}) => type === 'leaf' && id === leafId),
       );
 
       if (!nodeMetadata) {
-        throw Error(`Not found node metadata by leaf '${leafId}'`);
-      }
-
-      if (leafIndex === -1) {
-        if (nodeMetadata) {
-          nodeMetadata.nexts = nodeMetadata.nexts?.filter(
-            ({type, id}) => type !== 'leaf' || id !== leafId,
-          );
-        }
-
+        definition.leaves.splice(leafIndex, 1);
         return;
       }
 
@@ -231,12 +199,12 @@ export class Procedure implements IProcedure {
    *  3. next = NextMetadata, 创建新节点插入至节点 node 与 next 之间
    * @param metadata
    */
-  createNode(
+  async createNode(
     node: NodeId,
     target: NextMetadata | 'next' | undefined = undefined,
     {id: _id, nexts = [], ...partial}: Partial<NodeMetadata> = {},
-  ): void {
-    void this.update(definition => {
+  ): Promise<void> {
+    return this.update(definition => {
       let nodeMetadata = definition.nodes.find(({id}) => id === node);
 
       if (!nodeMetadata) {
@@ -272,8 +240,8 @@ export class Procedure implements IProcedure {
     });
   }
 
-  connectNode(node: NodeId, next: NextMetadata): void {
-    void this.update(definition => {
+  async connectNode(node: NodeId, next: NextMetadata): Promise<void> {
+    return this.update(definition => {
       let nodeMetadata = definition.nodes.find(({id}) => id === node);
 
       if (!nodeMetadata) {
@@ -286,22 +254,24 @@ export class Procedure implements IProcedure {
     });
   }
 
-  disconnectNode(node: NodeId, next: NextMetadata): void {
-    void this.update(definition => {
+  async disconnectNode(node: NodeId, next: NextMetadata): Promise<void> {
+    return this.update(definition => {
       let nodeMetadata = definition.nodes.find(({id}) => id === node);
 
       if (!nodeMetadata) {
         throw Error(`Not found node metadata by id '${node}'`);
       }
 
-      nodeMetadata.nexts = (nodeMetadata.nexts || []).filter(
-        ({id}) => id !== next.id,
-      );
+      if (!nodeMetadata.nexts?.length) {
+        return;
+      }
+
+      nodeMetadata.nexts = nodeMetadata.nexts.filter(({id}) => id !== next.id);
     });
   }
 
-  updateNode(metadata: NodeMetadata): void {
-    void this.update(definition => {
+  async updateNode(metadata: NodeMetadata): Promise<void> {
+    return this.update(definition => {
       let nodeIndex = definition.nodes.findIndex(({id}) => id === metadata.id);
 
       if (nodeIndex === -1) {
@@ -453,39 +423,63 @@ export class Procedure implements IProcedure {
     // });
   }
 
+  undo(): void {
+    let actionStack = this.actionStack;
+
+    if (actionStack.cursor === actionStack.redoes.length - 1) {
+      return;
+    }
+
+    actionStack.cursor += 1;
+
+    this.setDefinition(
+      applyPatches(this._definition, actionStack.undoes[actionStack.cursor]),
+    );
+  }
+
+  redo(): void {
+    let actionStack = this.actionStack;
+
+    if (actionStack.cursor === -1) {
+      return;
+    }
+
+    this.setDefinition(
+      applyPatches(this._definition, actionStack.redoes[actionStack.cursor]),
+    );
+
+    actionStack.cursor -= 1;
+  }
+
   async update(
     handler: (definition: ProcedureDefinition) => Promise<void> | void,
   ): Promise<void> {
-    try {
-      let definition = await produce(
-        this._definition,
-        handler,
-        (patches, inversePatches) => {
-          if (!patches.length) {
-            return;
-          }
+    let definition = await produce(
+      this._definition,
+      handler,
+      (patches, inversePatches) => {
+        if (!patches.length) {
+          return;
+        }
 
-          let actionStack = this.actionStack;
-          let size = actionStack.cursor + 1;
-          actionStack.undoes.splice(0, size, inversePatches);
-          actionStack.redoes.splice(0, size, patches);
-          actionStack.cursor = -1;
-        },
-      );
+        let actionStack = this.actionStack;
+        let size = actionStack.cursor + 1;
 
-      if (definition === this._definition) {
-        return;
-      }
+        actionStack.undoes.splice(0, size, inversePatches);
+        actionStack.redoes.splice(0, size, patches);
+        actionStack.cursor = -1;
+      },
+    );
 
-      this.setDefinition(definition);
-    } catch (error) {
-      console.error(error);
+    if (definition === this._definition) {
+      return;
     }
+
+    this.setDefinition(definition);
   }
 
   private setDefinition(definition: ProcedureDefinition, notify = true): void {
     this._definition = definition;
-    // this.buildMetadataMap(definition);
 
     if (!notify) {
       return;
@@ -493,11 +487,6 @@ export class Procedure implements IProcedure {
 
     this.listeners.afterDefinitionChange?.(definition);
   }
-
-  // private buildMetadataMap(definition: ProcedureDefinition): void {
-  //   this.nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
-  //   this.leavesMap = new Map(definition.leaves.map(leaf => [leaf.id, leaf]));
-  // }
 }
 
 export function createId<TId>(): TId {

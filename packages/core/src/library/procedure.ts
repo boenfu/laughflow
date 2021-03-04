@@ -9,7 +9,7 @@ export interface ProcedureMetadata {}
 
 export interface ProcedureDefinition {
   id: ProcedureId;
-  metadata: ProcedureMetadata;
   leaves: LeafMetadata[];
   nodes: NodeMetadata[];
+  metadata?: ProcedureMetadata;
 }
