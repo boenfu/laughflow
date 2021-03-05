@@ -146,7 +146,7 @@ export const Node: FC<NodeProps> = ({
   } = editor.getNodeRenderDescriptor(node);
 
   const onNodeChange = (node: NodeMetadata): void =>
-    editor.procedure.updateNode(node);
+    void editor.procedure.updateNode(node);
 
   let statefulNode = editor.statefulNode;
 

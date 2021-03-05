@@ -84,3 +84,17 @@ test('handle beforeDeleteLeaf', async () => {
 
   expect(procedure.definition.nodes[0].nexts?.length).toBe(2);
 });
+
+test('no-handle beforeDeleteLeaf and delete node nexts', async () => {
+  let procedure = new Procedure(definition, {
+    beforeLeafDelete(_definition, node) {
+      node.nexts = undefined;
+    },
+  });
+
+  await procedure.deleteLeaf(leafId);
+
+  expect(procedure.definition.leaves?.length).toBe(0);
+
+  expect(procedure.definition.nodes[0].nexts).toBeUndefined();
+});

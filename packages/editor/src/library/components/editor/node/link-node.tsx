@@ -41,7 +41,7 @@ export const LinkNode: FC<LinkNodeProps> = ({className, style, node, prev}) => {
   const {editor} = useContext(EditorContext);
 
   const onDisconnectNode = (): void =>
-    editor.procedure.disconnectNode(prev, {
+    void editor.procedure.disconnectNode(prev, {
       type: 'node',
       id: node.id,
     });

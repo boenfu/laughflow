@@ -104,7 +104,7 @@ export const Selectors: FC<SelectorsProps> = ({prev, node}) => {
     [editor, node],
   );
 
-  const onCreateNode = (): void => editor.procedure.createNode(node);
+  const onCreateNode = (): void => void editor.procedure.createNode(node);
 
   const onConnectNode = (event: MouseEvent): void => {
     editor.setStatefulNode({prev, node, type: 'connecting'});

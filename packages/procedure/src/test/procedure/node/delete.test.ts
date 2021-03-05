@@ -28,5 +28,5 @@ let definition: ProcedureDefinition = {
 test('delete node', async () => {
   let procedure = new Procedure(definition);
 
-  expect(procedure).toBe(2);
+  expect(procedure).toBeTruthy();
 });

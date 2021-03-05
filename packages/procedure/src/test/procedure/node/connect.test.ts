@@ -36,9 +36,7 @@ test('connect node', async () => {
   await procedure.connectNode(nodeId, {type: 'node', id: 'node2' as NodeId});
   await procedure.connectNode(nodeId, {type: 'leaf', id: 'leaf2' as LeafId});
 
-  expect(
-    procedure.definition.nodes.find(node => node.id === nodeId)?.nexts?.length,
-  ).toBe(2);
+  expect(procedure.getNode(nodeId)?.nexts?.length).toBe(2);
 });
 
 test('connect node at fakeNode', () => {
@@ -54,9 +52,15 @@ test('disconnect node', async () => {
 
   await procedure.disconnectNode(startId, {type: 'node', id: nodeId});
 
-  expect(
-    procedure.definition.nodes.find(node => node.id === startId)?.nexts?.length,
-  ).toBe(0);
+  expect(procedure.getNode(startId)?.nexts?.length).toBe(0);
+});
+
+test('disconnect node at no-nexts node', async () => {
+  let procedure = new Procedure(definition);
+
+  await procedure.disconnectNode(nodeId, {type: 'node', id: nodeId});
+
+  expect(procedure.getNode(nodeId)?.nexts).toBeFalsy();
 });
 
 test('disconnect node at fakeNode', () => {

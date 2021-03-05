@@ -22,7 +22,9 @@ test('update definition', async () => {
     nodes: [],
     leaves: [],
   };
-  let procedure = new Procedure(definition);
+  let procedure = new Procedure(definition, {
+    afterDefinitionChange() {},
+  });
 
   await procedure.update(definition => {
     definition.nodes = [{id: 'node' as NodeId}];

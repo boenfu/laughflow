@@ -37,7 +37,7 @@ export const Leaf: FC<LeafProps> = ({leaf}) => {
     return <></>;
   }
 
-  const onDelete = (): void => editor.procedure.deleteLeaf(leaf.id);
+  const onDelete = (): void => void editor.procedure.deleteLeaf(leaf.id);
 
   let {render: Component} = renderDescriptor;
 

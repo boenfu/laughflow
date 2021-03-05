@@ -1,24 +1,27 @@
-import {NodeId, ProcedureDefinition, ProcedureId} from '@magicflow/core';
+import {
+  LeafMetadata,
+  NodeId,
+  NodeMetadata,
+  ProcedureDefinition,
+  ProcedureId,
+} from '@magicflow/core';
 
 import {Procedure} from '../../../library';
 
-let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
 
-let definition: ProcedureDefinition = {
+type NodeMetadataWithName = {name?: string} & NodeMetadata;
+type LeafMetadataWithName = {name?: string} & LeafMetadata;
+
+let definition: ProcedureDefinition<
+  {},
+  NodeMetadataWithName,
+  LeafMetadataWithName
+> = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
   leaves: [],
   nodes: [
-    {
-      id: startId,
-      nexts: [
-        {
-          type: 'node',
-          id: nodeId,
-        },
-      ],
-    },
     {
       id: nodeId,
     },
@@ -28,5 +31,15 @@ let definition: ProcedureDefinition = {
 test('update node', async () => {
   let procedure = new Procedure(definition);
 
-  expect(procedure).toBe(2);
+  await procedure.updateNode({id: nodeId, name: 'hello'});
+
+  expect(procedure.definition.nodes[0]?.name).toBe('hello');
+});
+
+test('update node error params', () => {
+  let procedure = new Procedure(definition);
+
+  void expect(
+    procedure.updateNode({id: 'node2' as NodeId, name: 'hello'}),
+  ).rejects.toThrow("Not found node metadata by id 'node2'");
 });

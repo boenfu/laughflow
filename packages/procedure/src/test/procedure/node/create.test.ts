@@ -46,13 +46,13 @@ test('create subnode and move nexts', async () => {
 
   await procedure.createNode(startId, 'next');
 
-  let startNode = procedure.definition.nodes.find(node => node.id === startId);
+  let startNode = procedure.getNode(startId);
 
-  let newNodeId = startNode?.nexts?.[0].id;
+  let newNodeId = startNode?.nexts?.[0].id as NodeId;
 
   expect(newNodeId).not.toBe(nodeId);
 
-  let newNode = procedure.definition.nodes.find(node => node.id === newNodeId);
+  let newNode = procedure.getNode(newNodeId);
 
   expect(newNode?.nexts?.[0].id).toBe(nodeId);
 });
@@ -62,13 +62,13 @@ test('create node between two nodes', async () => {
 
   await procedure.createNode(startId, {type: 'node', id: nodeId});
 
-  let startNode = procedure.definition.nodes.find(node => node.id === startId);
+  let startNode = procedure.getNode(startId);
 
-  let newNodeId = startNode?.nexts?.[0].id;
+  let newNodeId = startNode?.nexts?.[0].id as NodeId;
 
   expect(newNodeId).not.toBe(nodeId);
 
-  let newNode = procedure.definition.nodes.find(node => node.id === newNodeId);
+  let newNode = procedure.getNode(newNodeId);
 
   expect(newNode?.nexts?.[0].id).toBe(nodeId);
 });
@@ -78,6 +78,12 @@ test('create node between node and fakeNext', () => {
 
   void expect(() =>
     procedure.createNode(startId, {type: 'node', id: 'fakeNode' as NodeId}),
+  ).rejects.toThrow(
+    `Not found node next by {\"type\":\"node\",\"id\":\"fakeNode\"}`,
+  );
+
+  void expect(() =>
+    procedure.createNode(nodeId, {type: 'node', id: 'fakeNode' as NodeId}),
   ).rejects.toThrow(
     `Not found node next by {\"type\":\"node\",\"id\":\"fakeNode\"}`,
   );

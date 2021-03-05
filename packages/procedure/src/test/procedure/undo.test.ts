@@ -31,6 +31,8 @@ test('undo action', async () => {
   await procedure.createLeaf(nodeId, 'done');
 
   procedure.undo();
+
+  // test branch
   procedure.undo();
 
   expect(procedure.definition.leaves.length).toBe(0);
@@ -38,6 +40,8 @@ test('undo action', async () => {
 
 test('redo action', async () => {
   procedure.redo();
+
+  // test branch
   procedure.redo();
 
   expect(procedure.definition.leaves.length).toBe(1);

@@ -7,9 +7,13 @@ export type ProcedureId = Nominal<string, 'procedure:id'>;
 
 export interface ProcedureMetadata {}
 
-export interface ProcedureDefinition {
+export interface ProcedureDefinition<
+  TProcedureMetadata extends ProcedureMetadata = ProcedureMetadata,
+  TNodeMetadata extends NodeMetadata = NodeMetadata,
+  TLeafMetadata extends LeafMetadata = LeafMetadata
+> {
   id: ProcedureId;
-  leaves: LeafMetadata[];
-  nodes: NodeMetadata[];
-  metadata?: ProcedureMetadata;
+  leaves: TLeafMetadata[];
+  nodes: TNodeMetadata[];
+  metadata?: TProcedureMetadata;
 }
