@@ -342,7 +342,7 @@ export class Procedure<
             return undefined;
           }
 
-          node.nexts = node.nexts?.filter(next => next.id === nodeId);
+          node.nexts = node.nexts?.filter(next => next.id !== nodeId);
 
           return node;
         }),

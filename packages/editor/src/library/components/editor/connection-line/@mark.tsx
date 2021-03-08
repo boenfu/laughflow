@@ -79,29 +79,26 @@ const Mark: FC<{
 
   const onClick = (): void => {
     if (editor.statefulNode) {
-      // editor.procedure.moveNode(editor.cuttingNode);
-      // editor.procedure.copyNode(editor.copyingNode, node, false);
-
       switch (editor.statefulNode.type) {
         case 'cutting':
-          editor.procedure.moveNode(
+          void editor.procedure.moveNode(
             editor.statefulNode.node,
             editor.statefulNode.prev,
             node,
             next,
           );
-          // editor.procedure.moveNode(editor.cuttingNode);
 
           break;
 
         case 'copying':
+          void editor.procedure.copyNode(editor.statefulNode.node, node, next);
           break;
 
         default:
           break;
       }
     } else {
-      editor.procedure.createNode(node, migrateChildren ? 'next' : next);
+      void editor.procedure.createNode(node, migrateChildren ? 'next' : next);
     }
   };
 
