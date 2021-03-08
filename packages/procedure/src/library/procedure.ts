@@ -3,13 +3,13 @@ import {
   LeafMetadata,
   LeafType,
   NextMetadata,
+  NextNodeMetadata,
   NodeId,
   NodeMetadata,
   ProcedureDefinition,
 } from '@magicflow/core';
 import {Patch, applyPatches, enableAllPlugins, produce} from 'immer';
-import {cloneDeep, isEqual} from 'lodash-es';
-// import {cloneDeep, compact, isEqual} from 'lodash-es';
+import {cloneDeep, compact, isEqual} from 'lodash-es';
 import {nanoid} from 'nanoid';
 
 enableAllPlugins();
@@ -40,8 +40,8 @@ export interface ProcedureListeners<
 export interface IProcedure<
   TProcedureDefinition extends ProcedureDefinition = ProcedureDefinition
 > {
-  listeners: ProcedureListeners<TProcedureDefinition>;
   definition: TProcedureDefinition;
+  listeners: ProcedureListeners<TProcedureDefinition>;
 
   createLeaf(
     node: NodeId,
@@ -52,10 +52,10 @@ export interface IProcedure<
 
   createNode(node: NodeId, next?: NextMetadata | 'next'): void;
   updateNode(node: NodeMetadata): void;
-  // deleteNode(node: NodeId, includeNextNodes?: boolean): void;
+  deleteNode(node: NodeId, prevNode: NodeId | undefined): void;
   moveNode(
     movingNode: NodeId,
-    originNode: NodeId | undefined,
+    prevNode: NodeId | undefined,
     targetNode: NodeId,
     targetNext: NextMetadata | undefined,
   ): void;
@@ -279,83 +279,84 @@ export class Procedure<
     });
   }
 
-  // async deleteNode(node: NodeId, includeNexts = false): Promise<void> {
-  //   return this.update(definition => {
-  //     let nodesMap: Map<NodeId, NodeMetadata> = new Map();
-  //     let nodeBeforeNodesMap: Map<NodeId, NodeId[]> = new Map();
+  async deleteNode(
+    nodeId: NodeId,
+    prevNodeId: NodeId | undefined,
+  ): Promise<void> {
+    return this.update(definition => {
+      let nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
 
-  //     for (let node of definition.nodes) {
-  //       nodesMap.set(node.id, node);
+      let node = nodesMap.get(nodeId);
 
-  //       for (let next of node.nexts || []) {
-  //         if (next.type !== 'node') {
-  //           continue;
-  //         }
+      if (!node) {
+        throw Error(`Not found node metadata by id '${nodeId}'`);
+      }
 
-  //         nodeBeforeNodesMap.set(next.id, [
-  //           ...(nodeBeforeNodesMap.get(next.id) || []),
-  //           node.id,
-  //         ]);
-  //       }
-  //     }
+      let prevNode = prevNodeId && nodesMap.get(prevNodeId);
 
-  //     if (!nodesMap.has(node)) {
-  //       throw Error(`Not found node metadata by id '${node}'`);
-  //     }
+      if (prevNodeId) {
+        if (!prevNode) {
+          throw Error(`Not found node metadata by id '${prevNodeId}'`);
+        }
 
-  //     let checkingNodes: NodeId[] = [node];
-  //     let pendingDeleteNodesSet: Set<NodeId> = new Set();
-  //     let pendingDeleteLeavesSet: Set<LeafId> = new Set();
+        if (!prevNode.nexts?.some(next => next.id === nodeId)) {
+          throw Error(
+            `Not found node '${nodeId}' at nexts of prevNode '${prevNodeId}'`,
+          );
+        }
+      }
 
-  //     while (checkingNodes.length) {
-  //       let node = checkingNodes.shift()!;
-  //       let beforeNodesLength = nodeBeforeNodesMap.get(node)?.length || 0;
+      let visitedNodesSet: Set<NodeId> = new Set();
 
-  //       if (beforeNodesLength > 1) {
-  //         throw Error(`'${node}' used multiple times`);
-  //       }
+      let checkingNodes = getTypeNextIds<NextNodeMetadata>(node, 'node');
 
-  //       let metadata = nodesMap.get(node);
+      while (checkingNodes.length) {
+        let checkingNodeId = checkingNodes.shift()!;
 
-  //       pendingDeleteNodesSet.add(node);
+        if (checkingNodeId === nodeId) {
+          throw Error(
+            `Delete node '${nodeId}' failed because delete path with cycle`,
+          );
+        }
 
-  //       if (!metadata || !includeNexts) {
-  //         continue;
-  //       }
+        let checkingNode = nodesMap.get(checkingNodeId)!;
 
-  //       for (let next of metadata.nexts || []) {
-  //         if (next.type === 'leaf') {
-  //           pendingDeleteLeavesSet.add(next.id);
-  //           continue;
-  //         }
+        if (!checkingNode) {
+          throw Error(`Not found node metadata by id '${checkingNodeId}'`);
+        }
 
-  //         pendingDeleteNodesSet.add(next.id);
-  //         checkingNodes.push(next.id);
-  //       }
-  //     }
+        if (visitedNodesSet.has(checkingNodeId)) {
+          continue;
+        }
 
-  //     definition.nodes = compact(
-  //       definition.nodes.map(node => {
-  //         if (pendingDeleteNodesSet.has(node.id)) {
-  //           return undefined;
-  //         }
+        visitedNodesSet.add(checkingNode.id);
 
-  //         node.nexts = node.nexts?.filter(next =>
-  //           next.type === 'node' ? !pendingDeleteNodesSet.has(next.id) : true,
-  //         );
+        checkingNodes.push(
+          ...getTypeNextIds<NextNodeMetadata>(checkingNode, 'node'),
+        );
+      }
 
-  //         return node;
-  //       }),
-  //     );
-  //     definition.leaves = definition.leaves.filter(
-  //       node => !pendingDeleteLeavesSet.has(node.id),
-  //     );
-  //   });
-  // }
+      definition.nodes = compact(
+        definition.nodes.map(node => {
+          if (node.id === nodeId) {
+            return undefined;
+          }
+
+          node.nexts = node.nexts?.filter(next => next.id === nodeId);
+
+          return node;
+        }),
+      );
+
+      if (prevNode && node.nexts?.length) {
+        prevNode.nexts!.push(...node.nexts);
+      }
+    });
+  }
 
   async moveNode(
     movingNodeId: NodeId,
-    originNodeId: NodeId | undefined,
+    prevNodeId: NodeId | undefined,
     targetNodeId: NodeId,
     targetNext: NextMetadata | undefined,
   ): Promise<void> {
@@ -367,7 +368,7 @@ export class Procedure<
       let nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
 
       let movingNode = nodesMap.get(movingNodeId);
-      let originNode = originNodeId && nodesMap.get(originNodeId);
+      let prevNode = prevNodeId && nodesMap.get(prevNodeId);
       let targetNode = nodesMap.get(targetNodeId);
 
       if (!movingNode) {
@@ -393,20 +394,20 @@ export class Procedure<
         pendingTransferMovingNodeNexts.push(next);
       }
 
-      if (originNode) {
-        originNode.nexts = originNode.nexts || [];
+      if (prevNode) {
+        prevNode.nexts = prevNode.nexts || [];
 
-        let movingNodeIndex = originNode.nexts.findIndex(
+        let movingNodeIndex = prevNode.nexts.findIndex(
           next => next.id === movingNodeId,
         );
 
         if (movingNodeIndex === -1) {
           throw Error(
-            `Not found movingNode '${movingNodeId}' at nexts of originNode '${originNodeId}'`,
+            `Not found movingNode '${movingNodeId}' at nexts of prevNode '${prevNodeId}'`,
           );
         }
 
-        originNode.nexts.splice(
+        prevNode.nexts.splice(
           movingNodeIndex,
           1,
           ...pendingTransferMovingNodeNexts,
@@ -561,4 +562,25 @@ export class Procedure<
 
 export function createId<TId>(): TId {
   return (nanoid(8) as unknown) as TId;
+}
+
+function getTypeNextIds<TNextMetadata extends NextMetadata>(
+  node: NodeMetadata,
+  type: TNextMetadata['type'],
+): TNextMetadata['id'][] {
+  if (!node.nexts?.length) {
+    return [];
+  }
+
+  let typeNextIds: TNextMetadata['id'][] = [];
+
+  for (let next of node.nexts) {
+    if (next.type !== type) {
+      continue;
+    }
+
+    typeNextIds.push(next.id);
+  }
+
+  return typeNextIds;
 }

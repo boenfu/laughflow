@@ -111,19 +111,19 @@ test('move node error params', () => {
   void expect(
     procedure.moveNode(node4Id, startId, node3Id, undefined),
   ).rejects.toThrow(
-    "Not found movingNode 'node4' at nexts of originNode 'start'",
+    "Not found movingNode 'node4' at nexts of prevNode 'start'",
   );
 
   void expect(
     procedure.moveNode(node4Id, startId, nodeId, undefined),
   ).rejects.toThrow(
-    "Not found movingNode 'node4' at nexts of originNode 'start'",
+    "Not found movingNode 'node4' at nexts of prevNode 'start'",
   );
 
   void expect(
     procedure.moveNode(node2Id, nodeId, node4Id, undefined),
   ).rejects.toThrow(
-    "Not found movingNode 'node2' at nexts of originNode 'node1'",
+    "Not found movingNode 'node2' at nexts of prevNode 'node1'",
   );
 
   void expect(
