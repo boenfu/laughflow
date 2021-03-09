@@ -1,0 +1,12 @@
+{
+  "name": "@magicflow/task",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "dependencies": {
+    "@magicflow/core": "*",
+    "@magicflow/procedure": "*",
+    "memorize-decorator": "^0.2.4",
+    "tslib": "^2.1.0"
+  }
+}

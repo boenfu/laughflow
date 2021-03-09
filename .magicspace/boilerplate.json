@@ -36,6 +36,28 @@
         ]
       },
       {
+        "name": "@magicflow/task",
+        "tsProjects": [
+          {
+            "name": "library",
+            "references": [
+              {
+                "package": "@magicflow/core",
+                "project": "library"
+              },
+              {
+                "package": "@magicflow/procedure",
+                "project": "library"
+              }
+            ]
+          },
+          {
+            "name": "test",
+            "references": ["library"]
+          }
+        ]
+      },
+      {
         "name": "@magicflow/editor",
         "tsProjects": [
           {

@@ -1,0 +1,15 @@
+{
+  "extends": "@mufan/code/tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "../../bld/library"
+  },
+  "references": [
+    {
+      "path": "../../../core/src/library"
+    },
+    {
+      "path": "../../../procedure/src/library"
+    }
+  ]
+}

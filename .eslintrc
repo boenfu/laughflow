@@ -23,6 +23,10 @@
       "extends": ["plugin:@mufan/override-dev"]
     },
     {
+      "files": ["packages/task/src/test/**/*.{ts,tsx}"],
+      "extends": ["plugin:@mufan/override-dev"]
+    },
+    {
       "files": ["packages/editor/src/test/**/*.{ts,tsx}"],
       "extends": ["plugin:@mufan/override-dev"]
     },

@@ -13,6 +13,12 @@
       "path": "packages/procedure/src/test"
     },
     {
+      "path": "packages/task/src/library"
+    },
+    {
+      "path": "packages/task/src/test"
+    },
+    {
       "path": "packages/editor/src/library"
     },
     {
