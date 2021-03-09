@@ -1,7 +1,7 @@
 import {
   LeafId,
-  NextNodeMetadata,
   NodeId,
+  NodeNextNodeMetadata,
   ProcedureDefinition,
   ProcedureId,
 } from '@magicflow/core';
@@ -74,7 +74,7 @@ test('copy node', async () => {
 test('copy node to between two nodes', async () => {
   let clonedDefinition = cloneDeep(definition);
   let node3Id = 'node3' as NodeId;
-  let node3Next: NextNodeMetadata = {type: 'node', id: node3Id};
+  let node3Next: NodeNextNodeMetadata = {type: 'node', id: node3Id};
 
   clonedDefinition.nodes.push({id: node3Id});
   clonedDefinition.nodes.find(node => node.id === node2Id)!.nexts = [node3Next];

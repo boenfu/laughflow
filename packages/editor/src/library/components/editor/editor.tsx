@@ -1,3 +1,4 @@
+import {LeafId, LeafMetadata} from '@magicflow/core';
 import {useCreation, useEventListener, useUpdate} from 'ahooks';
 import React, {FC, Fragment, ReactNode, useEffect} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
@@ -10,6 +11,13 @@ import {ConnectionLine, LINE_HEIGHT_DEFAULT} from './connection-line';
 import {EditorProps} from './editor.doc';
 import {Leaf} from './leaf';
 import {LinkNode, Node} from './node';
+
+const PlaceholderLeafId = 'placeholder' as LeafId;
+
+const PlaceholderLeaf: LeafMetadata = {
+  type: 'done',
+  id: PlaceholderLeafId,
+};
 
 declare module '@magicflow/core' {
   interface NodeMetadata {
@@ -57,6 +65,10 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
     links,
   }: ProcedureTreeNode): ReactNode {
     let nodeId = metadata.id;
+
+    if (!leaves.length && !nodes.length) {
+      leaves = [PlaceholderLeaf];
+    }
 
     return (
       <Fragment>

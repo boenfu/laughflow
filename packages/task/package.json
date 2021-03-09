@@ -3,10 +3,14 @@
   "version": "0.0.0",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "scripts": {
+    "test": "jest"
+  },
   "dependencies": {
     "@magicflow/core": "*",
     "@magicflow/procedure": "*",
     "memorize-decorator": "^0.2.4",
+    "tslang": "^0.1.23",
     "tslib": "^2.1.0"
   }
 }

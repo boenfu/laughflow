@@ -2,10 +2,10 @@ import {
   LeafId,
   LeafMetadata,
   LeafType,
-  NextMetadata,
-  NextNodeMetadata,
   NodeId,
   NodeMetadata,
+  NodeNextMetadata,
+  NodeNextNodeMetadata,
   ProcedureDefinition,
 } from '@magicflow/core';
 import {Patch, applyPatches, enableAllPlugins, produce} from 'immer';
@@ -50,19 +50,19 @@ export interface IProcedure<
   ): void;
   deleteLeaf(leafId: LeafId): void;
 
-  createNode(node: NodeId, next?: NextMetadata | 'next'): void;
+  createNode(node: NodeId, next?: NodeNextMetadata | 'next'): void;
   updateNode(node: NodeMetadata): void;
   deleteNode(node: NodeId, prevNode: NodeId | undefined): void;
   moveNode(
     movingNode: NodeId,
     prevNode: NodeId | undefined,
     targetNode: NodeId,
-    targetNext: NextMetadata | undefined,
+    targetNext: NodeNextMetadata | undefined,
   ): void;
   copyNode(
     copyingNode: NodeId,
     targetNode: NodeId,
-    targetNext: NextMetadata | undefined,
+    targetNext: NodeNextMetadata | undefined,
   ): void;
 
   undo(): void;
@@ -188,7 +188,7 @@ export class Procedure<
    */
   async createNode(
     node: NodeId,
-    target: NextMetadata | 'next' | undefined = undefined,
+    target: NodeNextMetadata | 'next' | undefined = undefined,
     {
       id: _id,
       nexts = [],
@@ -235,7 +235,7 @@ export class Procedure<
     });
   }
 
-  async connectNode(node: NodeId, next: NextMetadata): Promise<void> {
+  async connectNode(node: NodeId, next: NodeNextMetadata): Promise<void> {
     return this.update(definition => {
       let nodeMetadata = definition.nodes.find(({id}) => id === node);
 
@@ -249,7 +249,7 @@ export class Procedure<
     });
   }
 
-  async disconnectNode(node: NodeId, next: NextMetadata): Promise<void> {
+  async disconnectNode(node: NodeId, next: NodeNextMetadata): Promise<void> {
     return this.update(definition => {
       let nodeMetadata = definition.nodes.find(({id}) => id === node);
 
@@ -308,7 +308,7 @@ export class Procedure<
 
       let visitedNodesSet: Set<NodeId> = new Set();
 
-      let checkingNodes = getTypeNextIds<NextNodeMetadata>(node, 'node');
+      let checkingNodes = getTypeNextIds<NodeNextNodeMetadata>(node, 'node');
 
       while (checkingNodes.length) {
         let checkingNodeId = checkingNodes.shift()!;
@@ -332,7 +332,7 @@ export class Procedure<
         visitedNodesSet.add(checkingNode.id);
 
         checkingNodes.push(
-          ...getTypeNextIds<NextNodeMetadata>(checkingNode, 'node'),
+          ...getTypeNextIds<NodeNextNodeMetadata>(checkingNode, 'node'),
         );
       }
 
@@ -358,7 +358,7 @@ export class Procedure<
     movingNodeId: NodeId,
     prevNodeId: NodeId | undefined,
     targetNodeId: NodeId,
-    targetNext: NextMetadata | undefined,
+    targetNext: NodeNextMetadata | undefined,
   ): Promise<void> {
     if (movingNodeId === targetNodeId) {
       return;
@@ -441,7 +441,7 @@ export class Procedure<
   async copyNode(
     copyingNodeId: NodeId,
     targetNodeId: NodeId,
-    targetNext: NextMetadata | undefined,
+    targetNext: NodeNextMetadata | undefined,
   ): Promise<void> {
     return this.update(definition => {
       let nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
@@ -564,7 +564,7 @@ export function createId<TId>(): TId {
   return (nanoid(8) as unknown) as TId;
 }
 
-function getTypeNextIds<TNextMetadata extends NextMetadata>(
+function getTypeNextIds<TNextMetadata extends NodeNextMetadata>(
   node: NodeMetadata,
   type: TNextMetadata['type'],
 ): TNextMetadata['id'][] {

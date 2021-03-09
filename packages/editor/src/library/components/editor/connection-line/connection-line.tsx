@@ -1,4 +1,4 @@
-import {LeafId, NextMetadata, NodeId} from '@magicflow/core';
+import {LeafId, NodeId, NodeNextMetadata} from '@magicflow/core';
 import {Bezier, BezierStroke} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
@@ -22,7 +22,7 @@ const Wrapper = styled(Bezier)`
 
 export interface ConnectionLineProps {
   node: NodeId;
-  next: NextMetadata;
+  next: NodeNextMetadata;
   /**
    * 边际的两个元素会绘制向下的圆弧
    */

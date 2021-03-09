@@ -148,6 +148,17 @@ export const Node: FC<NodeProps> = ({
   const onNodeChange = (node: NodeMetadata): void =>
     void editor.procedure.updateNode(node);
 
+  const onContainerClick = (): void => {
+    if (!statefulNode || statefulNode.type !== 'connecting') {
+      return;
+    }
+
+    void editor.procedure.connectNode(statefulNode.node, {
+      type: 'node',
+      id: node.id,
+    });
+  };
+
   let statefulNode = editor.statefulNode;
 
   return (
@@ -160,6 +171,7 @@ export const Node: FC<NodeProps> = ({
             ? statefulNode.type
             : undefined,
         ])}
+        onClick={onContainerClick}
       >
         <Tools className="tools" prev={prev} node={node} />
         <Header>

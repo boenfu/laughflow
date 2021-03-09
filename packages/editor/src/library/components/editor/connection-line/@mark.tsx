@@ -1,4 +1,4 @@
-import {NextMetadata, NodeId} from '@magicflow/core';
+import {NodeId, NodeNextMetadata} from '@magicflow/core';
 import {Copy, PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
 import {Bezier as _Bezier, BezierPoint, Mark} from 'rc-bezier';
 import React, {
@@ -69,7 +69,7 @@ const Paste = styled(Copy)`
 const Mark: FC<{
   active: boolean;
   node: NodeId;
-  next: NextMetadata;
+  next: NodeNextMetadata;
   position: BezierPoint | undefined;
   onMouseEnter: MouseEventHandler;
   onMouseLeave: MouseEventHandler;
@@ -78,6 +78,9 @@ const Mark: FC<{
   const migrateChildren = position && position.y < LINE_HEIGHT_DEFAULT / 2;
 
   const onClick = (): void => {
+    let targetNext =
+      next.type !== 'leaf' || next.id !== 'placeholder' ? next : undefined;
+
     if (editor.statefulNode) {
       switch (editor.statefulNode.type) {
         case 'cutting':
@@ -85,20 +88,27 @@ const Mark: FC<{
             editor.statefulNode.node,
             editor.statefulNode.prev,
             node,
-            next,
+            targetNext,
           );
 
           break;
 
         case 'copying':
-          void editor.procedure.copyNode(editor.statefulNode.node, node, next);
+          void editor.procedure.copyNode(
+            editor.statefulNode.node,
+            node,
+            targetNext,
+          );
           break;
 
         default:
           break;
       }
     } else {
-      void editor.procedure.createNode(node, migrateChildren ? 'next' : next);
+      void editor.procedure.createNode(
+        node,
+        migrateChildren ? 'next' : targetNext,
+      );
     }
   };
 
@@ -126,7 +136,7 @@ const Mark: FC<{
   );
 };
 
-export function useMark(node: NodeId, next: NextMetadata): [Mark] {
+export function useMark(node: NodeId, next: NodeNextMetadata): [Mark] {
   const [position, setPosition] = useState<BezierPoint | undefined>(undefined);
 
   const [active, dispatch] = useReducer(
