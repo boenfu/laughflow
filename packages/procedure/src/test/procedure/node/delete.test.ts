@@ -19,6 +19,7 @@ let leaf = 'leaf' as LeafId;
 let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
+  joints: [],
   leaves: [
     {
       type: 'done',
@@ -82,7 +83,7 @@ test('delete node', async () => {
 test('delete node with prevNode', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.deleteNode(nodeId, startId);
+  await procedure.deleteNode(nodeId, {type: 'node', id: startId});
 
   expect(procedure.definition.nodes.length).toBe(4);
   expect(procedure.definition.nodes[0].nexts?.length).toBe(2);
@@ -91,20 +92,20 @@ test('delete node with prevNode', async () => {
 test('delete node error params', async () => {
   let procedure = new Procedure(definition);
 
-  void expect(procedure.deleteNode(nodeId, nodeId)).rejects.toThrow(
-    "Not found node 'node1' at nexts of prevNode 'node1'",
-  );
-
-  void expect(procedure.deleteNode(nodeId, node3Id)).rejects.toThrow(
-    "Not found node 'node1' at nexts of prevNode 'node3'",
-  );
+  void expect(
+    procedure.deleteNode(nodeId, {type: 'node', id: nodeId}),
+  ).rejects.toThrow("Not found node 'node1' at nexts of prevNode 'node1'");
 
   void expect(
-    procedure.deleteNode(nodeId, 'fakeNode' as NodeId),
+    procedure.deleteNode(nodeId, {type: 'node', id: node3Id}),
+  ).rejects.toThrow("Not found node 'node1' at nexts of prevNode 'node3'");
+
+  void expect(
+    procedure.deleteNode(nodeId, {type: 'node', id: 'fakeNode' as NodeId}),
   ).rejects.toThrow("Not found node metadata by id 'fakeNode'");
 
   void expect(
-    procedure.deleteNode('fakeNode' as NodeId, startId),
+    procedure.deleteNode('fakeNode' as NodeId, {type: 'node', id: startId}),
   ).rejects.toThrow("Not found node metadata by id 'fakeNode'");
 
   let clonedDefinition = cloneDeep(definition);
@@ -113,7 +114,9 @@ test('delete node error params', async () => {
   ];
   let procedureWithCycle = new Procedure(clonedDefinition);
 
-  void expect(procedureWithCycle.deleteNode(nodeId, startId)).rejects.toThrow(
+  void expect(
+    procedureWithCycle.deleteNode(nodeId, {type: 'node', id: startId}),
+  ).rejects.toThrow(
     "Delete node 'node1' failed because delete path with cycle",
   );
 
@@ -124,7 +127,7 @@ test('delete node error params', async () => {
   let procedureWithFakeNext = new Procedure(clonedDefinition2);
 
   void expect(
-    procedureWithFakeNext.deleteNode(nodeId, startId),
+    procedureWithFakeNext.deleteNode(nodeId, {type: 'node', id: startId}),
   ).rejects.toThrow("Not found node metadata by id 'fakeNode'");
 
   let clonedDefinition3 = cloneDeep(definition);
@@ -139,7 +142,13 @@ test('delete node error params', async () => {
 
   let procedureWithVisited = new Procedure(clonedDefinition3);
 
-  void expect(procedureWithVisited.deleteNode(nodeId, startId)).resolves;
-  void expect(procedureWithVisited.deleteNode(node4Id, node3Id)).resolves;
-  void expect(procedureWithVisited.deleteNode(node3Id, node2Id)).resolves;
+  void expect(
+    procedureWithVisited.deleteNode(nodeId, {type: 'node', id: startId}),
+  ).resolves;
+  void expect(
+    procedureWithVisited.deleteNode(node4Id, {type: 'node', id: node3Id}),
+  ).resolves;
+  void expect(
+    procedureWithVisited.deleteNode(node3Id, {type: 'node', id: node2Id}),
+  ).resolves;
 });

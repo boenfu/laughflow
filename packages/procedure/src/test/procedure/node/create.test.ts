@@ -9,6 +9,7 @@ let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
   leaves: [],
+  joints: [],
   nodes: [
     {
       id: startId,

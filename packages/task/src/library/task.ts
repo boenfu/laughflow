@@ -65,7 +65,7 @@ export class Task {
             type: 'node',
             id: node.id,
           });
-        } else {
+        } else if (nextMetadata.type === 'leaf') {
           let leaf = buildTaskLeaf(nextMetadata.id);
 
           taskLeaves.push(leaf);
@@ -74,6 +74,8 @@ export class Task {
             type: 'leaf',
             id: leaf.id,
           });
+        } else {
+          // TODO (boen): joint
         }
       }
     }

@@ -101,6 +101,13 @@ const Mark: FC<{
           );
           break;
 
+        case 'join':
+          void editor.procedure.createJoint(
+            editor.statefulNode.node,
+            migrateChildren ? undefined : targetNext,
+          );
+          break;
+
         default:
           break;
       }
@@ -119,9 +126,17 @@ const Mark: FC<{
   let Icon = <PlusCircleSolid />;
   let title = '插入节点';
 
-  if (editor.statefulNode && editor.statefulNode.type !== 'connecting') {
-    Icon = <Paste />;
-    title = '粘贴';
+  if (editor.statefulNode) {
+    if (
+      editor.statefulNode.type === 'copying' ||
+      editor.statefulNode.type === 'cutting'
+    ) {
+      Icon = <Paste />;
+      title = '粘贴';
+    } else {
+      Icon = <Paste />;
+      title = '创建';
+    }
   }
 
   return (

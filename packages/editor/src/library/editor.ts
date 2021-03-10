@@ -1,9 +1,13 @@
 import {
+  JointId,
+  JointMetadata,
   LeafId,
   LeafMetadata,
   LeafType,
   NodeId,
   NodeMetadata,
+  NodeNextJointMetadata,
+  NodeNextNodeMetadata,
   ProcedureDefinition,
 } from '@magicflow/core';
 import {Procedure} from '@magicflow/procedure';
@@ -25,11 +29,20 @@ import {
 } from './plugin';
 
 export interface ProcedureTreeNode {
-  prev: NodeId | undefined;
-  metadata: NodeMetadata;
+  prev: NodeNextNodeMetadata | NodeNextJointMetadata | undefined;
+  value:
+    | {
+        type: 'node';
+        metadata: NodeMetadata;
+      }
+    | {
+        type: 'joint';
+        metadata: JointMetadata;
+      };
   nodes: ProcedureTreeNode[];
   leaves: LeafMetadata[];
   links: NodeMetadata[];
+  joints: JointMetadata[];
 }
 
 export interface LeafRenderDescriptor {
@@ -46,7 +59,7 @@ type ProcedureEventType = 'update';
 interface StatefulNode {
   prev: NodeId | undefined;
   node: NodeId;
-  type: 'cutting' | 'copying' | 'connecting';
+  type: 'cutting' | 'copying' | 'connecting' | 'join';
 }
 
 export class Editor extends Eventemitter<ProcedureEventType> {
@@ -198,6 +211,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
   buildTreeNode(definition: ProcedureDefinition): void {
     let nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
     let leavesMap = new Map(definition.leaves.map(leaf => [leaf.id, leaf]));
+    let jointsMap = new Map(definition.joints.map(joint => [joint.id, joint]));
 
     this.nodesMap = nodesMap;
     this.leavesMap = leavesMap;
@@ -218,9 +232,17 @@ export class Editor extends Eventemitter<ProcedureEventType> {
       let nodes: ProcedureTreeNode[] = [];
       let leaves: LeafMetadata[] = [];
       let links: NodeMetadata[] = [];
+      let joints: JointMetadata[] = [];
 
       for (let next of metadata.nexts || []) {
-        if (next.type === 'leaf') {
+        if (next.type === 'joint') {
+          if (!jointsMap.has(next.id)) {
+            console.warn(`Not found joint metadata by id '${next.id}'`);
+            continue;
+          }
+
+          joints.push(jointsMap.get(next.id)!);
+        } else if (next.type === 'leaf') {
           if (!leavesMap.has(next.id)) {
             console.warn(`Not found leaf metadata by id '${next.id}'`);
             continue;
@@ -251,6 +273,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
         nodes,
         leaves,
         links,
+        joints,
       };
     }
   }

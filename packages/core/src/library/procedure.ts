@@ -1,5 +1,6 @@
 import {Nominal} from 'tslang';
 
+import {JointMetadata} from './joint';
 import {LeafMetadata} from './leaf';
 import {NodeMetadata} from './node';
 
@@ -10,10 +11,12 @@ export interface ProcedureMetadata {}
 export interface ProcedureDefinition<
   TProcedureMetadata extends ProcedureMetadata = ProcedureMetadata,
   TNodeMetadata extends NodeMetadata = NodeMetadata,
-  TLeafMetadata extends LeafMetadata = LeafMetadata
+  TLeafMetadata extends LeafMetadata = LeafMetadata,
+  TJointMetadata extends JointMetadata = JointMetadata
 > {
   id: ProcedureId;
-  leaves: TLeafMetadata[];
   nodes: TNodeMetadata[];
+  joints: TJointMetadata[];
+  leaves: TLeafMetadata[];
   metadata?: TProcedureMetadata;
 }

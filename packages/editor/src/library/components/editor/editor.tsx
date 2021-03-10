@@ -9,6 +9,7 @@ import {THEME_DEFAULT} from '../theme';
 
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from './connection-line';
 import {EditorProps} from './editor.doc';
+import {Joint} from './joint';
 import {Leaf} from './leaf';
 import {LinkNode, Node} from './node';
 
@@ -63,6 +64,7 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
     leaves,
     nodes,
     links,
+    joints,
   }: ProcedureTreeNode): ReactNode {
     let nodeId = metadata.id;
 
@@ -82,11 +84,28 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
                   left={leaves[index - 1]?.id}
                   right={
                     leaves[index + 1]?.id ||
+                    joints[0]?.id ||
                     nodes[0]?.metadata.id ||
                     links[0]?.id
                   }
                 />
                 <Leaf leaf={leaf} />
+              </Fragment>
+            ))}
+
+            {joints.map((joint, index) => (
+              <Fragment key={`joint:${nodeId}-${joint.id}`}>
+                <ConnectionLine
+                  node={nodeId}
+                  next={{type: 'joint', id: joint.id}}
+                  left={joints[index - 1]?.id || leaves[leaves.length - 1]?.id}
+                  right={
+                    joints[index + 1]?.id ||
+                    nodes[0]?.metadata.id ||
+                    links[0]?.id
+                  }
+                />
+                <Joint prev={nodeId} joint={joint} />
               </Fragment>
             ))}
 
@@ -97,6 +116,7 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
                   next={{type: 'node', id: treeNode.metadata.id}}
                   left={
                     nodes[index - 1]?.metadata.id ||
+                    joints[joints.length - 1]?.id ||
                     leaves[leaves.length - 1]?.id
                   }
                   right={nodes[index + 1]?.metadata.id || links[0]?.id}

@@ -1,4 +1,4 @@
-import {LeafId, NodeId, NodeNextMetadata} from '@magicflow/core';
+import {JointId, LeafId, NodeId, NodeNextMetadata} from '@magicflow/core';
 import {Bezier, BezierStroke} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
@@ -26,8 +26,8 @@ export interface ConnectionLineProps {
   /**
    * 边际的两个元素会绘制向下的圆弧
    */
-  left: NodeId | LeafId | undefined;
-  right: NodeId | LeafId | undefined;
+  left: NodeId | LeafId | JointId | undefined;
+  right: NodeId | LeafId | JointId | undefined;
 }
 
 export const ConnectionLine: FC<ConnectionLineProps> = ({

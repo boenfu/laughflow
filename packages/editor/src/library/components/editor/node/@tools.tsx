@@ -93,7 +93,13 @@ export const Tools: FC<ToolsProps> = ({className, prev, node}) => {
   };
 
   const onDeleteNode = (): void => {
-    void editor.procedure.deleteNode(node.id, prev);
+    void editor.procedure.deleteNode(
+      node.id,
+      prev && {
+        type: 'node',
+        id: prev,
+      },
+    );
   };
 
   return (
