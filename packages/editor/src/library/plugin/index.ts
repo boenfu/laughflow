@@ -1,9 +1,9 @@
 import {
   LeafMetadata,
   LeafType,
-  NodeId,
   NodeMetadata,
   ProcedureDefinition,
+  TrunkRef,
 } from '@magicflow/core';
 import {ComponentType} from 'react';
 import {Nominal} from 'tslang';
@@ -21,7 +21,7 @@ export type PluginLeafEventType = 'create' | 'delete';
 
 export interface PluginLeafEvent extends IPluginEvent {
   type: PluginLeafEventType;
-  node: NodeId;
+  trunk: TrunkRef['id'];
   metadata: LeafMetadata;
 }
 

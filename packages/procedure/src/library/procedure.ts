@@ -6,11 +6,10 @@ import {
   LeafType,
   NodeId,
   NodeMetadata,
-  NodeNextJointMetadata,
-  NodeNextLeafMetadata,
-  NodeNextMetadata,
-  NodeNextNodeMetadata,
+  NodeRef,
   ProcedureDefinition,
+  Ref,
+  TrunkRef,
 } from '@magicflow/core';
 import {Patch, applyPatches, enableAllPlugins, produce} from 'immer';
 import {cloneDeep, compact, isEqual} from 'lodash-es';
@@ -29,15 +28,19 @@ export interface ProcedureListeners<
   afterDefinitionChange?(definition: TProcedureDefinition): void;
 
   beforeLeafCreate?(
-    definition: TProcedureDefinition,
-    node: TProcedureDefinition['nodes'][number],
     leaf: TProcedureDefinition['leaves'][number],
+    trunk:
+      | TProcedureDefinition['nodes'][number]
+      | TProcedureDefinition['joints'][number],
+    definition: TProcedureDefinition,
   ): ProcedureBeforeListenerReturnType;
 
   beforeLeafDelete?(
-    definition: TProcedureDefinition,
-    node: TProcedureDefinition['nodes'][number],
     leaf: TProcedureDefinition['leaves'][number],
+    node:
+      | TProcedureDefinition['nodes'][number]
+      | TProcedureDefinition['joints'][number],
+    definition: TProcedureDefinition,
   ): ProcedureBeforeListenerReturnType;
 }
 
@@ -48,35 +51,31 @@ export interface IProcedure<
   listeners: ProcedureListeners<TProcedureDefinition>;
 
   createLeaf(
-    node: NodeId,
+    trunk: TrunkRef,
     type: LeafType,
     partial?: Partial<LeafMetadata>,
   ): void;
+  updateLeaf(leaf: LeafMetadata): void;
   deleteLeaf(leafId: LeafId): void;
 
-  createJoint(
-    node: NodeId,
-    next?: NodeNextNodeMetadata | NodeNextLeafMetadata,
-  ): void;
-  connectJoint(node: NodeId, joint: JointId): void;
+  createJoint(trunk: TrunkRef, otherTrunk: TrunkRef): void;
   deleteJoint(joint: JointId): void;
 
-  createNode(node: NodeId, next?: NodeNextMetadata | 'next'): void;
+  createNode(trunk: TrunkRef, next: Ref | 'next' | undefined): void;
+  connectNode(trunk: TrunkRef, node: NodeRef): void;
+  disconnectNode(trunk: TrunkRef, node: NodeRef): void;
   updateNode(node: NodeMetadata): void;
-  deleteNode(
-    node: NodeId,
-    prev: NodeNextNodeMetadata | NodeNextJointMetadata | undefined,
-  ): void;
+  deleteNode(node: NodeId, prev: TrunkRef | undefined): void;
   moveNode(
     movingNode: NodeId,
-    prevNode: NodeId | undefined,
-    targetNode: NodeId,
-    targetNext: NodeNextMetadata | undefined,
+    prev: TrunkRef | undefined,
+    target: TrunkRef,
+    targetNext: Ref | undefined,
   ): void;
   copyNode(
     copyingNode: NodeId,
-    targetNode: NodeId,
-    targetNext: NodeNextMetadata | undefined,
+    target: TrunkRef,
+    targetNext: Ref | undefined,
   ): void;
 
   undo(): void;
@@ -119,17 +118,19 @@ export class Procedure<
     return this.definition.leaves.find(leaf => leaf.id === leafId);
   }
 
-  getJoint(jointId: JointId): JointMetadata | undefined {
+  getJoint(
+    jointId: JointId,
+  ): TProcedureDefinition['joints'][number] | undefined {
     return this.definition.joints.find(joint => joint.id === jointId);
   }
 
   async createLeaf(
-    node: NodeId,
+    trunk: TrunkRef,
     type: LeafType,
     partial: Partial<TProcedureDefinition['leaves'][number]> = {},
   ): Promise<void> {
     return this.update(async definition => {
-      let nodeMetadata = requireNode(definition, node);
+      let trunkMetadata = requireTrunk(definition, trunk);
 
       let id = createId<LeafId>();
       let metadata = {
@@ -140,18 +141,32 @@ export class Procedure<
 
       if (
         (await this.listeners.beforeLeafCreate?.(
-          definition,
-          nodeMetadata,
           metadata,
+          trunkMetadata,
+          definition,
         )) === 'handled'
       ) {
         return;
       }
 
-      nodeMetadata.nexts = nodeMetadata.nexts || [];
+      trunkMetadata.nexts = trunkMetadata.nexts || [];
+      trunkMetadata.nexts.push({type: 'leaf', id});
 
-      nodeMetadata.nexts.push({type: 'leaf', id});
       definition.leaves.push(metadata);
+    });
+  }
+
+  async updateLeaf(
+    metadata: TProcedureDefinition['leaves'][number],
+  ): Promise<void> {
+    return this.update(definition => {
+      let leafIndex = definition.leaves.findIndex(({id}) => id === metadata.id);
+
+      if (leafIndex === -1) {
+        throw Error(`Not found leaf metadata by id '${metadata.id}'`);
+      }
+
+      definition.leaves.splice(leafIndex, 1, metadata);
     });
   }
 
@@ -163,11 +178,15 @@ export class Procedure<
         throw Error(`Not found leaf metadata by leaf '${leafId}'`);
       }
 
-      let nodeMetadata = definition.nodes.find(({nexts}) =>
-        nexts?.some(({type, id}) => type === 'leaf' && id === leafId),
-      );
+      let trunkMetadata =
+        definition.nodes.find(({nexts}) =>
+          nexts?.some(({type, id}) => type === 'leaf' && id === leafId),
+        ) ||
+        definition.joints.find(({nexts}) =>
+          nexts?.some(({type, id}) => type === 'leaf' && id === leafId),
+        );
 
-      if (!nodeMetadata) {
+      if (!trunkMetadata) {
         definition.leaves.splice(leafIndex, 1);
         return;
       }
@@ -176,70 +195,38 @@ export class Procedure<
 
       if (
         (await this.listeners.beforeLeafDelete?.(
-          definition,
-          nodeMetadata,
           leaf,
+          trunkMetadata,
+          definition,
         )) === 'handled'
       ) {
         return;
       }
 
       definition.leaves.splice(leafIndex, 1);
-      nodeMetadata.nexts = nodeMetadata.nexts?.filter(
+
+      trunkMetadata.nexts = trunkMetadata.nexts?.filter(
         ({type, id}) => type !== 'leaf' || id !== leafId,
       );
     });
   }
 
-  async createJoint(nodeId: NodeId, next?: NodeNextMetadata): Promise<void> {
+  async createJoint(trunk: TrunkRef, otherTrunk: TrunkRef): Promise<void> {
     return this.update(async definition => {
-      let nodeMetadata = requireNode(definition, nodeId);
+      let trunkMetadata = requireTrunk(definition, trunk);
+      let otherTrunkMetadata = requireTrunk(definition, otherTrunk);
+
+      // TODO (boen): 检查两个节点是否前后，是的话就无法添加
 
       let id = createId<JointId>();
 
-      nodeMetadata.nexts = nodeMetadata.nexts || [];
+      trunkMetadata.nexts = trunkMetadata.nexts || [];
+      otherTrunkMetadata.nexts = otherTrunkMetadata.nexts || [];
 
-      if (!next) {
-        nodeMetadata.nexts.push({type: 'joint', id});
-        definition.joints.push({
-          id,
-          master: nodeId,
-        });
-      } else {
-        let nextIndex = nodeMetadata.nexts.findIndex(item =>
-          isEqual(item, next),
-        );
+      trunkMetadata.nexts.push({type: 'joint', id});
+      otherTrunkMetadata.nexts.push({type: 'joint', id});
 
-        if (nextIndex === -1) {
-          throw Error(
-            `Not found next metadata ${JSON.stringify(
-              next,
-            )} at node '${nodeId}'`,
-          );
-        }
-
-        nodeMetadata.nexts.splice(nextIndex, 1, {type: 'joint', id});
-
-        definition.joints.push({
-          id,
-          master: nodeId,
-          nexts: [next],
-        });
-      }
-    });
-  }
-
-  async connectJoint(node: NodeId, jointId: JointId): Promise<void> {
-    return this.update(async definition => {
-      let nodeMetadata = requireNode(definition, node);
-
-      if (!definition.joints.find(joint => joint.id === jointId)) {
-        throw Error(`Not found joint metadata by id '${jointId}'`);
-      }
-
-      nodeMetadata.nexts = nodeMetadata.nexts || [];
-
-      nodeMetadata.nexts.push({type: 'joint', id: jointId});
+      definition.joints.push({id});
     });
   }
 
@@ -255,16 +242,27 @@ export class Procedure<
 
       let [jointMetadata] = definition.joints.splice(jointMetadataIndex, 1);
 
-      if (jointMetadata.nexts?.length) {
-        let masterNodeMetadata = requireNode(definition, jointMetadata.master);
-        masterNodeMetadata.nexts!.push(...jointMetadata.nexts);
-      }
-
       definition.nodes = definition.nodes.map(node => {
         node.nexts =
           node.nexts && node.nexts.filter(next => next.id !== jointId);
         return node;
       });
+
+      if (!jointMetadata.nexts?.length) {
+        return;
+      }
+
+      let leavesSet = new Set<LeafId>(
+        compact(
+          jointMetadata.nexts.map(next =>
+            next.type === 'leaf' ? next.id : undefined,
+          ),
+        ),
+      );
+
+      definition.leaves = definition.leaves.filter(
+        leaf => !leavesSet.has(leaf.id),
+      );
     });
   }
 
@@ -278,8 +276,8 @@ export class Procedure<
    * @param metadata
    */
   async createNode(
-    node: NodeId,
-    target: NodeNextMetadata | 'next' | undefined = undefined,
+    trunk: TrunkRef,
+    target: Ref | 'next' | undefined = undefined,
     {
       id: _id,
       nexts = [],
@@ -287,14 +285,14 @@ export class Procedure<
     }: Partial<TProcedureDefinition['nodes'][number]> = {},
   ): Promise<void> {
     return this.update(definition => {
-      let nodeMetadata = requireNode(definition, node);
+      let trunkMetadata = requireTrunk(definition, trunk);
 
       let id = createId<NodeId>();
 
       let newNodeMetadata: NodeMetadata = {...partial, id, nexts};
 
       if (typeof target === 'object') {
-        let nextMetadataIndex = nodeMetadata.nexts?.findIndex(item =>
+        let nextMetadataIndex = trunkMetadata.nexts?.findIndex(item =>
           isEqual(item, target),
         );
 
@@ -302,45 +300,47 @@ export class Procedure<
           throw Error(`Not found node next by ${JSON.stringify(target)}`);
         }
 
-        newNodeMetadata.nexts!.push(nodeMetadata.nexts![nextMetadataIndex]);
-        nodeMetadata.nexts!.splice(nextMetadataIndex, 1, {type: 'node', id});
+        newNodeMetadata.nexts!.push(trunkMetadata.nexts![nextMetadataIndex]);
+        trunkMetadata.nexts!.splice(nextMetadataIndex, 1, {type: 'node', id});
       } else {
         if (
           target === 'next' &&
-          nodeMetadata.nexts &&
-          nodeMetadata.nexts.length
+          trunkMetadata.nexts &&
+          trunkMetadata.nexts.length
         ) {
-          newNodeMetadata.nexts!.push(...nodeMetadata.nexts);
-          nodeMetadata.nexts = [];
+          newNodeMetadata.nexts!.push(...trunkMetadata.nexts);
+          trunkMetadata.nexts = [];
         }
 
-        nodeMetadata.nexts = nodeMetadata.nexts || [];
-        nodeMetadata.nexts.push({type: 'node', id});
+        trunkMetadata.nexts = trunkMetadata.nexts || [];
+        trunkMetadata.nexts.push({type: 'node', id});
       }
 
       definition.nodes.push(newNodeMetadata);
     });
   }
 
-  async connectNode(node: NodeId, next: NodeNextMetadata): Promise<void> {
+  async connectNode(trunk: TrunkRef, node: NodeRef): Promise<void> {
     return this.update(definition => {
-      let nodeMetadata = requireNode(definition, node);
+      let trunkMetadata = requireTrunk(definition, trunk);
 
-      nodeMetadata.nexts = nodeMetadata.nexts || [];
+      trunkMetadata.nexts = trunkMetadata.nexts || [];
 
-      nodeMetadata.nexts.push(next);
+      trunkMetadata.nexts.push(node);
     });
   }
 
-  async disconnectNode(node: NodeId, next: NodeNextMetadata): Promise<void> {
+  async disconnectNode(trunk: TrunkRef, node: NodeRef): Promise<void> {
     return this.update(definition => {
-      let nodeMetadata = requireNode(definition, node);
+      let trunkMetadata = requireTrunk(definition, trunk);
 
-      if (!nodeMetadata.nexts?.length) {
+      if (!trunkMetadata.nexts?.length) {
         return;
       }
 
-      nodeMetadata.nexts = nodeMetadata.nexts.filter(({id}) => id !== next.id);
+      trunkMetadata.nexts = trunkMetadata.nexts.filter(
+        ({id}) => id !== node.id,
+      );
     });
   }
 
@@ -358,10 +358,7 @@ export class Procedure<
     });
   }
 
-  async deleteNode(
-    nodeId: NodeId,
-    prev: NodeNextNodeMetadata | NodeNextJointMetadata | undefined,
-  ): Promise<void> {
+  async deleteNode(nodeId: NodeId, prev: TrunkRef | undefined): Promise<void> {
     return this.update(definition => {
       let nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
       let jointsMap = new Map(
@@ -398,7 +395,7 @@ export class Procedure<
 
       let visitedNodesSet: Set<NodeId> = new Set();
 
-      let checkingNodes = getTypeNextIds<NodeNextNodeMetadata>(node, 'node');
+      let checkingNodes = getTypeNextIds<NodeRef>(node, 'node');
 
       while (checkingNodes.length) {
         let checkingNodeId = checkingNodes.shift()!;
@@ -421,9 +418,7 @@ export class Procedure<
 
         visitedNodesSet.add(checkingNode.id);
 
-        checkingNodes.push(
-          ...getTypeNextIds<NodeNextNodeMetadata>(checkingNode, 'node'),
-        );
+        checkingNodes.push(...getTypeNextIds<NodeRef>(checkingNode, 'node'));
       }
 
       definition.nodes = compact(
@@ -443,7 +438,7 @@ export class Procedure<
       }
 
       // 删除 nexts 中的 leaves
-      let nexts: NodeNextMetadata[] = [];
+      let nexts: Ref[] = [];
       let leafNextsSet = new Set<LeafId>();
 
       for (let next of node.nexts) {
@@ -463,28 +458,20 @@ export class Procedure<
 
   async moveNode(
     movingNodeId: NodeId,
-    prevNodeId: NodeId | undefined,
-    targetNodeId: NodeId,
-    targetNext: NodeNextMetadata | undefined,
+    prev: TrunkRef | undefined,
+    target: TrunkRef,
+    targetNext: Ref | undefined,
   ): Promise<void> {
-    if (movingNodeId === targetNodeId) {
+    if (movingNodeId === target.id) {
       return;
     }
 
     return this.update(definition => {
-      let nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
-
-      let movingNode = nodesMap.get(movingNodeId);
-      let prevNode = prevNodeId && nodesMap.get(prevNodeId);
-      let targetNode = nodesMap.get(targetNodeId);
-
-      if (!movingNode) {
-        throw Error(`Not found movingNode metadata by id '${movingNodeId}'`);
-      }
-
-      if (!targetNode) {
-        throw Error(`Not found targetNode metadata by id '${targetNodeId}'`);
-      }
+      let movingNode = requireTrunk(definition, {
+        type: 'node',
+        id: movingNodeId,
+      });
+      let targetTrunk = requireTrunk(definition, target);
 
       let movingNodeNexts = movingNode.nexts || [];
       let pendingTransferMovingNodeNexts = [];
@@ -501,30 +488,32 @@ export class Procedure<
         pendingTransferMovingNodeNexts.push(next);
       }
 
-      if (prevNode) {
-        prevNode.nexts = prevNode.nexts || [];
+      if (prev) {
+        let prevTrunk = requireTrunk(definition, prev);
 
-        let movingNodeIndex = prevNode.nexts.findIndex(
+        prevTrunk.nexts = prevTrunk.nexts || [];
+
+        let movingNodeIndex = prevTrunk.nexts.findIndex(
           next => next.id === movingNodeId,
         );
 
         if (movingNodeIndex === -1) {
           throw Error(
-            `Not found movingNode '${movingNodeId}' at nexts of prevNode '${prevNodeId}'`,
+            `Not found movingNode '${movingNodeId}' at nexts of prevNode '${prev.id}'`,
           );
         }
 
-        prevNode.nexts.splice(
+        prevTrunk.nexts.splice(
           movingNodeIndex,
           1,
           ...pendingTransferMovingNodeNexts,
         );
       }
 
-      targetNode.nexts = targetNode.nexts || [];
+      targetTrunk.nexts = targetTrunk.nexts || [];
 
       if (targetNext) {
-        let targetNextIndex = targetNode.nexts.findIndex(
+        let targetNextIndex = targetTrunk.nexts.findIndex(
           next => next.id === targetNext.id,
         );
 
@@ -532,38 +521,33 @@ export class Procedure<
           throw Error(
             `Not found targetNext ${JSON.stringify(
               targetNext,
-            )} at nexts of targetNode '${targetNodeId}'`,
+            )} at nexts of targetNode '${targetTrunk.id}'`,
           );
         }
 
-        targetNode.nexts.splice(targetNextIndex, 1);
+        targetTrunk.nexts.splice(targetNextIndex, 1);
 
         movingNode.nexts.push(targetNext);
       }
 
-      targetNode.nexts.push({type: 'node', id: movingNodeId});
+      targetTrunk.nexts.push({
+        type: 'node',
+        id: movingNodeId,
+      });
     });
   }
 
   async copyNode(
     copyingNodeId: NodeId,
-    targetNodeId: NodeId,
-    targetNext: NodeNextMetadata | undefined,
+    target: TrunkRef,
+    targetNext: Ref | undefined,
   ): Promise<void> {
     return this.update(definition => {
-      let nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
-
-      let copyingNode = nodesMap.get(copyingNodeId);
-
-      let targetNode = nodesMap.get(targetNodeId);
-
-      if (!copyingNode) {
-        throw Error(`Not found node metadata by id '${copyingNodeId}'`);
-      }
-
-      if (!targetNode) {
-        throw Error(`Not found node metadata by id '${targetNodeId}'`);
-      }
+      let copyingNode = requireTrunk(definition, {
+        type: 'node',
+        id: copyingNodeId,
+      });
+      let targetTrunk = requireTrunk(definition, target);
 
       let duplicateNodeId = createId<NodeId>();
       let duplicateNode = cloneDeep(copyingNode);
@@ -571,28 +555,31 @@ export class Procedure<
       duplicateNode.id = duplicateNodeId;
       duplicateNode.nexts = [];
 
-      targetNode.nexts = targetNode.nexts || [];
+      targetTrunk.nexts = targetTrunk.nexts || [];
 
       if (!targetNext) {
-        targetNode.nexts.push({type: 'node', id: duplicateNodeId});
+        targetTrunk.nexts.push({
+          type: 'node',
+          id: duplicateNodeId,
+        });
         definition.nodes.push(duplicateNode);
 
         return;
       }
 
-      let nextIndex = targetNode.nexts.findIndex(next =>
+      let nextIndex = targetTrunk.nexts.findIndex(next =>
         isEqual(next, targetNext),
       );
 
       if (nextIndex === -1) {
         throw Error(
           `Not found next metadata ${JSON.stringify(targetNext)} at node '${
-            targetNode.id
+            targetTrunk.id
           }'`,
         );
       }
 
-      targetNode.nexts.splice(nextIndex, 1, {
+      targetTrunk.nexts.splice(nextIndex, 1, {
         type: 'node',
         id: duplicateNodeId,
       });
@@ -671,7 +658,7 @@ export function createId<TId>(): TId {
   return (nanoid(8) as unknown) as TId;
 }
 
-function getTypeNextIds<TNextMetadata extends NodeNextMetadata>(
+function getTypeNextIds<TNextMetadata extends Ref>(
   node: NodeMetadata,
   type: TNextMetadata['type'],
 ): TNextMetadata['id'][] {
@@ -692,15 +679,21 @@ function getTypeNextIds<TNextMetadata extends NodeNextMetadata>(
   return typeNextIds;
 }
 
-function requireNode(
+function requireTrunk<TTrunkRef extends TrunkRef>(
   definition: ProcedureDefinition,
-  node: NodeId,
-): NodeMetadata {
-  let nodeMetadata = definition.nodes.find(({id}) => id === node);
+  trunkRef: TTrunkRef,
+): {node: NodeMetadata; joint: JointMetadata}[TTrunkRef['type']] {
+  let trunkMetadata =
+    trunkRef.type === 'node'
+      ? definition.nodes.find(({id}) => id === trunkRef.id)
+      : definition.joints.find(({id}) => id === trunkRef.id);
 
-  if (!nodeMetadata) {
-    throw Error(`Not found node metadata by id '${node}'`);
+  if (!trunkMetadata) {
+    throw Error(`Not found ${trunkRef.type} metadata by id '${trunkRef.id}'`);
   }
 
-  return nodeMetadata;
+  return trunkMetadata as {
+    node: NodeMetadata;
+    joint: JointMetadata;
+  }[TTrunkRef['type']];
 }

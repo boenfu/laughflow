@@ -1,10 +1,10 @@
-import {LeafId, LeafMetadata} from '@magicflow/core';
+import {LeafId, LeafMetadata, Ref} from '@magicflow/core';
 import {useCreation, useEventListener, useUpdate} from 'ahooks';
 import React, {FC, Fragment, ReactNode, useEffect} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
 
 import {EditorContext} from '../../context';
-import {Editor, ProcedureTreeNode} from '../../editor';
+import {Editor, ProcedureNodeTreeNode, ProcedureTreeNode} from '../../editor';
 import {THEME_DEFAULT} from '../theme';
 
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from './connection-line';
@@ -58,87 +58,57 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function renderNode({
-    prev,
-    metadata,
-    leaves,
-    nodes,
-    links,
-    joints,
-  }: ProcedureTreeNode): ReactNode {
-    let nodeId = metadata.id;
-
-    if (!leaves.length && !nodes.length) {
-      leaves = [PlaceholderLeaf];
+  function renderNode(node: ProcedureTreeNode): ReactNode {
+    if (isTypeTreeNode(node, 'leaf')) {
+      return <Leaf leaf={node.metadata} />;
     }
+
+    let nexts = node.nexts;
+
+    if (nexts === false) {
+      if (isTypeTreeNode(node, 'node')) {
+        return <LinkNode prev={node.prev!.ref} node={node.metadata} />;
+      }
+
+      if (isTypeTreeNode(node, 'joint')) {
+        return <Joint prev={node.prev!.ref} joint={node.metadata} />;
+      }
+
+      return <></>;
+    } else if (!nexts.length) {
+      // placeholder leaf
+      nexts = [
+        {
+          prev: node,
+          ref: {
+            type: 'leaf',
+            id: PlaceholderLeafId,
+          },
+          metadata: PlaceholderLeaf,
+          nexts: false,
+        },
+      ];
+    }
+
+    let {ref, prev, metadata} = node as ProcedureNodeTreeNode;
 
     return (
       <Fragment>
-        <Node prev={prev} node={metadata}>
+        <Node prev={prev?.ref} node={metadata}>
           <Row>
-            {leaves.map((leaf, index) => (
-              <Fragment key={`leaf:${nodeId}-${leaf.id}`}>
-                <ConnectionLine
-                  node={nodeId}
-                  next={{type: 'leaf', id: leaf.id}}
-                  left={leaves[index - 1]?.id}
-                  right={
-                    leaves[index + 1]?.id ||
-                    joints[0]?.id ||
-                    nodes[0]?.metadata.id ||
-                    links[0]?.id
-                  }
-                />
-                <Leaf leaf={leaf} />
-              </Fragment>
-            ))}
-
-            {joints.map((joint, index) => (
-              <Fragment key={`joint:${nodeId}-${joint.id}`}>
-                <ConnectionLine
-                  node={nodeId}
-                  next={{type: 'joint', id: joint.id}}
-                  left={joints[index - 1]?.id || leaves[leaves.length - 1]?.id}
-                  right={
-                    joints[index + 1]?.id ||
-                    nodes[0]?.metadata.id ||
-                    links[0]?.id
-                  }
-                />
-                <Joint prev={nodeId} joint={joint} />
-              </Fragment>
-            ))}
-
-            {nodes.map((treeNode, index) => (
-              <Fragment key={`node:${nodeId}-${treeNode.metadata.id}`}>
-                <ConnectionLine
-                  node={nodeId}
-                  next={{type: 'node', id: treeNode.metadata.id}}
-                  left={
-                    nodes[index - 1]?.metadata.id ||
-                    joints[joints.length - 1]?.id ||
-                    leaves[leaves.length - 1]?.id
-                  }
-                  right={nodes[index + 1]?.metadata.id || links[0]?.id}
-                />
-                {renderNode(treeNode)}
-              </Fragment>
-            ))}
-
-            {links.map((linkNode, index) => (
-              <Fragment key={`node:${nodeId}-${linkNode.id}`}>
-                <ConnectionLine
-                  node={nodeId}
-                  next={{type: 'node', id: linkNode.id}}
-                  left={
-                    links[index - 1]?.id ||
-                    nodes[leaves.length - 1]?.metadata.id
-                  }
-                  right={links[index + 1]?.id}
-                />
-                <LinkNode prev={nodeId} node={linkNode} />
-              </Fragment>
-            ))}
+            {nexts.map((next, index, array) => {
+              return (
+                <Fragment key={`node:${ref.id}-${next.ref.id}`}>
+                  <ConnectionLine
+                    node={prev!.ref}
+                    next={ref}
+                    first={index === 0}
+                    last={index === array.length - 1}
+                  />
+                  {renderNode(next)}
+                </Fragment>
+              );
+            })}
           </Row>
         </Node>
       </Fragment>
@@ -157,3 +127,10 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
     </ThemeProvider>
   );
 };
+
+function isTypeTreeNode<TType extends Ref['type']>(
+  node: ProcedureTreeNode,
+  type: TType,
+): node is Extract<ProcedureTreeNode, {ref: {type: TType}}> {
+  return node.ref.type === type;
+}

@@ -29,7 +29,10 @@ let definition: ProcedureDefinition = {
 test('create normal subnode', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.createNode(nodeId);
+  await procedure.createNode({
+    type: 'node',
+    id: nodeId,
+  });
 
   expect(procedure.definition.nodes.length).toBe(3);
 });
@@ -37,15 +40,24 @@ test('create normal subnode', async () => {
 test('create node at fakeNode', () => {
   let procedure = new Procedure(definition);
 
-  void expect(() => procedure.createNode('fakeNode' as NodeId)).rejects.toThrow(
-    "Not found node metadata by id 'fakeNode'",
-  );
+  void expect(() =>
+    procedure.createNode({
+      type: 'node',
+      id: 'fakeNode' as NodeId,
+    }),
+  ).rejects.toThrow("Not found node metadata by id 'fakeNode'");
 });
 
 test('create subnode and move nexts', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.createNode(startId, 'next');
+  await procedure.createNode(
+    {
+      type: 'node',
+      id: startId,
+    },
+    'next',
+  );
 
   let startNode = procedure.getNode(startId);
 
@@ -61,7 +73,16 @@ test('create subnode and move nexts', async () => {
 test('create node between two nodes', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.createNode(startId, {type: 'node', id: nodeId});
+  await procedure.createNode(
+    {
+      type: 'node',
+      id: startId,
+    },
+    {
+      type: 'node',
+      id: nodeId,
+    },
+  );
 
   let startNode = procedure.getNode(startId);
 
@@ -78,13 +99,31 @@ test('create node between node and fakeNext', () => {
   let procedure = new Procedure(definition);
 
   void expect(() =>
-    procedure.createNode(startId, {type: 'node', id: 'fakeNode' as NodeId}),
+    procedure.createNode(
+      {
+        type: 'node',
+        id: startId,
+      },
+      {
+        type: 'node',
+        id: 'fakeNode' as NodeId,
+      },
+    ),
   ).rejects.toThrow(
     `Not found node next by {\"type\":\"node\",\"id\":\"fakeNode\"}`,
   );
 
   void expect(() =>
-    procedure.createNode(nodeId, {type: 'node', id: 'fakeNode' as NodeId}),
+    procedure.createNode(
+      {
+        type: 'node',
+        id: nodeId,
+      },
+      {
+        type: 'node',
+        id: 'fakeNode' as NodeId,
+      },
+    ),
   ).rejects.toThrow(
     `Not found node next by {\"type\":\"node\",\"id\":\"fakeNode\"}`,
   );

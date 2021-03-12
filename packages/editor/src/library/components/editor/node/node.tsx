@@ -1,4 +1,4 @@
-import {NodeId, NodeMetadata} from '@magicflow/core';
+import {NodeMetadata, TrunkRef} from '@magicflow/core';
 import classnames from 'classnames';
 import React, {CSSProperties, FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
@@ -11,7 +11,7 @@ import {Selectors} from './@selectors';
 import {Tools} from './@tools';
 
 export interface NodeProps {
-  prev: NodeId | undefined;
+  prev: TrunkRef | undefined;
   node: NodeMetadata;
   className?: string;
   readOnly?: boolean;
@@ -153,10 +153,16 @@ export const Node: FC<NodeProps> = ({
       return;
     }
 
-    void editor.procedure.connectNode(statefulNode.node, {
-      type: 'node',
-      id: node.id,
-    });
+    void editor.procedure.connectNode(
+      {
+        type: 'node',
+        id: statefulNode.node,
+      },
+      {
+        type: 'node',
+        id: node.id,
+      },
+    );
   };
 
   let statefulNode = editor.statefulNode;

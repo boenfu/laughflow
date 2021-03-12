@@ -1,4 +1,4 @@
-import {NodeId, NodeNextMetadata} from '@magicflow/core';
+import {Ref, TrunkRef} from '@magicflow/core';
 import {Copy, PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
 import {Bezier as _Bezier, BezierPoint, Mark} from 'rc-bezier';
 import React, {
@@ -68,12 +68,12 @@ const Paste = styled(Copy)`
 
 const Mark: FC<{
   active: boolean;
-  node: NodeId;
-  next: NodeNextMetadata;
+  start: TrunkRef;
+  next: Ref;
   position: BezierPoint | undefined;
   onMouseEnter: MouseEventHandler;
   onMouseLeave: MouseEventHandler;
-}> = ({active, node, next, position, onMouseEnter, onMouseLeave}) => {
+}> = ({active, start: node, next, position, onMouseEnter, onMouseLeave}) => {
   const {editor} = useContext(EditorContext);
   const migrateChildren = position && position.y < LINE_HEIGHT_DEFAULT / 2;
 
@@ -98,13 +98,6 @@ const Mark: FC<{
             editor.statefulNode.node,
             node,
             targetNext,
-          );
-          break;
-
-        case 'join':
-          void editor.procedure.createJoint(
-            editor.statefulNode.node,
-            migrateChildren ? undefined : targetNext,
           );
           break;
 
@@ -151,7 +144,7 @@ const Mark: FC<{
   );
 };
 
-export function useMark(node: NodeId, next: NodeNextMetadata): [Mark] {
+export function useMark(trunk: TrunkRef, next: Ref): [Mark] {
   const [position, setPosition] = useState<BezierPoint | undefined>(undefined);
 
   const [active, dispatch] = useReducer(
@@ -169,7 +162,7 @@ export function useMark(node: NodeId, next: NodeNextMetadata): [Mark] {
       position,
       render: (
         <Mark
-          node={node}
+          start={trunk}
           next={next}
           position={position}
           active={!!(active > 0 && position)}

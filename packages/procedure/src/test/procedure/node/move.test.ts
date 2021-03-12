@@ -71,7 +71,18 @@ let definition: ProcedureDefinition = {
 test('move node', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.moveNode(node2Id, startId, node3Id, undefined);
+  await procedure.moveNode(
+    node2Id,
+    {
+      type: 'node',
+      id: startId,
+    },
+    {
+      type: 'node',
+      id: node3Id,
+    },
+    undefined,
+  );
 
   expect(procedure.getNode(startId)?.nexts?.length).toBe(3);
   expect(procedure.getNode(node3Id)?.nexts?.length).toBe(2);
@@ -80,7 +91,18 @@ test('move node', async () => {
 test('move node to self', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.moveNode(node2Id, startId, node2Id, undefined);
+  await procedure.moveNode(
+    node2Id,
+    {
+      type: 'node',
+      id: startId,
+    },
+    {
+      type: 'node',
+      id: node2Id,
+    },
+    undefined,
+  );
 
   expect(procedure.getNode(startId)?.nexts?.length).toBe(3);
 });
@@ -88,10 +110,21 @@ test('move node to self', async () => {
 test('move node to between two nodes', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.moveNode(node2Id, startId, node3Id, {
-    type: 'node',
-    id: node4Id,
-  });
+  await procedure.moveNode(
+    node2Id,
+    {
+      type: 'node',
+      id: startId,
+    },
+    {
+      type: 'node',
+      id: node3Id,
+    },
+    {
+      type: 'node',
+      id: node4Id,
+    },
+  );
 
   expect(procedure.getNode(startId)?.nexts?.length).toBe(3);
   expect(procedure.getNode(node3Id)?.nexts?.length).toBe(1);
@@ -102,36 +135,99 @@ test('move node error params', () => {
   let procedure = new Procedure(definition);
 
   void expect(
-    procedure.moveNode('fakeNode' as NodeId, startId, nodeId, undefined),
+    procedure.moveNode(
+      'fakeNode' as NodeId,
+      {
+        type: 'node',
+        id: startId,
+      },
+      {
+        type: 'node',
+        id: nodeId,
+      },
+      undefined,
+    ),
   ).rejects.toThrow("Not found movingNode metadata by id 'fakeNode'");
 
   void expect(
-    procedure.moveNode(node2Id, startId, 'fakeNode' as NodeId, undefined),
+    procedure.moveNode(
+      node2Id,
+      {
+        type: 'node',
+        id: startId,
+      },
+      {
+        type: 'node',
+        id: 'fakeNode' as NodeId,
+      },
+      undefined,
+    ),
   ).rejects.toThrow("Not found targetNode metadata by id 'fakeNode'");
 
   void expect(
-    procedure.moveNode(node4Id, startId, node3Id, undefined),
+    procedure.moveNode(
+      node4Id,
+      {
+        type: 'node',
+        id: startId,
+      },
+      {
+        type: 'node',
+        id: node3Id,
+      },
+      undefined,
+    ),
   ).rejects.toThrow(
     "Not found movingNode 'node4' at nexts of prevNode 'start'",
   );
 
   void expect(
-    procedure.moveNode(node4Id, startId, nodeId, undefined),
+    procedure.moveNode(
+      node4Id,
+      {
+        type: 'node',
+        id: startId,
+      },
+      {
+        type: 'node',
+        id: nodeId,
+      },
+      undefined,
+    ),
   ).rejects.toThrow(
     "Not found movingNode 'node4' at nexts of prevNode 'start'",
   );
 
   void expect(
-    procedure.moveNode(node2Id, nodeId, node4Id, undefined),
+    procedure.moveNode(
+      node2Id,
+      {
+        type: 'node',
+        id: startId,
+      },
+      {
+        type: 'node',
+        id: node4Id,
+      },
+      undefined,
+    ),
   ).rejects.toThrow(
     "Not found movingNode 'node2' at nexts of prevNode 'node1'",
   );
 
   void expect(
-    procedure.moveNode(node3Id, undefined, nodeId, {
-      type: 'node',
-      id: node4Id,
-    }),
+    procedure.moveNode(
+      node3Id,
+      undefined,
+      {
+        type: 'node',
+        id: startId,
+      },
+      {
+        type: 'node',
+        id: node4Id,
+      },
+    ),
   ).rejects.toThrow(
     'Not found targetNext {"type":"node","id":"node4"} at nexts of targetNode \'node1\'',
   );

@@ -1,4 +1,4 @@
-import {JointId, LeafId, NodeId, NodeNextMetadata} from '@magicflow/core';
+import {Ref, TrunkRef} from '@magicflow/core';
 import {Bezier, BezierStroke} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
@@ -21,20 +21,20 @@ const Wrapper = styled(Bezier)`
 `;
 
 export interface ConnectionLineProps {
-  node: NodeId;
-  next: NodeNextMetadata;
+  node: TrunkRef;
+  next: Ref;
   /**
    * 边际的两个元素会绘制向下的圆弧
    */
-  left: NodeId | LeafId | JointId | undefined;
-  right: NodeId | LeafId | JointId | undefined;
+  first: boolean;
+  last: boolean;
 }
 
 export const ConnectionLine: FC<ConnectionLineProps> = ({
   node,
   next,
-  left,
-  right,
+  first,
+  last,
 }) => {
   const [Mark] = useMark(node, next);
 
@@ -56,7 +56,7 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
         let direction = end.x > start.x ? 1 : -1;
         let midline = (start.y + end.y) / 2;
 
-        if (!left) {
+        if (first) {
           return `M ${start.x},${start.y} V ${
             midline - radius
           } A ${radius},${radius},0,0,${direction === 1 ? '0' : '1'},${
@@ -68,7 +68,7 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
           } V ${end.y}`;
         }
 
-        if (!right) {
+        if (last) {
           return `M ${start.x},${midline - radius} A ${radius},${radius},0,0,${
             direction === 1 ? '0' : '1'
           },${start.x + radius * direction},${midline} H ${

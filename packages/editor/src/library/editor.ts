@@ -1,14 +1,17 @@
 import {
   JointId,
   JointMetadata,
+  JointRef,
   LeafId,
   LeafMetadata,
+  LeafRef,
   LeafType,
   NodeId,
   NodeMetadata,
-  NodeNextJointMetadata,
-  NodeNextNodeMetadata,
+  NodeRef,
   ProcedureDefinition,
+  Ref,
+  TrunkRef,
 } from '@magicflow/core';
 import {Procedure} from '@magicflow/procedure';
 import Eventemitter from 'eventemitter3';
@@ -28,22 +31,39 @@ import {
   PluginLeafEventType,
 } from './plugin';
 
-export interface ProcedureTreeNode {
-  prev: NodeNextNodeMetadata | NodeNextJointMetadata | undefined;
-  value:
-    | {
-        type: 'node';
-        metadata: NodeMetadata;
-      }
-    | {
-        type: 'joint';
-        metadata: JointMetadata;
-      };
-  nodes: ProcedureTreeNode[];
-  leaves: LeafMetadata[];
-  links: NodeMetadata[];
-  joints: JointMetadata[];
+export interface IProcedureTreeNode<
+  TRef extends Ref,
+  TMetadata,
+  TNexts extends boolean
+> {
+  prev: ProcedureNodeTreeNode | ProcedureJointTreeNode | undefined;
+  ref: TRef;
+  metadata: TMetadata;
+  nexts: TNexts extends true ? ProcedureTreeNode[] | false : false;
 }
+
+export type ProcedureTreeNode =
+  | ProcedureNodeTreeNode
+  | ProcedureJointTreeNode
+  | ProcedureLeafTreeNode;
+
+export type ProcedureNodeTreeNode = IProcedureTreeNode<
+  NodeRef,
+  NodeMetadata,
+  true
+>;
+
+export type ProcedureJointTreeNode = IProcedureTreeNode<
+  JointRef,
+  JointMetadata,
+  true
+>;
+
+export type ProcedureLeafTreeNode = IProcedureTreeNode<
+  LeafRef,
+  LeafMetadata,
+  false
+>;
 
 export interface LeafRenderDescriptor {
   type: LeafType;
@@ -57,7 +77,7 @@ export type NodeRenderDescriptor = NodePluginComponentRender;
 type ProcedureEventType = 'update';
 
 interface StatefulNode {
-  prev: NodeId | undefined;
+  prev: TrunkRef | undefined;
   node: NodeId;
   type: 'cutting' | 'copying' | 'connecting' | 'join';
 }
@@ -100,14 +120,14 @@ export class Editor extends Eventemitter<ProcedureEventType> {
         this.buildTreeNode(definition);
         this.emit('update');
       },
-      async beforeLeafCreate(definition, node, leaf) {
+      async beforeLeafCreate(leaf, node, definition) {
         if (await leafHandler('create', definition, plugins, node.id, leaf)) {
           return;
         }
 
         return 'handled';
       },
-      async beforeLeafDelete(definition, node, leaf) {
+      async beforeLeafDelete(leaf, node, definition) {
         if (await leafHandler('delete', definition, plugins, node.id, leaf)) {
           return;
         }
@@ -216,65 +236,78 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     this.nodesMap = nodesMap;
     this.leavesMap = leavesMap;
 
-    this.procedureTreeNode = buildTreeNode('start' as NodeId);
+    let refTypeToMetadataMapDict: {
+      [TType in Ref['type']]: Map<
+        string,
+        Extract<ProcedureTreeNode, {ref: {type: TType}}>['metadata']
+      >;
+    } = {
+      node: nodesMap,
+      leaf: leavesMap,
+      joint: jointsMap,
+    };
 
-    function buildTreeNode(
-      node: NodeId,
-      prev: NodeId | undefined = undefined,
-      visitedNodeSet: Set<NodeId> = new Set([node]),
-    ): ProcedureTreeNode {
-      let metadata = nodesMap.get(node);
+    this.procedureTreeNode = buildTreeNode({
+      type: 'node',
+      id: 'start' as NodeId,
+    });
+
+    function buildTreeNode<TProcedureTreeNode extends ProcedureTreeNode>(
+      ref: TProcedureTreeNode['ref'],
+      prev: ProcedureTreeNode['prev'] = undefined,
+      visitedNodeSet: Set<NodeId | JointId> = new Set([]),
+      hasNexts = true,
+    ): TProcedureTreeNode {
+      let metadata = refTypeToMetadataMapDict[ref.type].get(ref.id);
 
       if (!metadata) {
-        throw Error(`Not found node metadata by id '${node}'`);
+        throw Error(`Not found ${ref.type} metadata by id '${ref.id}'`);
       }
 
-      let nodes: ProcedureTreeNode[] = [];
-      let leaves: LeafMetadata[] = [];
-      let links: NodeMetadata[] = [];
-      let joints: JointMetadata[] = [];
+      if (!hasNexts) {
+        return {
+          prev,
+          ref,
+          metadata,
+          nexts: false,
+        } as TProcedureTreeNode;
+      }
 
-      for (let next of metadata.nexts || []) {
-        if (next.type === 'joint') {
-          if (!jointsMap.has(next.id)) {
-            console.warn(`Not found joint metadata by id '${next.id}'`);
-            continue;
-          }
+      let node = ({prev, ref, metadata} as unknown) as NonNullable<
+        ProcedureTreeNode['prev']
+      >;
 
-          joints.push(jointsMap.get(next.id)!);
-        } else if (next.type === 'leaf') {
-          if (!leavesMap.has(next.id)) {
-            console.warn(`Not found leaf metadata by id '${next.id}'`);
-            continue;
-          }
+      let nodes: ProcedureNodeTreeNode[] = [];
+      let leaves: ProcedureLeafTreeNode[] = [];
+      let links: ProcedureNodeTreeNode[] = [];
+      let joints: ProcedureJointTreeNode[] = [];
 
-          leaves.push(leavesMap.get(next.id)!);
-        } else {
-          let nextNodeMetadata = nodesMap.get(next.id);
+      for (let next of (metadata as NodeMetadata | JointMetadata).nexts || []) {
+        if (next.type === 'leaf') {
+          leaves.push(buildTreeNode(next, node, visitedNodeSet, false));
+          continue;
+        }
 
-          if (!nextNodeMetadata) {
-            console.warn(`Not found node metadata by id '${next.id}'`);
-            continue;
-          }
-
-          if (!visitedNodeSet.has(next.id)) {
-            visitedNodeSet.add(next.id);
-
-            nodes.push(buildTreeNode(next.id, node, visitedNodeSet));
+        if (visitedNodeSet.has(next.id)) {
+          if (next.type === 'joint') {
+            joints.push(buildTreeNode(next, node, visitedNodeSet, false));
           } else {
-            links.push(nextNodeMetadata);
+            links.push(buildTreeNode(next, node, visitedNodeSet, false));
+          }
+        } else {
+          visitedNodeSet.add(next.id);
+
+          if (next.type === 'joint') {
+            joints.push(buildTreeNode(next, node, visitedNodeSet));
+          } else {
+            nodes.push(buildTreeNode(next, node, visitedNodeSet));
           }
         }
       }
 
-      return {
-        prev,
-        metadata,
-        nodes,
-        leaves,
-        links,
-        joints,
-      };
+      node.nexts = [...leaves, ...nodes, ...joints, ...links];
+
+      return node as TProcedureTreeNode;
     }
   }
 }
@@ -293,7 +326,7 @@ async function leafHandler(
   type: PluginLeafEventType,
   definition: ProcedureDefinition,
   plugins: IPlugin[],
-  parent: NodeId,
+  trunk: TrunkRef['id'],
   metadata: LeafMetadata,
 ): Promise<boolean> {
   let [globalEventKey, leafEventKey] = LEAF_EVENT_TYPE_TO_KEY_DICT[type];
@@ -338,7 +371,7 @@ async function leafHandler(
       type,
       definition,
       metadata,
-      node: parent,
+      trunk,
       stopPropagation,
       preventDefault,
     });

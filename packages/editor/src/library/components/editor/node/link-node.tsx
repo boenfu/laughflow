@@ -1,4 +1,4 @@
-import {NodeId, NodeMetadata} from '@magicflow/core';
+import {NodeMetadata, TrunkRef} from '@magicflow/core';
 import {Trash} from '@magicflow/icons';
 import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
@@ -7,7 +7,7 @@ import {EditorContext} from '../../../context';
 import {TooltipActions} from '../../common';
 
 export interface LinkNodeProps {
-  prev: NodeId;
+  prev: TrunkRef;
   node: NodeMetadata;
   className?: string;
   readOnly?: boolean;

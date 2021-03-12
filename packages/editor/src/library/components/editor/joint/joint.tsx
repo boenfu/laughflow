@@ -1,13 +1,12 @@
-import {JointMetadata, NodeId} from '@magicflow/core';
+import {JointMetadata, TrunkRef} from '@magicflow/core';
 import {Trash} from '@magicflow/icons';
-import React, {CSSProperties, FC, useContext} from 'react';
+import React, {CSSProperties, FC} from 'react';
 import styled from 'styled-components';
 
-import {EditorContext} from '../../../context';
 import {TooltipActions} from '../../common';
 
 export interface JointProps {
-  prev: NodeId;
+  prev: TrunkRef;
   joint: JointMetadata;
   className?: string;
   readOnly?: boolean;
@@ -37,11 +36,10 @@ const Content = styled.div`
   background-color: #fff;
 `;
 
-export const Joint: FC<JointProps> = ({className, style, joint, prev}) => {
-  const {editor} = useContext(EditorContext);
+export const Joint: FC<JointProps> = ({className, style}) => {
+  // const {editor} = useContext(EditorContext);
 
-  const onDisconnectNode = (): void =>
-    void editor.procedure.disconnectNode(prev, {type: 'joint', id: joint.id});
+  const onDisconnectNode = (): void => {};
 
   return (
     <TooltipActions

@@ -1,4 +1,4 @@
-import {NodeId, NodeMetadata} from '@magicflow/core';
+import {NodeMetadata, TrunkRef} from '@magicflow/core';
 import {
   Copy,
   Cut,
@@ -13,7 +13,7 @@ import {MenuPopup, transition} from '../../common';
 
 export interface ToolsProps {
   className?: string;
-  prev: NodeId | undefined;
+  prev: TrunkRef | undefined;
   node: NodeMetadata;
 }
 
@@ -93,13 +93,7 @@ export const Tools: FC<ToolsProps> = ({className, prev, node}) => {
   };
 
   const onDeleteNode = (): void => {
-    void editor.procedure.deleteNode(
-      node.id,
-      prev && {
-        type: 'node',
-        id: prev,
-      },
-    );
+    void editor.procedure.deleteNode(node.id, prev);
   };
 
   return (

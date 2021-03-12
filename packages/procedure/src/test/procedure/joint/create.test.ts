@@ -34,7 +34,16 @@ let definition: ProcedureDefinition<{}> = {
 test('create joint', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.createJoint(nodeId);
+  await procedure.createJoint(
+    {
+      type: 'node',
+      id: nodeId,
+    },
+    {
+      type: 'node',
+      id: nodeId,
+    },
+  );
 
   expect(procedure.getNode(nodeId)?.nexts?.length).toBe(1);
 
@@ -46,7 +55,16 @@ test('create joint', async () => {
 test('create joint with next', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.createJoint(startId, {type: 'node', id: nodeId});
+  await procedure.createJoint(
+    {
+      type: 'node',
+      id: startId,
+    },
+    {
+      type: 'node',
+      id: nodeId,
+    },
+  );
 
   expect(procedure.getNode(startId)?.nexts?.length).toBe(1);
 
@@ -60,7 +78,16 @@ test('create joint error params', () => {
   let procedure = new Procedure(definition);
 
   void expect(
-    procedure.createJoint(startId, {type: 'node', id: 'fakeNode' as NodeId}),
+    procedure.createJoint(
+      {
+        type: 'node',
+        id: startId,
+      },
+      {
+        type: 'node',
+        id: 'fakeNode' as NodeId,
+      },
+    ),
   ).rejects.toThrow(
     'Not found next metadata {"type":"node","id":"fakeNode"} at node \'start\'',
   );

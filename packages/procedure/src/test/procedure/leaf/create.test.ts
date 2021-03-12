@@ -1,4 +1,5 @@
 import {
+  JointMetadata,
   LeafId,
   LeafMetadata,
   NodeId,
@@ -14,11 +15,13 @@ let nodeId = 'node1' as NodeId;
 
 type NodeMetadataWithName = {name?: string} & NodeMetadata;
 type LeafMetadataWithName = {name?: string} & LeafMetadata;
+type JointMetadataWithName = {name?: string} & JointMetadata;
 
 let definition: ProcedureDefinition<
   {},
   NodeMetadataWithName,
-  LeafMetadataWithName
+  LeafMetadataWithName,
+  JointMetadataWithName
 > = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
@@ -43,7 +46,13 @@ let definition: ProcedureDefinition<
 test('create leaf', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.createLeaf(nodeId, 'done');
+  await procedure.createLeaf(
+    {
+      type: 'node',
+      id: nodeId,
+    },
+    'done',
+  );
 
   expect(procedure.getNode(nodeId)?.nexts?.length).toBe(1);
 
@@ -56,13 +65,19 @@ test('create leaf at fakeNode', () => {
   let procedure = new Procedure(definition);
 
   void expect(() =>
-    procedure.createLeaf('fakeNode' as NodeId, 'done'),
+    procedure.createLeaf(
+      {
+        type: 'node',
+        id: 'fakeNode' as NodeId,
+      },
+      'done',
+    ),
   ).rejects.toThrow("Not found node metadata by id 'fakeNode'");
 });
 
 test('no-handle beforeCreateLeaf & update metadata', async () => {
   let procedure = new Procedure(definition, {
-    beforeLeafCreate(definition, node, leaf) {
+    beforeLeafCreate(leaf, node, definition) {
       definition.nodes.push({
         id: 'extraNodeId' as NodeId,
         name: 'extraNodeName',
@@ -73,7 +88,13 @@ test('no-handle beforeCreateLeaf & update metadata', async () => {
     },
   });
 
-  await procedure.createLeaf(nodeId, 'done');
+  await procedure.createLeaf(
+    {
+      type: 'node',
+      id: nodeId,
+    },
+    'done',
+  );
 
   expect(procedure.definition.leaves[0].name).toBe('leafName');
 
@@ -91,7 +112,13 @@ test('handle beforeCreateLeaf', async () => {
     },
   });
 
-  await procedure.createLeaf(nodeId, 'done');
+  await procedure.createLeaf(
+    {
+      type: 'node',
+      id: nodeId,
+    },
+    'done',
+  );
 
   expect(procedure.definition.leaves?.length).toBeFalsy();
 

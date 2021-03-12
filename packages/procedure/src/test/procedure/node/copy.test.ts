@@ -1,7 +1,7 @@
 import {
   LeafId,
   NodeId,
-  NodeNextNodeMetadata,
+  NodeRef,
   ProcedureDefinition,
   ProcedureId,
 } from '@magicflow/core';
@@ -55,7 +55,14 @@ let definition: ProcedureDefinition = {
 test('copy node', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.copyNode(nodeId, startId, undefined);
+  await procedure.copyNode(
+    nodeId,
+    {
+      type: 'node',
+      id: startId,
+    },
+    undefined,
+  );
 
   // check node nexts
   expect(procedure.getNode(startId)?.nexts?.length).toBe(3);
@@ -75,14 +82,24 @@ test('copy node', async () => {
 test('copy node to between two nodes', async () => {
   let clonedDefinition = cloneDeep(definition);
   let node3Id = 'node3' as NodeId;
-  let node3Next: NodeNextNodeMetadata = {type: 'node', id: node3Id};
+  let node3Next: NodeRef = {
+    type: 'node',
+    id: node3Id,
+  };
 
   clonedDefinition.nodes.push({id: node3Id});
   clonedDefinition.nodes.find(node => node.id === node2Id)!.nexts = [node3Next];
 
   let procedure = new Procedure(clonedDefinition);
 
-  await procedure.copyNode(nodeId, node2Id, node3Next);
+  await procedure.copyNode(
+    nodeId,
+    {
+      type: 'node',
+      id: node2Id,
+    },
+    node3Next,
+  );
 
   let node2 = procedure.getNode(node2Id);
 
@@ -100,30 +117,65 @@ test('copy node to between two nodes', async () => {
 test('copy node error params', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.copyNode(nodeId, startId, undefined);
+  await procedure.copyNode(
+    nodeId,
+    {
+      type: 'node',
+      id: startId,
+    },
+    undefined,
+  );
 
   void expect(
-    procedure.copyNode('fakeNode' as NodeId, startId, undefined),
+    procedure.copyNode(
+      'fakeNode' as NodeId,
+      {
+        type: 'node',
+        id: startId,
+      },
+      undefined,
+    ),
   ).rejects.toThrow("Not found node metadata by id 'fakeNode'");
 
   void expect(
-    procedure.copyNode(nodeId, 'fakeTargetNode' as NodeId, undefined),
+    procedure.copyNode(
+      nodeId,
+      {
+        type: 'node',
+        id: 'fakeTargetNode' as NodeId,
+      },
+      undefined,
+    ),
   ).rejects.toThrow("Not found node metadata by id 'fakeTargetNode'");
 
   void expect(
-    procedure.copyNode(nodeId, startId, {
-      type: 'leaf',
-      id: 'fakeTargetNext' as LeafId,
-    }),
+    procedure.copyNode(
+      nodeId,
+      {
+        type: 'node',
+        id: startId,
+      },
+      {
+        type: 'leaf',
+        id: 'fakeTargetNext' as LeafId,
+      },
+    ),
   ).rejects.toThrow(
     'Not found next metadata {"type":"leaf","id":"fakeTargetNext"} at node \'start\'',
   );
 
   void expect(
-    procedure.copyNode(nodeId, node2Id, {
-      type: 'leaf',
-      id: 'fakeTargetNext' as LeafId,
-    }),
+    procedure.copyNode(
+      nodeId,
+      {
+        type: 'node',
+        id: node2Id,
+      },
+      {
+        type: 'leaf',
+        id: 'fakeTargetNext' as LeafId,
+      },
+    ),
   ).rejects.toThrow(
     'Not found next metadata {"type":"leaf","id":"fakeTargetNext"} at node \'node2\'',
   );

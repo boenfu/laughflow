@@ -1,4 +1,4 @@
-import {LeafMetadata, LeafType, NodeId} from '@magicflow/core';
+import {LeafMetadata, LeafType, NodeId, TrunkRef} from '@magicflow/core';
 import {
   ConnectNode,
   More,
@@ -18,7 +18,7 @@ import {EditorContext} from '../../../context';
 import {MenuPopup, transition} from '../../common';
 
 export interface SelectorsProps {
-  prev: NodeId | undefined;
+  prev: TrunkRef | undefined;
   node: NodeId;
 }
 
@@ -99,12 +99,23 @@ export const Selectors: FC<SelectorsProps> = ({prev, node}) => {
 
   const getOnCreateLeaf = useCallback(
     (type: string) => {
-      return () => editor.procedure.createLeaf(node, type as LeafType);
+      return () =>
+        editor.procedure.createLeaf(
+          {
+            type: 'node',
+            id: node,
+          },
+          type as LeafType,
+        );
     },
     [editor, node],
   );
 
-  const onCreateNode = (): void => void editor.procedure.createNode(node);
+  const onCreateNode = (): void =>
+    void editor.procedure.createNode({
+      type: 'node',
+      id: node,
+    });
 
   const onConnectNode = (event: MouseEvent): void => {
     editor.setStatefulNode({prev, node, type: 'connecting'});

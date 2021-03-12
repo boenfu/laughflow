@@ -29,7 +29,13 @@ let definition: ProcedureDefinition = {
 let procedure = new Procedure(definition);
 
 test('undo action', async () => {
-  await procedure.createLeaf(nodeId, 'done');
+  await procedure.createLeaf(
+    {
+      type: 'node',
+      id: nodeId,
+    },
+    'done',
+  );
 
   procedure.undo();
 
