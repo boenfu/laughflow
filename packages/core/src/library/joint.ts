@@ -1,11 +1,10 @@
 import {Nominal} from 'tslang';
 
-import {NodeId, NodeNextMetadata} from './node';
+import {Ref} from './ref';
 
 export type JointId = Nominal<string, 'joint:id'>;
 
 export interface JointMetadata {
   id: JointId;
-  master: NodeId;
-  nexts?: NodeNextMetadata[];
+  nexts?: Ref[];
 }
