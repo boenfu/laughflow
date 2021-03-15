@@ -2,7 +2,6 @@ import {
   JointId,
   JointMetadata,
   JointRef,
-  LeafId,
   LeafMetadata,
   LeafRef,
   LeafType,
@@ -88,10 +87,6 @@ export class Editor extends Eventemitter<ProcedureEventType> {
   plugins: IPlugin[] = [];
 
   procedureTreeNode!: ProcedureTreeNode;
-
-  nodesMap!: Map<NodeId, NodeMetadata>;
-
-  leavesMap!: Map<LeafId, LeafMetadata>;
 
   private leafRenderDescriptors: Map<string, LeafRenderDescriptor> = new Map();
 
@@ -229,22 +224,15 @@ export class Editor extends Eventemitter<ProcedureEventType> {
   }
 
   buildTreeNode(definition: ProcedureDefinition): void {
-    let nodesMap = new Map(definition.nodes.map(node => [node.id, node]));
-    let leavesMap = new Map(definition.leaves.map(leaf => [leaf.id, leaf]));
-    let jointsMap = new Map(definition.joints.map(joint => [joint.id, joint]));
-
-    this.nodesMap = nodesMap;
-    this.leavesMap = leavesMap;
-
     let refTypeToMetadataMapDict: {
       [TType in Ref['type']]: Map<
         string,
         Extract<ProcedureTreeNode, {ref: {type: TType}}>['metadata']
       >;
     } = {
-      node: nodesMap,
-      leaf: leavesMap,
-      joint: jointsMap,
+      node: new Map(definition.nodes.map(node => [node.id, node])),
+      leaf: new Map(definition.leaves.map(leaf => [leaf.id, leaf])),
+      joint: new Map(definition.joints.map(joint => [joint.id, joint])),
     };
 
     this.procedureTreeNode = buildTreeNode({

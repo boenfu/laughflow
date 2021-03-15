@@ -100,8 +100,8 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
               return (
                 <Fragment key={`node:${ref.id}-${next.ref.id}`}>
                   <ConnectionLine
-                    node={prev!.ref}
-                    next={ref}
+                    node={ref}
+                    next={next.ref}
                     first={index === 0}
                     last={index === array.length - 1}
                   />

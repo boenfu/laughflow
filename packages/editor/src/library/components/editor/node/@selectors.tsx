@@ -122,11 +122,6 @@ export const Selectors: FC<SelectorsProps> = ({prev, node}) => {
     event.stopPropagation();
   };
 
-  const onConnectJoint = (event: MouseEvent): void => {
-    editor.setStatefulNode({prev, node, type: 'join'});
-    event.stopPropagation();
-  };
-
   // let leaves = editor.procedure.getNodeLeaves(node);
   let leaves: any[] = [];
 
@@ -156,10 +151,6 @@ export const Selectors: FC<SelectorsProps> = ({prev, node}) => {
             );
           },
         )}
-
-        <MenuItem onClick={onConnectJoint}>
-          <ConnectNode />
-        </MenuItem>
 
         <MenuItem onClick={onConnectNode}>
           <ConnectNode />
