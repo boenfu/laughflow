@@ -6,7 +6,7 @@
   "main": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
   "scripts": {
-    "prebuild": "rimraf ./src/library/*.tsx && svgr ./resources --out-dir ./src/library --typescript --icon"
+    "prebuild": "rimraf ./src/library/*.tsx && svgr ./resources --out-dir ./src/library --typescript --icon --replace-attr-values '#000=currentColor' "
   },
   "peerDependencies": {
     "react": ">=16.8.0"

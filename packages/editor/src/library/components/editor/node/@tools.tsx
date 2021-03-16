@@ -1,10 +1,5 @@
-import {NodeMetadata, TrunkRef} from '@magicflow/core';
-import {
-  Copy,
-  Cut,
-  PlusCircleSolid as _PlusCircleSolid,
-  Trash,
-} from '@magicflow/icons';
+import {NodeRef, TrunkRef} from '@magicflow/core';
+import {Copy, Cut, Trash} from '@magicflow/icons';
 import React, {FC, MouseEvent, useContext} from 'react';
 import styled from 'styled-components';
 
@@ -14,7 +9,7 @@ import {MenuPopup, transition} from '../../common';
 export interface ToolsProps {
   className?: string;
   prev: TrunkRef | undefined;
-  node: NodeMetadata;
+  node: NodeRef;
 }
 
 const Menus = styled(MenuPopup)`
@@ -79,21 +74,21 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-export const Tools: FC<ToolsProps> = ({className, prev, node}) => {
+export const Tools: FC<ToolsProps> = ({className, prev, node: trunk}) => {
   const {editor} = useContext(EditorContext);
 
   const onCutNode = (event: MouseEvent): void => {
-    editor.setStatefulNode({prev, node: node.id, type: 'cutting'});
+    editor.setStatefulNode({prev, trunk, type: 'cutting'});
     event.stopPropagation();
   };
 
   const onCopyNode = (event: MouseEvent): void => {
-    editor.setStatefulNode({prev, node: node.id, type: 'copying'});
+    editor.setStatefulNode({prev, trunk, type: 'copying'});
     event.stopPropagation();
   };
 
   const onDeleteNode = (): void => {
-    void editor.procedure.deleteNode(node.id, prev);
+    void editor.procedure.deleteNode(trunk.id, prev);
   };
 
   return (

@@ -1,6 +1,7 @@
 import {
   JointId,
   JointMetadata,
+  JointRef,
   LeafId,
   LeafMetadata,
   LeafType,
@@ -12,7 +13,7 @@ import {
   TrunkRef,
 } from '@magicflow/core';
 import {Patch, applyPatches, enableAllPlugins, produce} from 'immer';
-import {cloneDeep, compact, isEqual} from 'lodash-es';
+import {castArray, cloneDeep, compact, isEqual} from 'lodash-es';
 import {nanoid} from 'nanoid';
 
 enableAllPlugins();
@@ -58,7 +59,8 @@ export interface IProcedure<
   updateLeaf(leaf: LeafMetadata): void;
   deleteLeaf(leafId: LeafId): void;
 
-  createJoint(trunk: TrunkRef, otherTrunk: TrunkRef): void;
+  createJoint(trunk: TrunkRef, otherTrunks: TrunkRef | TrunkRef[]): void;
+  connectJoint(joint: JointRef, otherTrunks: TrunkRef | TrunkRef[]): void;
   deleteJoint(joint: JointId): void;
 
   createNode(trunk: TrunkRef, next: Ref | 'next' | undefined): void;
@@ -211,22 +213,46 @@ export class Procedure<
     });
   }
 
-  async createJoint(trunk: TrunkRef, otherTrunk: TrunkRef): Promise<void> {
+  async createJoint(
+    trunk: TrunkRef,
+    otherTrunks: TrunkRef | TrunkRef[],
+  ): Promise<void> {
     return this.update(async definition => {
       let trunkMetadata = requireTrunk(definition, trunk);
-      let otherTrunkMetadata = requireTrunk(definition, otherTrunk);
+      let otherTrunksMetadata = requireTrunks(
+        definition,
+        castArray(otherTrunks),
+      );
 
-      // TODO (boen): 检查两个节点是否前后，是的话就无法添加
+      // TODO (boen): 检查是否存在节点是前后关系，是的话就无需添加
 
       let id = createId<JointId>();
 
       trunkMetadata.nexts = trunkMetadata.nexts || [];
-      otherTrunkMetadata.nexts = otherTrunkMetadata.nexts || [];
 
       trunkMetadata.nexts.push({type: 'joint', id});
-      otherTrunkMetadata.nexts.push({type: 'joint', id});
 
-      definition.joints.push({id});
+      for (let otherTrunkMetadata of otherTrunksMetadata) {
+        otherTrunkMetadata.nexts = otherTrunkMetadata.nexts || [];
+        otherTrunkMetadata.nexts.push({type: 'joint', id});
+      }
+
+      definition.joints.push({id, master: trunk});
+    });
+  }
+
+  async connectJoint(
+    joint: JointRef,
+    _otherTrunks: TrunkRef | TrunkRef[],
+  ): Promise<void> {
+    return this.update(async definition => {
+      let jointMetadata = requireTrunk(definition, joint);
+      let otherTrunks = castArray(_otherTrunks);
+
+      requireTrunks(definition, castArray(otherTrunks));
+
+      jointMetadata.nexts = jointMetadata.nexts || [];
+      jointMetadata.nexts.push(...otherTrunks);
     });
   }
 
@@ -252,17 +278,25 @@ export class Procedure<
         return;
       }
 
-      let leavesSet = new Set<LeafId>(
-        compact(
-          jointMetadata.nexts.map(next =>
-            next.type === 'leaf' ? next.id : undefined,
-          ),
-        ),
-      );
+      let trunkNexts: TrunkRef[] = [];
+      let leavesSet = new Set<LeafId>();
+
+      for (let next of jointMetadata.nexts) {
+        if (next.type === 'leaf') {
+          leavesSet.add(next.id);
+        } else {
+          trunkNexts.push(next);
+        }
+      }
 
       definition.leaves = definition.leaves.filter(
         leaf => !leavesSet.has(leaf.id),
       );
+
+      let masterTrunk = requireTrunk(definition, jointMetadata.master);
+
+      masterTrunk.nexts = masterTrunk.nexts || [];
+      masterTrunk.nexts.push(...trunkNexts);
     });
   }
 
@@ -696,4 +730,33 @@ function requireTrunk<TTrunkRef extends TrunkRef>(
     node: NodeMetadata;
     joint: JointMetadata;
   }[TTrunkRef['type']];
+}
+
+function requireTrunks<TTrunkRef extends TrunkRef>(
+  definition: ProcedureDefinition,
+  trunkRef: TTrunkRef[],
+): {node: NodeMetadata; joint: JointMetadata}[TTrunkRef['type']][] {
+  let trunksMap = new Map(
+    [...definition.nodes, ...definition.joints].map(trunk => [trunk.id, trunk]),
+  );
+
+  let trunks: {
+    node: NodeMetadata;
+    joint: JointMetadata;
+  }[TTrunkRef['type']][] = [];
+
+  for (let ref of trunkRef) {
+    if (!trunksMap.has(ref.id)) {
+      throw Error(`Not found ${ref.type} metadata by id '${ref.id}'`);
+    }
+
+    trunks.push(
+      trunksMap.get(ref.id)! as {
+        node: NodeMetadata;
+        joint: JointMetadata;
+      }[TTrunkRef['type']],
+    );
+  }
+
+  return trunks;
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-function SvgCheckSolid(props: React.SVGProps<SVGSVGElement>) {
+function SvgAddSolid(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="1em"
@@ -13,11 +13,11 @@ function SvgCheckSolid(props: React.SVGProps<SVGSVGElement>) {
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M8 16A8 8 0 108 0a8 8 0 000 16zm-1.333-4.873a.65.65 0 00.92 0l5.27-5.27a.65.65 0 10-.92-.92l-4.81 4.811-2.343-2.342a.65.65 0 00-.92.919l2.803 2.802z"
-        fill="#81CB5F"
+        d="M8 16A8 8 0 108 0a8 8 0 000 16zm.648-11.7a.65.65 0 00-1.3 0v3.047H4.3a.65.65 0 000 1.3h3.048V11.7a.65.65 0 101.3 0V8.647H11.7a.65.65 0 100-1.3H8.648V4.3z"
+        fill="#9BA0AB"
       />
     </svg>
   );
 }
 
-export default SvgCheckSolid;
+export default SvgAddSolid;

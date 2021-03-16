@@ -1,8 +1,9 @@
-import {LeafMetadata, LeafType, NodeId, TrunkRef} from '@magicflow/core';
+import {LeafMetadata, LeafType, TrunkRef} from '@magicflow/core';
 import {
-  ConnectNode,
+  AddSolid as _AddSolid,
+  CombineSolid,
+  JumpSolid,
   More,
-  PlusCircleSolid as _PlusCircleSolid,
 } from '@magicflow/icons';
 import {useBoolean} from 'ahooks';
 import React, {
@@ -19,7 +20,7 @@ import {MenuPopup, transition} from '../../common';
 
 export interface SelectorsProps {
   prev: TrunkRef | undefined;
-  node: NodeId;
+  trunk: TrunkRef;
 }
 
 const MoreButton = styled(More)`
@@ -88,37 +89,31 @@ const Wrapper = styled.div`
   }
 `;
 
-const PlusCircleSolid = styled(_PlusCircleSolid)`
+const AddSolid = styled(_AddSolid)`
   color: #9ba0ab;
 `;
 
-export const Selectors: FC<SelectorsProps> = ({prev, node}) => {
+export const Selectors: FC<SelectorsProps> = ({prev, trunk}) => {
   const [initialized, {setTrue}] = useBoolean(false);
 
   const {editor} = useContext(EditorContext);
 
   const getOnCreateLeaf = useCallback(
     (type: string) => {
-      return () =>
-        editor.procedure.createLeaf(
-          {
-            type: 'node',
-            id: node,
-          },
-          type as LeafType,
-        );
+      return () => editor.procedure.createLeaf(trunk, type as LeafType);
     },
-    [editor, node],
+    [editor, trunk],
   );
 
-  const onCreateNode = (): void =>
-    void editor.procedure.createNode({
-      type: 'node',
-      id: node,
-    });
+  const onCreateNode = (): void => void editor.procedure.createNode(trunk);
 
   const onConnectNode = (event: MouseEvent): void => {
-    editor.setStatefulNode({prev, node, type: 'connecting'});
+    editor.setStatefulNode({prev, trunk, type: 'connecting'});
+    event.stopPropagation();
+  };
+
+  const onCreateJoint = (event: MouseEvent): void => {
+    editor.setStatefulNode({prev, trunk, type: 'join'});
     event.stopPropagation();
   };
 
@@ -153,11 +148,15 @@ export const Selectors: FC<SelectorsProps> = ({prev, node}) => {
         )}
 
         <MenuItem onClick={onConnectNode}>
-          <ConnectNode />
+          <JumpSolid />
+        </MenuItem>
+
+        <MenuItem onClick={onCreateJoint}>
+          <CombineSolid />
         </MenuItem>
 
         <MenuItem onClick={onCreateNode}>
-          <PlusCircleSolid />
+          <AddSolid />
         </MenuItem>
       </Menus>
     </Wrapper>

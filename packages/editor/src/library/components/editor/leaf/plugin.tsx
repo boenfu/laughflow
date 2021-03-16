@@ -1,4 +1,4 @@
-import {CheckCircleSolid, TimesCircleSolid} from '@magicflow/icons';
+import {CheckSolid, WrongSolid} from '@magicflow/icons';
 
 import {ILeafPlugin} from '../../../plugin';
 
@@ -11,7 +11,7 @@ export const doneLeaf: ILeafPlugin = {
   selector: {
     order: 0,
     multiple: false,
-    render: CheckCircleSolid,
+    render: CheckSolid,
   },
 };
 
@@ -21,6 +21,6 @@ export const terminateLeaf: ILeafPlugin = {
   selector: {
     order: 1,
     multiple: false,
-    render: TimesCircleSolid,
+    render: WrongSolid,
   },
 };

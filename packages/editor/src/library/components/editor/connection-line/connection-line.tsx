@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import {useMark} from './@mark';
 
-export const LINE_HEIGHT_DEFAULT = 68;
+export const LINE_HEIGHT_DEFAULT = 48;
 
 const STROKE_DEFAULT: BezierStroke = {color: '#C8CDD8', width: 1};
 

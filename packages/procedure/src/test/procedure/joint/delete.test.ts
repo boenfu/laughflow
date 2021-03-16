@@ -19,6 +19,10 @@ let definition: ProcedureDefinition = {
   joints: [
     {
       id: jointId,
+      master: {
+        type: 'node',
+        id: nodeId,
+      },
     },
   ],
   leaves: [],

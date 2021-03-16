@@ -1,4 +1,4 @@
-import {TimesSolid} from '@magicflow/icons';
+import {Wrong} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
@@ -20,7 +20,7 @@ const Content = styled.div`
 export const TerminateLeaf: FC<TerminateLeafProps> = () => {
   return (
     <Content>
-      <TimesSolid />
+      <Wrong />
     </Content>
   );
 };

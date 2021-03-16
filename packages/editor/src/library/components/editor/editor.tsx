@@ -1,6 +1,7 @@
 import {LeafId, LeafMetadata, Ref} from '@magicflow/core';
 import {useCreation, useEventListener, useUpdate} from 'ahooks';
-import React, {FC, Fragment, ReactNode, useEffect} from 'react';
+import classNames from 'classnames';
+import React, {FC, Fragment, ReactNode, useEffect, useRef} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
 
 import {EditorContext} from '../../context';
@@ -11,6 +12,7 @@ import {ConnectionLine, LINE_HEIGHT_DEFAULT} from './connection-line';
 import {EditorProps} from './editor.doc';
 import {Joint} from './joint';
 import {Leaf} from './leaf';
+import {Navigation} from './navigation';
 import {LinkNode, Node} from './node';
 
 const PlaceholderLeafId = 'placeholder' as LeafId;
@@ -29,23 +31,37 @@ declare module '@magicflow/core' {
 const Wrapper = styled.div`
   height: 100%;
   width: 100%;
+  padding: 0 64px 64px;
   box-sizing: border-box;
-  padding: 64px;
   text-align: center;
   overflow: auto;
+  background-color: #e5e7eb;
 `;
 
 const Row = styled.div`
   padding-top: ${LINE_HEIGHT_DEFAULT}px;
   text-align: center;
+
+  &.muti {
+    padding-top: ${LINE_HEIGHT_DEFAULT * 2}px;
+  }
 `;
 
 export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const editor = useCreation(() => new Editor(definition, plugins), []);
   const reRender = useUpdate();
 
+  const onFullScreenToggle = (): void => {
+    if (document.fullscreenElement) {
+      void document.exitFullscreen();
+    } else {
+      void wrapperRef.current?.requestFullscreen();
+    }
+  };
+
   useEventListener('click', () => {
-    if (editor.statefulNode) {
+    if (editor.statefulTrunk) {
       editor.setStatefulNode(undefined);
     }
   });
@@ -95,7 +111,7 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
     return (
       <Fragment>
         <Node prev={prev?.ref} node={metadata}>
-          <Row>
+          <Row className={classNames({muti: nexts.length > 1})}>
             {nexts.map((next, index, array) => {
               return (
                 <Fragment key={`node:${ref.id}-${next.ref.id}`}>
@@ -117,10 +133,9 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
 
   return (
     <ThemeProvider theme={THEME_DEFAULT}>
-      <Wrapper>
+      <Wrapper ref={wrapperRef}>
         <EditorContext.Provider value={{editor}}>
-          <button onClick={() => editor.procedure.undo()}>undo</button>
-          <button onClick={() => editor.procedure.redo()}>redo</button>
+          <Navigation onFullScreenToggle={onFullScreenToggle} />
           {renderNode(editor.procedureTreeNode)}
         </EditorContext.Provider>
       </Wrapper>

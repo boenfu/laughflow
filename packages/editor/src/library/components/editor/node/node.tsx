@@ -1,6 +1,12 @@
-import {NodeMetadata, TrunkRef} from '@magicflow/core';
+import {NodeMetadata, NodeRef, TrunkRef} from '@magicflow/core';
 import classnames from 'classnames';
-import React, {CSSProperties, FC, createElement, useContext} from 'react';
+import React, {
+  CSSProperties,
+  FC,
+  MouseEvent,
+  createElement,
+  useContext,
+} from 'react';
 import styled from 'styled-components';
 
 import {EditorContext} from '../../../context';
@@ -47,7 +53,7 @@ const HeaderExtra = styled.div`
 
 const Wrapper = styled.div`
   position: relative;
-  margin: 0 16px;
+  margin: 0 17px;
   width: 220px;
   display: inline-block;
   vertical-align: top;
@@ -83,39 +89,41 @@ const Wrapper = styled.div`
     }
   }
 
-  &.cutting,
-  &.copying,
-  &.connecting {
+  &.stateful {
     .tools {
       opacity: 0;
       pointer-events: none;
     }
 
     &::before {
+      opacity: 0;
       margin: 0px;
       height: 100%;
-      transform: scale(1.2);
+      transform: translate(-12px, -12px);
+      padding: 12px;
       position: absolute;
       top: 0px;
       left: 0px;
       width: 100%;
       content: '';
-      background-color: rgba(255, 255, 255, 0.61);
       z-index: 2;
+      border: 1px dashed #296dff;
+      border-radius: 4px;
+      pointer-events: none;
     }
-  }
 
-  &.cutting::before {
-    border: 1px dashed rgb(217, 217, 217);
-  }
+    &:hover {
+      &::before {
+        opacity: 1;
+      }
+    }
 
-  &.copying::before {
-    border: 1px dashed blue;
-  }
-
-  &.connecting::before {
-    border: 1px dashed blue;
-    background-color: transparent;
+    &.selected {
+      &::before {
+        opacity: 1;
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+    }
   }
 `;
 
@@ -145,27 +153,31 @@ export const Node: FC<NodeProps> = ({
     body,
   } = editor.getNodeRenderDescriptor(node);
 
+  let nodeRef: NodeRef = {type: 'node', id: node.id};
+
   const onNodeChange = (node: NodeMetadata): void =>
     void editor.procedure.updateNode(node);
 
-  const onContainerClick = (): void => {
-    if (!statefulNode || statefulNode.type !== 'connecting') {
+  const onContainerClick = (event: MouseEvent<HTMLDivElement>): void => {
+    if (!statefulNode) {
       return;
     }
 
-    void editor.procedure.connectNode(
-      {
-        type: 'node',
-        id: statefulNode.node,
-      },
-      {
-        type: 'node',
-        id: node.id,
-      },
-    );
+    if (statefulNode.type === 'connecting') {
+      void editor.procedure.connectNode(statefulNode.trunk, nodeRef);
+      return;
+    }
+
+    if (statefulNode.type === 'join') {
+      editor.setStatefulNode({
+        ...statefulNode,
+        otherTrunks: [...(statefulNode.otherTrunks || []), nodeRef],
+      });
+      event.stopPropagation();
+    }
   };
 
-  let statefulNode = editor.statefulNode;
+  let statefulNode = editor.statefulTrunk;
 
   return (
     <Container style={style}>
@@ -173,13 +185,14 @@ export const Node: FC<NodeProps> = ({
       <Wrapper
         className={classnames([
           className,
-          statefulNode && statefulNode.node === node.id
-            ? statefulNode.type
-            : undefined,
+          {
+            stateful: !!statefulNode,
+            selected: statefulNode?.trunk?.id === node.id,
+          },
         ])}
         onClick={onContainerClick}
       >
-        <Tools className="tools" prev={prev} node={node} />
+        <Tools className="tools" prev={prev} node={nodeRef} />
         <Header>
           {headLeft && (
             <HeaderExtra>{createElement(headLeft, {node})}</HeaderExtra>
@@ -193,7 +206,7 @@ export const Node: FC<NodeProps> = ({
         </Header>
         <Body>{body && createElement(body, {node})}</Body>
         <Footer>
-          <Selectors prev={prev} node={node.id} />
+          <Selectors prev={prev} trunk={nodeRef} />
           {footer && createElement(footer, {node})}
         </Footer>
       </Wrapper>

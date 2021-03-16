@@ -1,5 +1,5 @@
 import {Ref, TrunkRef} from '@magicflow/core';
-import {Copy, PlusCircleSolid as _PlusCircleSolid} from '@magicflow/icons';
+import {AddSolid as _AddSolid, Copy} from '@magicflow/icons';
 import {Bezier as _Bezier, BezierPoint, Mark} from 'rc-bezier';
 import React, {
   FC,
@@ -47,7 +47,7 @@ const MarkWrapper = styled.div`
   }
 `;
 
-const PlusCircleSolid = styled(_PlusCircleSolid)`
+const AddSolid = styled(_AddSolid)`
   opacity: 1;
   color: ${props => props.theme.primary};
 
@@ -75,18 +75,24 @@ const Mark: FC<{
   onMouseLeave: MouseEventHandler;
 }> = ({active, start: node, next, position, onMouseEnter, onMouseLeave}) => {
   const {editor} = useContext(EditorContext);
-  const migrateChildren = position && position.y < LINE_HEIGHT_DEFAULT / 2;
+  const migrateChildren = position && position.y < LINE_HEIGHT_DEFAULT;
 
   const onClick = (): void => {
     let targetNext =
       next.type !== 'leaf' || next.id !== 'placeholder' ? next : undefined;
 
-    if (editor.statefulNode) {
-      switch (editor.statefulNode.type) {
+    if (editor.statefulTrunk) {
+      let statefulTrunkRef = editor.statefulTrunk.trunk;
+
+      if (statefulTrunkRef.type !== 'node') {
+        return;
+      }
+
+      switch (editor.statefulTrunk.type) {
         case 'cutting':
           void editor.procedure.moveNode(
-            editor.statefulNode.node,
-            editor.statefulNode.prev,
+            statefulTrunkRef.id,
+            editor.statefulTrunk.prev,
             node,
             targetNext,
           );
@@ -94,11 +100,7 @@ const Mark: FC<{
           break;
 
         case 'copying':
-          void editor.procedure.copyNode(
-            editor.statefulNode.node,
-            node,
-            targetNext,
-          );
+          void editor.procedure.copyNode(statefulTrunkRef.id, node, targetNext);
           break;
 
         default:
@@ -116,13 +118,13 @@ const Mark: FC<{
     return <></>;
   }
 
-  let Icon = <PlusCircleSolid />;
+  let Icon = <AddSolid />;
   let title = '插入节点';
 
-  if (editor.statefulNode) {
+  if (editor.statefulTrunk) {
     if (
-      editor.statefulNode.type === 'copying' ||
-      editor.statefulNode.type === 'cutting'
+      editor.statefulTrunk.type === 'copying' ||
+      editor.statefulTrunk.type === 'cutting'
     ) {
       Icon = <Paste />;
       title = '粘贴';

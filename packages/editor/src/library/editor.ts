@@ -75,10 +75,11 @@ export type NodeRenderDescriptor = NodePluginComponentRender;
 
 type ProcedureEventType = 'update';
 
-interface StatefulNode {
+interface StatefulTrunk {
   prev: TrunkRef | undefined;
-  node: NodeId;
+  trunk: TrunkRef;
   type: 'cutting' | 'copying' | 'connecting' | 'join';
+  otherTrunks?: TrunkRef[];
 }
 
 export class Editor extends Eventemitter<ProcedureEventType> {
@@ -98,10 +99,10 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     fns: [],
   };
 
-  private _statefulNode: StatefulNode | undefined;
+  private _statefulTrunk: StatefulTrunk | undefined;
 
-  get statefulNode(): StatefulNode | undefined {
-    return this._statefulNode;
+  get statefulTrunk(): StatefulTrunk | undefined {
+    return this._statefulTrunk;
   }
 
   constructor(definition: ProcedureDefinition, plugins: IPlugin[] = []) {
@@ -218,8 +219,8 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     );
   }
 
-  setStatefulNode(statefulNode: StatefulNode | undefined): void {
-    this._statefulNode = statefulNode;
+  setStatefulNode(statefulNode: StatefulTrunk | undefined): void {
+    this._statefulTrunk = statefulNode;
     this.emit('update');
   }
 
