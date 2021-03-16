@@ -2,11 +2,10 @@ import {LeafId, LeafMetadata, Ref} from '@magicflow/core';
 import {useCreation, useEventListener, useUpdate} from 'ahooks';
 import classNames from 'classnames';
 import React, {FC, Fragment, ReactNode, useEffect, useRef} from 'react';
-import styled, {ThemeProvider} from 'styled-components';
+import styled from 'styled-components';
 
 import {EditorContext} from '../../context';
 import {Editor, ProcedureNodeTreeNode, ProcedureTreeNode} from '../../editor';
-import {THEME_DEFAULT} from '../theme';
 
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from './connection-line';
 import {EditorProps} from './editor.doc';
@@ -48,6 +47,7 @@ const Row = styled.div`
 `;
 
 export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
+  // eslint-disable-next-line no-null/no-null
   const wrapperRef = useRef<HTMLDivElement>(null);
   const editor = useCreation(() => new Editor(definition, plugins), []);
   const reRender = useUpdate();
@@ -132,14 +132,12 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
   }
 
   return (
-    <ThemeProvider theme={THEME_DEFAULT}>
-      <Wrapper ref={wrapperRef}>
-        <EditorContext.Provider value={{editor}}>
-          <Navigation onFullScreenToggle={onFullScreenToggle} />
-          {renderNode(editor.procedureTreeNode)}
-        </EditorContext.Provider>
-      </Wrapper>
-    </ThemeProvider>
+    <Wrapper ref={wrapperRef}>
+      <EditorContext.Provider value={{editor}}>
+        <Navigation onFullScreenToggle={onFullScreenToggle} />
+        {renderNode(editor.procedureTreeNode)}
+      </EditorContext.Provider>
+    </Wrapper>
   );
 };
 

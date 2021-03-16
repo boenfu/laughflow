@@ -49,7 +49,7 @@ const MarkWrapper = styled.div`
 
 const AddSolid = styled(_AddSolid)`
   opacity: 1;
-  color: ${props => props.theme.primary};
+  color: #296dff;
 
   &:hover {
     opacity: 0.8;
@@ -61,7 +61,7 @@ const AddSolid = styled(_AddSolid)`
 const Paste = styled(Copy)`
   font-size: 16px;
   color: white;
-  background-color: ${props => props.theme.primary};
+  background-color: #296dff;
   border-radius: 50%;
   padding: 4px;
 `;

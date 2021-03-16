@@ -12,7 +12,7 @@ const Content = styled.div`
   justify-content: center;
   border-radius: 50%;
   color: #fff;
-  box-shadow: 0 2px 4px ${props => props.theme.shadow};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   background-color: #e55a3a;
 `;

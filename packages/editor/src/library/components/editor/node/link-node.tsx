@@ -31,9 +31,9 @@ const Content = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 28px;
-  box-shadow: 0 2px 4px ${props => props.theme.shadow};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  color: ${props => props.theme['text-primary']};
+  color: #333333;
   background-color: #fff;
 `;
 

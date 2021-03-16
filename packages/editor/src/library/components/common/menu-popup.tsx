@@ -6,7 +6,7 @@ export const MenuPopup = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px ${props => props.theme.shadow};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   background-color: #fff;
   overflow: hidden;
 `;

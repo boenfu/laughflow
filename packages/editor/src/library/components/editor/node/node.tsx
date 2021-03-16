@@ -38,9 +38,9 @@ const Header = styled.div`
   padding: 0 16px;
   align-items: center;
   font-size: 14px;
-  color: ${props => props.theme['text-primary']};
-  background-color: ${props => props.theme.background};
-  border-bottom: 1px solid ${props => props.theme.border};
+  color: #333333;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid rgba(16, 42, 100, 0.08);
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
 
@@ -58,7 +58,7 @@ const Wrapper = styled.div`
   display: inline-block;
   vertical-align: top;
   border-radius: 4px;
-  box-shadow: 0 2px 4px ${props => props.theme.shadow};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   background-color: #fff;
 
   .tools {
@@ -69,18 +69,18 @@ const Wrapper = styled.div`
   }
 
   &.active {
-    box-shadow: 0 6px 12px ${props => props.theme['shadow-solid']};
+    box-shadow: 0 6px 12px rgba(58, 69, 92, 0.16);
 
     ${Header} {
-      color: ${props => props.theme['text-primary-inverse']};
-      background-color: ${props => props.theme.primary};
+      color: #ffffff;
+      background-color: #296dff;
     }
   }
 
   &:hover {
     ${Header}:hover {
-      color: ${props => props.theme['text-primary-inverse']};
-      background-color: ${props => props.theme.secondary};
+      color: #ffffff;
+      background-color: #5b6e95;
     }
 
     .tools {
