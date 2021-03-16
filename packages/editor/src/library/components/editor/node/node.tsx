@@ -1,4 +1,5 @@
 import {NodeMetadata, NodeRef, TrunkRef} from '@magicflow/core';
+import {Connect, Copy, Cut} from '@magicflow/icons';
 import classnames from 'classnames';
 import React, {
   CSSProperties,
@@ -10,6 +11,7 @@ import React, {
 import styled from 'styled-components';
 
 import {EditorContext} from '../../../context';
+import {ActiveTrunk} from '../../../editor';
 import {transition} from '../../common';
 
 import {DisplayName} from './@header';
@@ -117,6 +119,49 @@ const Footer = styled.div`
   height: 40px;
 `;
 
+const EditingIconWrapper = styled.div`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -4px);
+
+  background: #296dff;
+  color: #fff;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
+  border-radius: 28px;
+
+  z-index: 3;
+`;
+
+const STATE_ICON_DICT: Partial<
+  {[key in ActiveTrunk['state']]: React.ElementType}
+> = {
+  joining: Connect,
+  cutting: Cut,
+  copying: Copy,
+};
+
+const EditingIcon: FC<{state: ActiveTrunk['state']}> = ({state}) => {
+  let Component = STATE_ICON_DICT[state];
+
+  if (!Component) {
+    return <></>;
+  }
+
+  return (
+    <EditingIconWrapper>
+      <Component />
+    </EditingIconWrapper>
+  );
+};
+
 export const Node: FC<NodeProps> = ({
   className,
   style,
@@ -165,6 +210,9 @@ export const Node: FC<NodeProps> = ({
     event.stopPropagation();
   };
 
+  let editing = activeTrunk && activeTrunk?.state !== 'none';
+  let active = activeTrunk?.ref?.id === node.id;
+
   return (
     <Container style={style}>
       {before && createElement(before, {node})}
@@ -172,8 +220,8 @@ export const Node: FC<NodeProps> = ({
         className={classnames([
           className,
           {
-            editing: activeTrunk && activeTrunk?.state !== 'none',
-            active: activeTrunk?.ref?.id === node.id,
+            editing,
+            active,
             selected: activeTrunk?.relationTrunks?.some(
               ref => ref.id === node.id,
             ),
@@ -194,6 +242,10 @@ export const Node: FC<NodeProps> = ({
         </Header>
         <Body>{body && createElement(body, {node})}</Body>
         <Footer>{footer && createElement(footer, {node})}</Footer>
+
+        {editing && active ? (
+          <EditingIcon state={activeTrunk!.state} />
+        ) : undefined}
       </Wrapper>
       {after && createElement(after, {node})}
       {children}

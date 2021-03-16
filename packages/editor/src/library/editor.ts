@@ -74,7 +74,7 @@ export type NodeRenderDescriptor = NodePluginComponentRender;
 
 type ProcedureEventType = 'update';
 
-interface ActiveTrunk {
+export interface ActiveTrunk {
   prev: TrunkRef | undefined;
   ref: TrunkRef;
   // 无 / 剪切 / 复制 / 跳转 / 汇入 / 连接
