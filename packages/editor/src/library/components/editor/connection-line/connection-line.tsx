@@ -54,7 +54,7 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
 
         let radius = ARC_RADIUS_DEFAULT;
         let direction = end.x > start.x ? 1 : -1;
-        let midline = (start.y + end.y) / 2;
+        let midline = start.y + LINE_HEIGHT_DEFAULT;
 
         if (first) {
           return `M ${start.x},${start.y} V ${

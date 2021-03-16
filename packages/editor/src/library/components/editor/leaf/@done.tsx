@@ -1,4 +1,4 @@
-import {CheckSolid} from '@magicflow/icons';
+import {Check} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
@@ -20,7 +20,7 @@ const Content = styled.div`
 export const DoneLeaf: FC<DoneLeafProps> = () => {
   return (
     <Content>
-      <CheckSolid />
+      <Check />
     </Content>
   );
 };

@@ -81,18 +81,18 @@ const Mark: FC<{
     let targetNext =
       next.type !== 'leaf' || next.id !== 'placeholder' ? next : undefined;
 
-    if (editor.statefulTrunk) {
-      let statefulTrunkRef = editor.statefulTrunk.trunk;
+    if (editor.activeTrunk) {
+      let editingTrunkRef = editor.activeTrunk.ref;
 
-      if (statefulTrunkRef.type !== 'node') {
+      if (editingTrunkRef.type !== 'node') {
         return;
       }
 
-      switch (editor.statefulTrunk.type) {
+      switch (editor.activeTrunk.state) {
         case 'cutting':
           void editor.procedure.moveNode(
-            statefulTrunkRef.id,
-            editor.statefulTrunk.prev,
+            editingTrunkRef.id,
+            editor.activeTrunk.prev,
             node,
             targetNext,
           );
@@ -100,7 +100,7 @@ const Mark: FC<{
           break;
 
         case 'copying':
-          void editor.procedure.copyNode(statefulTrunkRef.id, node, targetNext);
+          void editor.procedure.copyNode(editingTrunkRef.id, node, targetNext);
           break;
 
         default:
@@ -121,10 +121,10 @@ const Mark: FC<{
   let Icon = <AddSolid />;
   let title = '插入节点';
 
-  if (editor.statefulTrunk) {
+  if (editor.activeTrunk) {
     if (
-      editor.statefulTrunk.type === 'copying' ||
-      editor.statefulTrunk.type === 'cutting'
+      editor.activeTrunk.state === 'copying' ||
+      editor.activeTrunk.state === 'cutting'
     ) {
       Icon = <Paste />;
       title = '粘贴';

@@ -5,13 +5,14 @@ import React, {FC, Fragment, ReactNode, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
 import {EditorContext} from '../../context';
-import {Editor, ProcedureNodeTreeNode, ProcedureTreeNode} from '../../editor';
+import {Editor, ProcedureTreeNode} from '../../editor';
 
+import {Footer} from './@footer';
+import {Navigation} from './@navigation';
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from './connection-line';
 import {EditorProps} from './editor.doc';
 import {Joint} from './joint';
 import {Leaf} from './leaf';
-import {Navigation} from './navigation';
 import {LinkNode, Node} from './node';
 
 const PlaceholderLeafId = 'placeholder' as LeafId;
@@ -28,9 +29,16 @@ declare module '@magicflow/core' {
 }
 
 const Wrapper = styled.div`
+  position: relative;
   height: 100%;
   width: 100%;
-  padding: 0 64px 64px;
+  overflow: hidden;
+`;
+
+const Content = styled.div`
+  height: 100%;
+  width: 100%;
+  padding: 64px;
   box-sizing: border-box;
   text-align: center;
   overflow: auto;
@@ -61,15 +69,15 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
   };
 
   useEventListener('click', () => {
-    if (editor.statefulTrunk) {
-      editor.setStatefulNode(undefined);
+    if (editor.activeTrunk) {
+      editor.setActiveTrunk(undefined);
     }
   });
 
   useEffect(() => {
     editor.on('update', () => {
       reRender();
-      console.log(editor.procedure);
+      console.log(editor, editor.procedure);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -106,27 +114,35 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
       ];
     }
 
-    let {ref, prev, metadata} = node as ProcedureNodeTreeNode;
+    let children = (
+      <Row className={classNames({muti: nexts.length > 1})}>
+        {nexts.map((next, index, array) => {
+          return (
+            <Fragment key={`node:${node.ref.id}-${next.ref.id}`}>
+              <ConnectionLine
+                node={node.ref}
+                next={next.ref}
+                first={index === 0 && array.length > 1}
+                last={index === array.length - 1 && array.length > 1}
+              />
+              {renderNode(next)}
+            </Fragment>
+          );
+        })}
+      </Row>
+    );
 
     return (
       <Fragment>
-        <Node prev={prev?.ref} node={metadata}>
-          <Row className={classNames({muti: nexts.length > 1})}>
-            {nexts.map((next, index, array) => {
-              return (
-                <Fragment key={`node:${ref.id}-${next.ref.id}`}>
-                  <ConnectionLine
-                    node={ref}
-                    next={next.ref}
-                    first={index === 0}
-                    last={index === array.length - 1}
-                  />
-                  {renderNode(next)}
-                </Fragment>
-              );
-            })}
-          </Row>
-        </Node>
+        {isTypeTreeNode(node, 'node') ? (
+          <Node prev={node.prev?.ref} node={node.metadata}>
+            {children}
+          </Node>
+        ) : (
+          <Joint prev={node.prev!.ref} joint={node.metadata}>
+            {children}
+          </Joint>
+        )}
       </Fragment>
     );
   }
@@ -135,7 +151,8 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
     <Wrapper ref={wrapperRef}>
       <EditorContext.Provider value={{editor}}>
         <Navigation onFullScreenToggle={onFullScreenToggle} />
-        {renderNode(editor.procedureTreeNode)}
+        <Content>{renderNode(editor.procedureTreeNode)}</Content>
+        <Footer />
       </EditorContext.Provider>
     </Wrapper>
   );

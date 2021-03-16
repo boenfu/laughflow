@@ -78,12 +78,12 @@ export const Tools: FC<ToolsProps> = ({className, prev, node: trunk}) => {
   const {editor} = useContext(EditorContext);
 
   const onCutNode = (event: MouseEvent): void => {
-    editor.setStatefulNode({prev, trunk, type: 'cutting'});
+    editor.setActiveTrunk({prev, ref: trunk, state: 'cutting'});
     event.stopPropagation();
   };
 
   const onCopyNode = (event: MouseEvent): void => {
-    editor.setStatefulNode({prev, trunk, type: 'copying'});
+    editor.setActiveTrunk({prev, ref: trunk, state: 'copying'});
     event.stopPropagation();
   };
 

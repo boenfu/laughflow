@@ -1,8 +1,9 @@
 import {JointMetadata, TrunkRef} from '@magicflow/core';
 import {Trash} from '@magicflow/icons';
-import React, {CSSProperties, FC} from 'react';
+import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
 
+import {EditorContext} from '../../../context';
 import {TooltipActions} from '../../common';
 
 export interface JointProps {
@@ -22,39 +23,43 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
-  width: 64px;
+  width: 48px;
   height: 32px;
-  font-size: 12px;
-  line-height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 28px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  color: #333333;
-  background-color: #fff;
+  font-size: 12px;
+
+  background: #ffbb29;
+
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
+  border-radius: 28px;
 `;
 
-export const Joint: FC<JointProps> = ({className, style}) => {
-  // const {editor} = useContext(EditorContext);
+export const Joint: FC<JointProps> = ({className, style, joint, children}) => {
+  const {editor} = useContext(EditorContext);
+
+  let index =
+    editor.procedure.definition.joints.findIndex(({id}) => id === joint.id) + 1;
 
   const onDisconnectNode = (): void => {};
 
   return (
-    <TooltipActions
-      actions={[
-        {
-          name: 'delete',
-          icon: <Trash />,
-          content: '删除',
-          onAction: onDisconnectNode,
-        },
-      ]}
-    >
-      <Container style={style}>
-        <Content className={className}>{'连接器'}</Content>
-      </Container>
-    </TooltipActions>
+    <Container style={style}>
+      <TooltipActions
+        actions={[
+          {
+            name: 'delete',
+            icon: <Trash />,
+            content: '删除',
+            onAction: onDisconnectNode,
+          },
+        ]}
+      >
+        <Content className={className}>{index}</Content>
+      </TooltipActions>
+      {children}
+    </Container>
   );
 };

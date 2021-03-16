@@ -13,8 +13,6 @@ import {EditorContext} from '../../../context';
 import {transition} from '../../common';
 
 import {DisplayName} from './@header';
-import {Selectors} from './@selectors';
-import {Tools} from './@tools';
 
 export interface NodeProps {
   prev: TrunkRef | undefined;
@@ -61,11 +59,11 @@ const Wrapper = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   background-color: #fff;
 
-  .tools {
-    opacity: 0;
-    pointer-events: none;
-
-    ${transition(['opacity'])}
+  &:hover {
+    ${Header}:hover {
+      color: #ffffff;
+      background-color: #5b6e95;
+    }
   }
 
   &.active {
@@ -77,24 +75,7 @@ const Wrapper = styled.div`
     }
   }
 
-  &:hover {
-    ${Header}:hover {
-      color: #ffffff;
-      background-color: #5b6e95;
-    }
-
-    .tools {
-      opacity: 1;
-      pointer-events: unset;
-    }
-  }
-
-  &.stateful {
-    .tools {
-      opacity: 0;
-      pointer-events: none;
-    }
-
+  &.editing {
     &::before {
       opacity: 0;
       margin: 0px;
@@ -118,7 +99,8 @@ const Wrapper = styled.div`
       }
     }
 
-    &.selected {
+    &.selected,
+    &.active {
       &::before {
         opacity: 1;
         background-color: rgba(255, 255, 255, 0.5);
@@ -155,29 +137,33 @@ export const Node: FC<NodeProps> = ({
 
   let nodeRef: NodeRef = {type: 'node', id: node.id};
 
+  let activeTrunk = editor.activeTrunk;
+
   const onNodeChange = (node: NodeMetadata): void =>
     void editor.procedure.updateNode(node);
 
   const onContainerClick = (event: MouseEvent<HTMLDivElement>): void => {
-    if (!statefulNode) {
+    if (activeTrunk?.state === 'connecting') {
+      void editor.procedure.connectNode(activeTrunk.ref, nodeRef);
       return;
     }
 
-    if (statefulNode.type === 'connecting') {
-      void editor.procedure.connectNode(statefulNode.trunk, nodeRef);
-      return;
-    }
-
-    if (statefulNode.type === 'join') {
-      editor.setStatefulNode({
-        ...statefulNode,
-        otherTrunks: [...(statefulNode.otherTrunks || []), nodeRef],
+    if (activeTrunk?.state === 'joining') {
+      editor.setActiveTrunk({
+        ...activeTrunk,
+        relationTrunks: [...(activeTrunk.relationTrunks || []), nodeRef],
       });
       event.stopPropagation();
     }
-  };
 
-  let statefulNode = editor.statefulTrunk;
+    void editor.setActiveTrunk({
+      prev,
+      ref: nodeRef,
+      state: 'none',
+    });
+
+    event.stopPropagation();
+  };
 
   return (
     <Container style={style}>
@@ -186,13 +172,15 @@ export const Node: FC<NodeProps> = ({
         className={classnames([
           className,
           {
-            stateful: !!statefulNode,
-            selected: statefulNode?.trunk?.id === node.id,
+            editing: activeTrunk && activeTrunk?.state !== 'none',
+            active: activeTrunk?.ref?.id === node.id,
+            selected: activeTrunk?.relationTrunks?.some(
+              ref => ref.id === node.id,
+            ),
           },
         ])}
         onClick={onContainerClick}
       >
-        <Tools className="tools" prev={prev} node={nodeRef} />
         <Header>
           {headLeft && (
             <HeaderExtra>{createElement(headLeft, {node})}</HeaderExtra>
@@ -205,10 +193,7 @@ export const Node: FC<NodeProps> = ({
           {before && createElement(before, {node})}
         </Header>
         <Body>{body && createElement(body, {node})}</Body>
-        <Footer>
-          <Selectors prev={prev} trunk={nodeRef} />
-          {footer && createElement(footer, {node})}
-        </Footer>
+        <Footer>{footer && createElement(footer, {node})}</Footer>
       </Wrapper>
       {after && createElement(after, {node})}
       {children}

@@ -1,5 +1,4 @@
 import {
-  JointId,
   JointMetadata,
   JointRef,
   LeafMetadata,
@@ -75,11 +74,12 @@ export type NodeRenderDescriptor = NodePluginComponentRender;
 
 type ProcedureEventType = 'update';
 
-interface StatefulTrunk {
+interface ActiveTrunk {
   prev: TrunkRef | undefined;
-  trunk: TrunkRef;
-  type: 'cutting' | 'copying' | 'connecting' | 'join';
-  otherTrunks?: TrunkRef[];
+  ref: TrunkRef;
+  // 无 / 剪切 / 复制 / 跳转 / 汇入 / 连接
+  state: 'none' | 'cutting' | 'copying' | 'connecting' | 'merging' | 'joining';
+  relationTrunks?: TrunkRef[];
 }
 
 export class Editor extends Eventemitter<ProcedureEventType> {
@@ -99,10 +99,10 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     fns: [],
   };
 
-  private _statefulTrunk: StatefulTrunk | undefined;
+  private _activeTrunk: ActiveTrunk | undefined;
 
-  get statefulTrunk(): StatefulTrunk | undefined {
-    return this._statefulTrunk;
+  get activeTrunk(): ActiveTrunk | undefined {
+    return this._activeTrunk;
   }
 
   constructor(definition: ProcedureDefinition, plugins: IPlugin[] = []) {
@@ -219,8 +219,8 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     );
   }
 
-  setStatefulNode(statefulNode: StatefulTrunk | undefined): void {
-    this._statefulTrunk = statefulNode;
+  setActiveTrunk(activeTrunk: ActiveTrunk | undefined): void {
+    this._activeTrunk = activeTrunk;
     this.emit('update');
   }
 
@@ -244,7 +244,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     function buildTreeNode<TProcedureTreeNode extends ProcedureTreeNode>(
       ref: TProcedureTreeNode['ref'],
       prev: ProcedureTreeNode['prev'] = undefined,
-      visitedNodeSet: Set<NodeId | JointId> = new Set([]),
+      visitedNodeSet: Set<NodeId> = new Set([]),
       hasNexts = true,
     ): TProcedureTreeNode {
       let metadata = refTypeToMetadataMapDict[ref.type].get(ref.id);
@@ -277,20 +277,26 @@ export class Editor extends Eventemitter<ProcedureEventType> {
           continue;
         }
 
+        if (next.type === 'joint') {
+          joints.push(
+            buildTreeNode(
+              next,
+              node,
+              visitedNodeSet,
+              refTypeToMetadataMapDict.joint.get(next.id)?.master?.id !==
+                metadata.id
+                ? false
+                : undefined,
+            ),
+          );
+          continue;
+        }
+
         if (visitedNodeSet.has(next.id)) {
-          if (next.type === 'joint') {
-            joints.push(buildTreeNode(next, node, visitedNodeSet, false));
-          } else {
-            links.push(buildTreeNode(next, node, visitedNodeSet, false));
-          }
+          links.push(buildTreeNode(next, node, visitedNodeSet, false));
         } else {
           visitedNodeSet.add(next.id);
-
-          if (next.type === 'joint') {
-            joints.push(buildTreeNode(next, node, visitedNodeSet));
-          } else {
-            nodes.push(buildTreeNode(next, node, visitedNodeSet));
-          }
+          nodes.push(buildTreeNode(next, node, visitedNodeSet));
         }
       }
 

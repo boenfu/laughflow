@@ -108,12 +108,12 @@ export const Selectors: FC<SelectorsProps> = ({prev, trunk}) => {
   const onCreateNode = (): void => void editor.procedure.createNode(trunk);
 
   const onConnectNode = (event: MouseEvent): void => {
-    editor.setStatefulNode({prev, trunk, type: 'connecting'});
+    editor.setActiveTrunk({prev, ref: trunk, state: 'connecting'});
     event.stopPropagation();
   };
 
   const onCreateJoint = (event: MouseEvent): void => {
-    editor.setStatefulNode({prev, trunk, type: 'join'});
+    editor.setActiveTrunk({prev, ref: trunk, state: 'joining'});
     event.stopPropagation();
   };
 
