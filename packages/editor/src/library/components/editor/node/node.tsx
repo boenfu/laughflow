@@ -62,7 +62,7 @@ const Wrapper = styled.div`
   background-color: #fff;
 
   &:hover {
-    ${Header}:hover {
+    ${Header} {
       color: #ffffff;
       background-color: #5b6e95;
     }

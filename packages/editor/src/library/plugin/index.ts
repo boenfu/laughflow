@@ -107,6 +107,8 @@ export interface INodePlugin {
 }
 
 export interface IPlugin extends IPluginEventHandlers {
+  name: string;
+  devDependencies?: string[];
   nodes?: INodePlugin[];
   leaves?: ILeafPlugin[];
 }
