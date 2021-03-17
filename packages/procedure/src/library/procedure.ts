@@ -101,6 +101,14 @@ export class Procedure<
     cursor: -1,
   };
 
+  get undoAble(): boolean {
+    return !!this.actionStack.undoes?.[this.actionStack.cursor + 1];
+  }
+
+  get redoAble(): boolean {
+    return !!this.actionStack.redoes?.[this.actionStack.cursor];
+  }
+
   get definition(): TProcedureDefinition {
     return this._definition;
   }

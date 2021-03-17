@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import {castArray} from 'lodash-es';
 import Tooltip from 'rc-tooltip';
 import React, {FC, ReactElement} from 'react';
@@ -5,6 +6,7 @@ import styled from 'styled-components';
 
 export interface IconButtonProps extends React.HTMLAttributes<HTMLDivElement> {
   tooltip?: string | string[];
+  disable?: boolean | boolean[];
 }
 
 const Button = styled.div`
@@ -20,21 +22,28 @@ const Button = styled.div`
   &:hover {
     color: #296dff;
   }
+
+  &.disable {
+    color: #999999;
+    cursor: default;
+    pointer-events: none;
+  }
 `;
 
 const SplitLine = styled.div`
   width: 1px;
-  background-color: #c2c5cd;
   height: 18px;
+  margin: 0 1.5px;
+  background-color: #c2c5cd;
 `;
 
 const ButtonWrapper = styled.div`
   display: flex;
+  align-items: center;
   padding: 2px;
+  border-radius: 4px;
   background: #d8dade;
   box-shadow: 0px 2px 4px rgba(185, 188, 196, 0.77);
-  border-radius: 4px;
-  align-items: center;
 
   & + & {
     margin-left: 8px;
@@ -84,18 +93,28 @@ const TextTooltip: FC<{text?: string}> = ({text, children}) => {
 };
 
 export const IconButton: FC<IconButtonProps> = React.memo(
-  ({children, tooltip, ...props}) => {
+  ({children, tooltip, disable, ...props}) => {
     let tooltips = castArray(tooltip);
+    let disables = castArray(disable);
 
     return (
       <ButtonWrapper {...props}>
         {React.Children.toArray(children)
-          .flatMap((child, index) => [
-            <TextTooltip key={`button:${index}`} text={tooltips[index]}>
-              <Button>{child}</Button>
-            </TextTooltip>,
-            <SplitLine key={`line:${index}`} />,
-          ])
+          .flatMap((child: React.ReactElement, index) => {
+            let {onClick, ...restProps} = child.props;
+
+            return [
+              <TextTooltip key={`button:${index}`} text={tooltips[index]}>
+                <Button
+                  className={classNames({disable: disables[index] ?? disable})}
+                  onClick={onClick}
+                >
+                  {{...child, props: restProps}}
+                </Button>
+              </TextTooltip>,
+              <SplitLine key={`line:${index}`} />,
+            ];
+          })
           .slice(0, -1)}
       </ButtonWrapper>
     );

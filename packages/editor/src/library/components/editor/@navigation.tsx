@@ -7,9 +7,7 @@ import {
   Expand,
   Jump,
   More,
-  Redo,
   Trash,
-  Undo,
   Wrong,
 } from '@magicflow/icons';
 import React, {FC, MouseEvent, useContext} from 'react';
@@ -100,9 +98,6 @@ export const Navigation: FC<NavigationProps> = React.memo(
 
     let activeTrunk = editor.activeTrunk;
 
-    const onUndo = (): void => editor.procedure.undo();
-    const onRedo = (): void => editor.procedure.redo();
-
     const onNodeActionClick = (event: MouseEvent<HTMLDivElement>): void => {
       if (!activeTrunk) {
         return;
@@ -153,10 +148,6 @@ export const Navigation: FC<NavigationProps> = React.memo(
         <Left />
         <Mid />
         <Right>
-          <IconButton tooltip={['撤销', '重做']}>
-            <Undo onClick={onUndo} />
-            <Redo onClick={onRedo} />
-          </IconButton>
           {activeTrunk?.ref.type === 'node'
             ? NODE_ACTIONS.map(({type, icon: Icon, title}) => (
                 <IconButton
