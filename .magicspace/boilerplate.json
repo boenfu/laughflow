@@ -68,6 +68,10 @@
                 "project": "library"
               },
               {
+                "package": "@magicflow/condition",
+                "project": "library"
+              },
+              {
                 "package": "@magicflow/procedure",
                 "project": "library"
               },
@@ -87,7 +91,13 @@
         "name": "@magicflow/condition",
         "tsProjects": [
           {
-            "name": "library"
+            "name": "library",
+            "references": [
+              {
+                "package": "@magicflow/core",
+                "project": "library"
+              }
+            ]
           },
           {
             "name": "test"

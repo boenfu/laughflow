@@ -194,3 +194,27 @@ function includes(leftValue: any, rightValue: any): boolean {
     return false;
   }
 }
+
+export interface IOperant {
+  type: Type;
+}
+
+export interface VariableOperant extends IOperant {
+  variable: string;
+}
+
+export interface ValueOperant extends IOperant {
+  value: unknown;
+}
+
+export type Operant = VariableOperant | ValueOperant;
+
+export interface Condition {
+  operator: OperatorName;
+  left: Operant;
+  right: Operant;
+}
+
+export type LogicalAndConditionGroup = Condition[];
+
+export type LogicalOrConditionGroup = LogicalAndConditionGroup[];
