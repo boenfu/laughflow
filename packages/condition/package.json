@@ -4,6 +4,7 @@
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "dependencies": {
+    "@magicflow/core": "*",
     "tslib": "^2.1.0"
   }
 }

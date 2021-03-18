@@ -4,6 +4,7 @@
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "dependencies": {
+    "@magicflow/condition": "*",
     "@magicflow/core": "*",
     "@magicflow/icons": "*",
     "@magicflow/procedure": "*",

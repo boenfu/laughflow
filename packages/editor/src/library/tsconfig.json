@@ -9,6 +9,9 @@
       "path": "../../../core/src/library"
     },
     {
+      "path": "../../../condition/src/library"
+    },
+    {
       "path": "../../../procedure/src/library"
     },
     {
