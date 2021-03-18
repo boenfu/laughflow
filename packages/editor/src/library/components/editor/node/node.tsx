@@ -1,5 +1,5 @@
 import {NodeMetadata, NodeRef, TrunkRef} from '@magicflow/core';
-import {Connect, Copy, Cut} from '@magicflow/icons';
+import {Connect, Copy, Cut, Jump} from '@magicflow/icons';
 import classnames from 'classnames';
 import React, {
   CSSProperties,
@@ -60,6 +60,7 @@ const Wrapper = styled.div`
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   background-color: #fff;
+  cursor: pointer;
 
   &:hover {
     ${Header} {
@@ -146,6 +147,7 @@ const STATE_ICON_DICT: Partial<
   joining: Connect,
   cutting: Cut,
   copying: Copy,
+  connecting: Jump,
 };
 
 const EditingIcon: FC<{state: ActiveTrunk['state']}> = ({state}) => {
@@ -188,8 +190,11 @@ export const Node: FC<NodeProps> = ({
     void editor.procedure.updateNode(node);
 
   const onContainerClick = (event: MouseEvent<HTMLDivElement>): void => {
+    event.stopPropagation();
+
     if (activeTrunk?.state === 'connecting') {
       void editor.procedure.connectNode(activeTrunk.ref, nodeRef);
+      editor.setActiveTrunk(undefined);
       return;
     }
 
@@ -198,7 +203,7 @@ export const Node: FC<NodeProps> = ({
         ...activeTrunk,
         relationTrunks: [...(activeTrunk.relationTrunks || []), nodeRef],
       });
-      event.stopPropagation();
+      return;
     }
 
     void editor.setActiveTrunk({
@@ -206,12 +211,11 @@ export const Node: FC<NodeProps> = ({
       ref: nodeRef,
       state: 'none',
     });
-
-    event.stopPropagation();
   };
 
   let editing = activeTrunk && activeTrunk?.state !== 'none';
   let active = activeTrunk?.ref?.id === node.id;
+  let selected = activeTrunk?.relationTrunks?.some(ref => ref.id === node.id);
 
   return (
     <Container style={style}>
@@ -222,9 +226,7 @@ export const Node: FC<NodeProps> = ({
           {
             editing,
             active,
-            selected: activeTrunk?.relationTrunks?.some(
-              ref => ref.id === node.id,
-            ),
+            selected,
           },
         ])}
         onClick={onContainerClick}

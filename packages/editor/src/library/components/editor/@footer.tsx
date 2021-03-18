@@ -52,6 +52,10 @@ export const Footer: FC<FooterProps> = React.memo(() => {
   const onUndo = (): void => editor.procedure.undo();
   const onRedo = (): void => editor.procedure.redo();
 
+  const onCancelJoin = (): void => {
+    editor.setActiveTrunk(undefined);
+  };
+
   const onCreateJoint = (): void => {
     if (!activeTrunk) {
       return;
@@ -61,6 +65,8 @@ export const Footer: FC<FooterProps> = React.memo(() => {
       activeTrunk.ref,
       activeTrunk?.relationTrunks || [],
     );
+
+    editor.setActiveTrunk(undefined);
   };
 
   return (
@@ -77,7 +83,7 @@ export const Footer: FC<FooterProps> = React.memo(() => {
 
       {activeTrunk?.state === 'joining' ? (
         <>
-          <Button>取消</Button>
+          <Button onClick={onCancelJoin}>取消</Button>
           <Button
             {...(relationTrunksLength
               ? {

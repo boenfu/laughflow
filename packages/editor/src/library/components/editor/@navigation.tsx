@@ -148,7 +148,7 @@ export const Navigation: FC<NavigationProps> = React.memo(
         <Left />
         <Mid />
         <Right>
-          {activeTrunk?.ref.type === 'node'
+          {!!activeTrunk?.ref
             ? NODE_ACTIONS.map(({type, icon: Icon, title}) => (
                 <IconButton
                   key={type}

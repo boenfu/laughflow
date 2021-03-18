@@ -17,7 +17,7 @@ export class AssignmentPlugin implements IPlugin {
     {
       render: {
         headRight(metadata) {
-          return metadata.node.approval ? <ApprovalSolid /> : <></>;
+          return metadata.node.displayName ? <ApprovalSolid /> : <></>;
         },
         footer(metadata) {
           return metadata.node.assignment ? <UserSolid /> : <></>;

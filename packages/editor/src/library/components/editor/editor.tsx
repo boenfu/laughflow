@@ -1,5 +1,5 @@
 import {LeafId, LeafMetadata, Ref} from '@magicflow/core';
-import {useCreation, useEventListener, useUpdate} from 'ahooks';
+import {useCreation, useUpdate} from 'ahooks';
 import classNames from 'classnames';
 import React, {FC, Fragment, ReactNode, useEffect, useRef} from 'react';
 import styled from 'styled-components';
@@ -49,7 +49,7 @@ const Row = styled.div`
   padding-top: ${LINE_HEIGHT_DEFAULT}px;
   text-align: center;
 
-  &.muti {
+  &.multi {
     padding-top: ${LINE_HEIGHT_DEFAULT * 2}px;
   }
 `;
@@ -68,16 +68,16 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
     }
   };
 
-  useEventListener('click', () => {
+  const onContentClick = (): void => {
     if (editor.activeTrunk) {
       editor.setActiveTrunk(undefined);
     }
-  });
+  };
 
   useEffect(() => {
     editor.on('update', () => {
       reRender();
-      console.log(editor, editor.procedure);
+      console.info(editor.procedure);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -115,7 +115,7 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
     }
 
     let children = (
-      <Row className={classNames({muti: nexts.length > 1})}>
+      <Row className={classNames({multi: nexts.length > 1})}>
         {nexts.map((next, index, array) => {
           return (
             <Fragment key={`node:${node.ref.id}-${next.ref.id}`}>
@@ -151,7 +151,9 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
     <Wrapper ref={wrapperRef}>
       <EditorContext.Provider value={{editor}}>
         <Navigation onFullScreenToggle={onFullScreenToggle} />
-        <Content>{renderNode(editor.procedureTreeNode)}</Content>
+        <Content onClick={onContentClick}>
+          {renderNode(editor.procedureTreeNode)}
+        </Content>
         <Footer />
       </EditorContext.Provider>
     </Wrapper>

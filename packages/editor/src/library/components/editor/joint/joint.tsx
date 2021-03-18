@@ -1,10 +1,10 @@
 import {JointMetadata, TrunkRef} from '@magicflow/core';
-import {Trash} from '@magicflow/icons';
-import React, {CSSProperties, FC, useContext} from 'react';
+import React, {CSSProperties, FC, MouseEvent, useContext} from 'react';
 import styled from 'styled-components';
 
 import {EditorContext} from '../../../context';
-import {TooltipActions} from '../../common';
+import {transition} from '../../common';
+import {EditingContent} from '../@editing-content';
 
 export interface JointProps {
   prev: TrunkRef;
@@ -22,43 +22,63 @@ const Container = styled.div`
   margin: 0 16px;
 `;
 
-const Content = styled.div`
+const Content = styled(EditingContent)`
   width: 48px;
   height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   font-size: 12px;
 
-  background: #ffbb29;
-
+  color: #fff;
+  background-color: #ffbb29;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
   border-radius: 28px;
+
+  ${transition(['opacity', 'background-color'])}
+
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &.active {
+    background-color: #296dff;
+  }
 `;
 
-export const Joint: FC<JointProps> = ({className, style, joint, children}) => {
+export const Joint: FC<JointProps> = ({style, prev, joint, children}) => {
   const {editor} = useContext(EditorContext);
 
   let index =
     editor.procedure.definition.joints.findIndex(({id}) => id === joint.id) + 1;
 
-  const onDisconnectNode = (): void => {};
+  const onJointClick = (event: MouseEvent<HTMLDivElement>): void => {
+    event.stopPropagation();
+
+    editor.setActiveTrunk({
+      prev,
+      ref: {
+        type: 'joint',
+        id: joint.id,
+      },
+      state: 'none',
+    });
+  };
 
   return (
     <Container style={style}>
-      <TooltipActions
-        actions={[
-          {
-            name: 'delete',
-            icon: <Trash />,
-            content: '删除',
-            onAction: onDisconnectNode,
-          },
-        ]}
+      <Content
+        trunk={{
+          type: 'joint',
+          id: joint.id,
+        }}
+        editable={joint.master.id === prev.id}
+        onClick={onJointClick}
       >
-        <Content className={className}>{index}</Content>
-      </TooltipActions>
+        {index}
+      </Content>
       {children}
     </Container>
   );
