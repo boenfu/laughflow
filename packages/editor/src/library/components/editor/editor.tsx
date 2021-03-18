@@ -22,9 +22,11 @@ const PlaceholderLeaf: LeafMetadata = {
   id: PlaceholderLeafId,
 };
 
-declare module '@magicflow/core' {
-  interface NodeMetadata {
-    displayName?: string;
+declare global {
+  namespace Magicflow {
+    interface NodeMetadataExtension {
+      displayName?: string;
+    }
   }
 }
 

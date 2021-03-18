@@ -6,17 +6,13 @@ import {NodeMetadata} from './node';
 
 export type ProcedureId = Nominal<string, 'procedure:id'>;
 
-export interface ProcedureMetadata {}
+export interface ProcedureMetadata
+  extends Magicflow.ProcedureMetadataExtension {}
 
-export interface ProcedureDefinition<
-  TProcedureMetadata extends ProcedureMetadata = ProcedureMetadata,
-  TNodeMetadata extends NodeMetadata = NodeMetadata,
-  TLeafMetadata extends LeafMetadata = LeafMetadata,
-  TJointMetadata extends JointMetadata = JointMetadata
-> {
+export interface ProcedureDefinition {
   id: ProcedureId;
-  nodes: TNodeMetadata[];
-  joints: TJointMetadata[];
-  leaves: TLeafMetadata[];
-  metadata?: TProcedureMetadata;
+  nodes: NodeMetadata[];
+  joints: JointMetadata[];
+  leaves: LeafMetadata[];
+  metadata?: ProcedureMetadata;
 }

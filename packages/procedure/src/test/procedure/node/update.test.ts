@@ -1,23 +1,22 @@
-import {
-  LeafMetadata,
-  NodeId,
-  NodeMetadata,
-  ProcedureDefinition,
-  ProcedureId,
-} from '@magicflow/core';
+import {NodeId, ProcedureDefinition, ProcedureId} from '@magicflow/core';
 
 import {Procedure} from '../../../library';
 
+declare global {
+  namespace Magicflow {
+    interface NodeMetadataExtension {
+      name?: string;
+    }
+
+    interface LeafMetadataExtension {
+      name?: string;
+    }
+  }
+}
+
 let nodeId = 'node1' as NodeId;
 
-type NodeMetadataWithName = {name?: string} & NodeMetadata;
-type LeafMetadataWithName = {name?: string} & LeafMetadata;
-
-let definition: ProcedureDefinition<
-  {},
-  NodeMetadataWithName,
-  LeafMetadataWithName
-> = {
+let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
   leaves: [],

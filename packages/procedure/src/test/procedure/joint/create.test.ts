@@ -10,7 +10,7 @@ import {Procedure} from '../../../library';
 let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
 
-let definition: ProcedureDefinition<{}> = {
+let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
   leaves: [],

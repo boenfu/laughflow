@@ -4,7 +4,7 @@ export type LeafType = 'done' | 'terminate';
 
 export type LeafId = Nominal<string, 'leaf:id'>;
 
-export interface LeafMetadata {
+export interface LeafMetadata extends Magicflow.LeafMetadataExtension {
   id: LeafId;
   type: LeafType;
 }

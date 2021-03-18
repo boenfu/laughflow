@@ -2,11 +2,11 @@ import {INodePlugin, IPlugin} from '@magicflow/editor';
 import {ApprovalSolid, UserSolid} from '@magicflow/icons';
 import React from 'react';
 
-declare module '@magicflow/core' {
-  interface NodeMetadata {
-    assignment?: boolean;
-    role?: string;
-    approval?: boolean;
+declare global {
+  namespace Magicflow {
+    interface NodeMetadataExtension {
+      assignment?: boolean;
+    }
   }
 }
 
