@@ -163,22 +163,6 @@ function generateOperators(
   );
 }
 
-export const leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap = new Map(
-  Object.entries(
-    groupBy(operatorDefinitions, definition => definition.left),
-  ).map(([left, definitions]: [Type, OperatorDefinition[]]) => [
-    left,
-    new Map(
-      Object.entries(
-        groupBy(definitions, definition => definition.name),
-      ).map(([name, definitions]: [OperatorName, OperatorDefinition[]]) => [
-        name,
-        new Map(definitions.map(definition => [definition.right, definition])),
-      ]),
-    ),
-  ]),
-);
-
 function includes(leftValue: any, rightValue: any): boolean {
   if (typeof leftValue === 'string') {
     return leftValue.includes(String(rightValue));
@@ -195,26 +179,61 @@ function includes(leftValue: any, rightValue: any): boolean {
   }
 }
 
-export interface IOperant {
-  type: Type;
+export const leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap = new Map(
+  Object.entries(
+    groupBy(operatorDefinitions, definition => definition.left),
+  ).map(([left, definitions]: [Type, OperatorDefinition[]]) => [
+    left,
+    new Map(
+      Object.entries(
+        groupBy(definitions, definition => definition.name),
+      ).map(([name, definitions]: [OperatorName, OperatorDefinition[]]) => [
+        name,
+        new Map(definitions.map(definition => [definition.right, definition])),
+      ]),
+    ),
+  ]),
+);
+
+export function listOperatorDefinitionsForLeftOperantOfType(
+  type: Type,
+): OperatorDefinition[] {
+  let operatorNameToRightTypeToOperatorDefinitionMapMap = leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap.get(
+    type,
+  );
+
+  if (!operatorNameToRightTypeToOperatorDefinitionMapMap) {
+    return [];
+  }
+
+  return Array.from(
+    operatorNameToRightTypeToOperatorDefinitionMapMap.values(),
+    rightTypeToOperatorDefinitionMap =>
+      rightTypeToOperatorDefinitionMap.values().next().value,
+  );
 }
 
-export interface VariableOperant extends IOperant {
-  variable: string;
+export function getRightOperantType(
+  left: Type,
+  operator: OperatorName,
+): Type | undefined {
+  let operatorNameToRightTypeToOperatorDefinitionMapMap = leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap.get(
+    left,
+  );
+
+  let rightTypeToOperatorDefinitionMap =
+    operatorNameToRightTypeToOperatorDefinitionMapMap &&
+    operatorNameToRightTypeToOperatorDefinitionMapMap.get(operator);
+
+  if (!rightTypeToOperatorDefinitionMap) {
+    return undefined;
+  }
+
+  let [definition] = rightTypeToOperatorDefinitionMap.values();
+
+  return definition && definition.right;
 }
 
-export interface ValueOperant extends IOperant {
-  value: unknown;
+export function getOperatorDisplayName(operator: OperatorName): string {
+  return commonOperatorDefinitionDict[operator].displayName;
 }
-
-export type Operant = VariableOperant | ValueOperant;
-
-export interface Condition {
-  operator: OperatorName;
-  left: Operant;
-  right: Operant;
-}
-
-export type LogicalAndConditionGroup = Condition[];
-
-export type LogicalOrConditionGroup = LogicalAndConditionGroup[];
