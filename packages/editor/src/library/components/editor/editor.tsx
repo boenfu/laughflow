@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import React, {FC, Fragment, ReactNode, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
+import {ConditionPlugin} from '../../condition';
 import {EditorContext} from '../../context';
 import {Editor, ProcedureTreeNode} from '../../editor';
 
@@ -59,7 +60,10 @@ const Row = styled.div`
 export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
   // eslint-disable-next-line no-null/no-null
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const editor = useCreation(() => new Editor(definition, plugins), []);
+  const editor = useCreation(
+    () => new Editor(definition, [...(plugins || []), new ConditionPlugin()]),
+    [],
+  );
   const reRender = useUpdate();
 
   const onFullScreenToggle = (): void => {

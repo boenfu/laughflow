@@ -31,6 +31,18 @@ const Container = styled.div`
   vertical-align: top;
 `;
 
+const BeforeWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const AfterWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const Header = styled.div`
   display: flex;
   height: 42px;
@@ -114,11 +126,7 @@ const Wrapper = styled.div`
 
 const Body = styled.div``;
 
-const Footer = styled.div`
-  display: flex;
-  align-items: center;
-  height: 40px;
-`;
+const Footer = styled.div``;
 
 const EditingIconWrapper = styled.div`
   position: absolute;
@@ -219,7 +227,7 @@ export const Node: FC<NodeProps> = ({
 
   return (
     <Container style={style}>
-      {before && createElement(before, {node})}
+      {before && <BeforeWrapper>{createElement(before, {node})}</BeforeWrapper>}
       <Wrapper
         className={classnames([
           className,
@@ -240,7 +248,6 @@ export const Node: FC<NodeProps> = ({
           {headRight && (
             <HeaderExtra>{createElement(headRight, {node})}</HeaderExtra>
           )}
-          {before && createElement(before, {node})}
         </Header>
         <Body>{body && createElement(body, {node})}</Body>
         <Footer>{footer && createElement(footer, {node})}</Footer>
@@ -249,7 +256,7 @@ export const Node: FC<NodeProps> = ({
           <EditingIcon state={activeTrunk!.state} />
         ) : undefined}
       </Wrapper>
-      {after && createElement(after, {node})}
+      {after && <AfterWrapper>{createElement(after, {node})}</AfterWrapper>}
       {children}
     </Container>
   );
