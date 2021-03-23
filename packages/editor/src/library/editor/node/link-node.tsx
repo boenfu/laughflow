@@ -3,7 +3,7 @@ import {Trash} from '@magicflow/icons';
 import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
 
-import {TooltipActions} from '../../components/common';
+import {TooltipActions} from '../../components';
 import {EditorContext} from '../../context';
 
 export interface LinkNodeProps {

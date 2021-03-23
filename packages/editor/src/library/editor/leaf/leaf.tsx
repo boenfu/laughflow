@@ -3,7 +3,7 @@ import {Trash} from '@magicflow/icons';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {TooltipActions, transition} from '../../components/common';
+import {TooltipActions, transition} from '../../components';
 import {EditorContext} from '../../context';
 
 export interface LeafProps {

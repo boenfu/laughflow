@@ -13,7 +13,7 @@ import {
 import React, {FC, MouseEvent, useContext} from 'react';
 import styled from 'styled-components';
 
-import {IconButton} from '../components/common';
+import {IconButton} from '../components';
 import {EditorContext} from '../context';
 
 export interface NavigationProps {
