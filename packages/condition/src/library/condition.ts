@@ -6,7 +6,3 @@ export interface Condition {
   right: Operant;
   operator: OperatorName;
 }
-
-export type LogicalAndConditionGroup = Condition[];
-
-export type LogicalOrConditionGroup = LogicalAndConditionGroup[];

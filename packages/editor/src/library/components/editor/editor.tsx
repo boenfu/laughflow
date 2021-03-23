@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import React, {FC, Fragment, ReactNode, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
-import {ConditionPlugin} from '../../condition';
+import {ConditionModal, ConditionPlugin} from '../../condition';
 import {EditorContext} from '../../context';
 import {Editor, ProcedureTreeNode} from '../../editor';
 
@@ -161,6 +161,7 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
           {renderNode(editor.procedureTreeNode)}
         </Content>
         <Footer />
+        <ConditionModal />
       </EditorContext.Provider>
     </Wrapper>
   );

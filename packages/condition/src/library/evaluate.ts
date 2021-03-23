@@ -1,4 +1,4 @@
-import {LogicalOrConditionGroup} from './condition';
+import {Condition} from './condition';
 import {Operant} from './operant';
 import {
   commonOperatorDefinitionDict,
@@ -8,7 +8,7 @@ import {
 export type EvaluateResolver = (variable: string) => any;
 
 export function evaluate(
-  orGroup: LogicalOrConditionGroup,
+  orGroup: Condition[][],
   resolver: EvaluateResolver,
 ): boolean {
   return orGroup.some(andGroup =>

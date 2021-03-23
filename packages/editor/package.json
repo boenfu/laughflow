@@ -22,9 +22,11 @@
     "lodash-es": "^4.17.20",
     "nanoid": "^3.1.20",
     "rc-bezier": "^0.2.4",
+    "rc-dialog": "^8.5.2",
     "rc-dropdown": "^3.2.0",
     "rc-menu": "^8.10.6",
     "rc-tooltip": "^5.0.1",
+    "react-select": "^4.3.0",
     "styled-components": "^5.2.1",
     "tslang": "^0.1.23",
     "tslib": "^2.1.0"
@@ -35,6 +37,7 @@
     "@types/nanoid": "^2.1.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@types/react-select": "^4.0.13",
     "@types/styled-components": "^5.1.5",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"

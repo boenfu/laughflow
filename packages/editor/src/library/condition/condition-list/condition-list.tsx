@@ -1,9 +1,10 @@
-import {LogicalOrConditionGroup, Operant} from '@magicflow/condition';
+import {Operant} from '@magicflow/condition';
 import classNames from 'classnames';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
 import {TextSeparator} from '../../components';
+import {ConditionOrGroup} from '../@custom-condition';
 
 const Wrapper = styled.div``;
 
@@ -40,7 +41,7 @@ export interface CustomConditionOperantCandidate {
 
 export interface ConditionListProps {
   className?: string;
-  conditions?: LogicalOrConditionGroup;
+  conditions?: ConditionOrGroup;
   operantCandidates?: CustomConditionOperantCandidate[];
 }
 
