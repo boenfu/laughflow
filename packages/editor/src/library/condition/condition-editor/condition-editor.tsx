@@ -15,7 +15,7 @@ import {ConditionGroup} from './@group';
 
 const Wrapper = styled.div`
   width: 680px;
-  margin: 12px 40px;
+  margin: 12px 60px;
 
   > .add {
     margin-left: 30px;
