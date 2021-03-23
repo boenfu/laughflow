@@ -10,8 +10,8 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 
-import {EditorContext} from '../../../context';
-import {transition} from '../../common';
+import {transition} from '../../components/common';
+import {EditorContext} from '../../context';
 
 import {LINE_HEIGHT_DEFAULT} from './connection-line';
 

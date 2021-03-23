@@ -4,9 +4,9 @@ import classNames from 'classnames';
 import React, {FC, Fragment, ReactNode, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
-import {ConditionModal, ConditionPlugin} from '../../condition';
-import {EditorContext} from '../../context';
-import {Editor, ProcedureTreeNode} from '../../editor';
+import {ConditionModal, ConditionPlugin} from '../condition';
+import {EditorContext} from '../context';
+import {Editor, ProcedureTreeNode} from '../editor-object';
 
 import {Footer} from './@footer';
 import {Navigation} from './@navigation';

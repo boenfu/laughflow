@@ -2,8 +2,8 @@ import {Redo, Undo} from '@magicflow/icons';
 import React, {FC, useContext} from 'react';
 import styled from 'styled-components';
 
-import {EditorContext} from '../../context';
-import {IconButton} from '../common';
+import {IconButton} from '../components/common';
+import {EditorContext} from '../context';
 
 export interface FooterProps {}
 

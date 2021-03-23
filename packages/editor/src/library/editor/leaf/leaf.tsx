@@ -3,8 +3,8 @@ import {Trash} from '@magicflow/icons';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {EditorContext} from '../../../context';
-import {TooltipActions, transition} from '../../common';
+import {TooltipActions, transition} from '../../components/common';
+import {EditorContext} from '../../context';
 
 export interface LeafProps {
   leaf: LeafMetadata;

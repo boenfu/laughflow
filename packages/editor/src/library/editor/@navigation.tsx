@@ -13,8 +13,8 @@ import {
 import React, {FC, MouseEvent, useContext} from 'react';
 import styled from 'styled-components';
 
-import {EditorContext} from '../../context';
-import {IconButton} from '../common';
+import {IconButton} from '../components/common';
+import {EditorContext} from '../context';
 
 export interface NavigationProps {
   onFullScreenToggle(): void;

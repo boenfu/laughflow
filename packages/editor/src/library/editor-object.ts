@@ -15,7 +15,7 @@ import {Procedure} from '@magicflow/procedure';
 import Eventemitter from 'eventemitter3';
 import {castArray, compact, merge, sortBy} from 'lodash-es';
 
-import {doneLeaf, terminateLeaf} from './components';
+import {doneLeaf, terminateLeaf} from './editor';
 import {
   ILeafPlugin,
   ILeafPluginEventHandlers,

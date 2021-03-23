@@ -10,9 +10,9 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 
-import {EditorContext} from '../../../context';
-import {ActiveTrunk} from '../../../editor';
-import {transition} from '../../common';
+import {transition} from '../../components';
+import {EditorContext} from '../../context';
+import {ActiveTrunk} from '../../editor-object';
 
 import {DisplayName} from './@header';
 

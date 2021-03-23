@@ -4,8 +4,8 @@ import classnames from 'classnames';
 import React, {FC, useContext} from 'react';
 import styled from 'styled-components';
 
-import {EditorContext} from '../../../context';
-import {ActiveTrunk} from '../../../editor';
+import {EditorContext} from '../../context';
+import {ActiveTrunk} from '../../editor-object';
 
 export interface EditingContentProps
   extends React.HTMLAttributes<HTMLDivElement> {

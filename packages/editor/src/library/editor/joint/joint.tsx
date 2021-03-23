@@ -2,8 +2,8 @@ import {JointMetadata, TrunkRef} from '@magicflow/core';
 import React, {CSSProperties, FC, MouseEvent, useContext} from 'react';
 import styled from 'styled-components';
 
-import {EditorContext} from '../../../context';
-import {transition} from '../../common';
+import {transition} from '../../components/common';
+import {EditorContext} from '../../context';
 import {EditingContent} from '../@editing-content';
 
 export interface JointProps {

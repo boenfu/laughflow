@@ -3,8 +3,8 @@ import {Trash} from '@magicflow/icons';
 import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
 
-import {EditorContext} from '../../../context';
-import {TooltipActions} from '../../common';
+import {TooltipActions} from '../../components/common';
+import {EditorContext} from '../../context';
 
 export interface LinkNodeProps {
   prev: TrunkRef;
