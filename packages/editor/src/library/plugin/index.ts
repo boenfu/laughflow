@@ -8,6 +8,8 @@ import {
 import {ComponentType, ReactNode} from 'react';
 import {Nominal} from 'tslang';
 
+import {Editor} from '../editor-object';
+
 export type LeafPluginType = Nominal<string, ['leaf-plugin-type']>;
 
 export interface IPluginEvent {
@@ -83,7 +85,9 @@ export interface IPluginEventHandlers {
 
 export interface NodePluginComponentProps {
   node: NodeMetadata;
+  editor: Editor;
   prevChildren?: ReactNode;
+  onChange?(next: NodeMetadata): void;
 }
 
 export type NodePluginComponent = ComponentType<NodePluginComponentProps>;
@@ -103,20 +107,16 @@ export interface NodePluginRenderObject {
    * default `flex-direction: row`
    */
   footer?: NodePluginComponent;
+
+  config?: NodePluginComponent;
 }
 
 export interface INodePlugin {
   render: NodePluginRenderObject;
 }
 
-export interface IPluginConfig<TName = string> {
-  name: TName;
-  component: NodePluginComponent;
-}
-
-export interface IPlugin<TName = string> extends IPluginEventHandlers {
-  name: TName;
-  config?: IPluginConfig<TName>;
-  nodes?: INodePlugin[];
+export interface IPlugin extends IPluginEventHandlers {
+  name: string;
+  node?: INodePlugin;
   leaves?: ILeafPlugin[];
 }

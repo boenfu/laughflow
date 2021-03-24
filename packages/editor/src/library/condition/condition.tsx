@@ -5,12 +5,14 @@ import styled from 'styled-components';
 import {transition} from '../components';
 import {INodePlugin, IPlugin} from '../plugin';
 
+import {CustomCondition, CustomConditionCandidate} from './@custom-condition';
+import {ConditionEditor} from './condition-editor';
 import {ConditionList} from './condition-list';
 
 declare global {
   namespace Magicflow {
     interface NodeMetadataExtension {
-      condition?: boolean;
+      conditions?: CustomCondition[][];
     }
   }
 }
@@ -77,67 +79,58 @@ const ConnectArrow = styled.div`
 export class ConditionPlugin implements IPlugin {
   readonly name = 'condition';
 
-  nodes: INodePlugin[] = [
+  private leftCandidates: CustomConditionCandidate[] = [
     {
-      render: {
-        before() {
-          return (
-            <NodeBeforeWrapper>
-              <ConditionList
-                conditions={[
-                  [
-                    {
-                      left: {type: 'number', value: '333'},
-                      operator: '!includes',
-                      right: {type: 'number', value: '333'},
-                    },
-                    {
-                      left: {type: 'number', value: '333'},
-                      operator: '!includes',
-                      right: {type: 'number', value: '333'},
-                    },
-                  ],
-                  [
-                    {
-                      left: {type: 'number', value: '333'},
-                      operator: '!includes',
-                      right: {type: 'number', value: '333'},
-                    },
-                  ],
-                ]}
-              />
-              <ConnectArrow>
-                <ArrowDown />
-              </ConnectArrow>
-            </NodeBeforeWrapper>
-          );
-        },
-        body() {
-          return (
-            <NodeBodyWrapper>
-              <ConditionName>展示条件</ConditionName>
-              <ConditionList
-                conditions={[
-                  [
-                    {
-                      left: {type: 'number', value: '333'},
-                      operator: '!includes',
-                      right: {type: 'number', value: '333'},
-                    },
-                  ],
-                  [
-                    {
-                      left: {type: 'number', value: '333'},
-                      operator: '!includes',
-                      right: {type: 'number', value: '333'},
-                    },
-                  ],
-                ]}
-              />
-            </NodeBodyWrapper>
-          );
-        },
+      name: 'username',
+      displayName: '用户名',
+      operant: {
+        type: 'object',
+        value: '啊哈',
       },
     },
   ];
+
+  private rightCandidates: CustomConditionCandidate[] = [];
+
+  node: INodePlugin = {
+    render: {
+      before: ({node, prevChildren}) => {
+        if (!node.conditions?.length) {
+          return <>{prevChildren}</>;
+        }
+
+        return (
+          <NodeBeforeWrapper>
+            <ConditionList conditions={node.conditions} />
+            <ConnectArrow>
+              <ArrowDown />
+            </ConnectArrow>
+          </NodeBeforeWrapper>
+        );
+      },
+      body: ({node, prevChildren}) => {
+        return (
+          <>
+            {node.conditions?.length ? (
+              <NodeBodyWrapper>
+                <ConditionName>展示条件</ConditionName>
+                <ConditionList conditions={node.conditions} />
+              </NodeBodyWrapper>
+            ) : undefined}
+            {prevChildren}
+          </>
+        );
+      },
+      config: ({node, onChange}) => {
+        return (
+          <ConditionEditor
+            leftCandidates={this.leftCandidates}
+            rightCandidates={this.rightCandidates}
+            conditions={node.conditions}
+            onChange={conditions => onChange?.({...node, conditions})}
+          />
+        );
+      },
+    },
+  };
 }

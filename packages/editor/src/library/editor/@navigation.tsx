@@ -137,6 +137,9 @@ export const Navigation: FC<NavigationProps> = React.memo(
           }
 
           break;
+        case 'more':
+          editor.emitConfig(activeTrunk.ref);
+          break;
 
         default:
           break;

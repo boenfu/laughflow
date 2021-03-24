@@ -57,7 +57,11 @@ const Row = styled.div`
   }
 `;
 
-export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
+export const FlowEditor: FC<EditorProps> = ({
+  definition,
+  plugins,
+  onConfig,
+}) => {
   // eslint-disable-next-line no-null/no-null
   const wrapperRef = useRef<HTMLDivElement>(null);
   const editor = useCreation(
@@ -85,6 +89,10 @@ export const FlowEditor: FC<EditorProps> = ({definition, plugins}) => {
       reRender();
       console.info(editor.procedure);
     });
+
+    if (onConfig) {
+      editor.on('config', onConfig);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -76,7 +76,7 @@ export type NodeRenderDescriptor = Record<
   NodePluginComponent[]
 >;
 
-type ProcedureEventType = 'update';
+type ProcedureEventType = 'update' | 'config';
 
 export interface ActiveTrunk {
   prev: TrunkRef | undefined;
@@ -102,6 +102,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     headRight: [],
     body: [],
     footer: [],
+    config: [],
   };
 
   private _activeTrunk: ActiveTrunk | undefined;
@@ -187,16 +188,14 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     // node
 
     for (let plugin of castArray(plugins)) {
-      if (!plugin?.nodes?.length) {
+      if (!plugin?.node) {
         continue;
       }
 
-      for (let node of plugin.nodes) {
-        for (let [name, component] of Object.entries(node.render)) {
-          this.nodeRenderDescriptor[name as keyof NodePluginRenderObject].push(
-            component,
-          );
-        }
+      for (let [name, component] of Object.entries(plugin.node.render)) {
+        this.nodeRenderDescriptor[name as keyof NodePluginRenderObject].push(
+          component,
+        );
       }
     }
   }
@@ -294,6 +293,36 @@ export class Editor extends Eventemitter<ProcedureEventType> {
 
       return node as TProcedureTreeNode;
     }
+  }
+
+  emitConfig<TPayload>(trunkRef: TrunkRef, payload?: TPayload): void {
+    if (trunkRef.type === 'joint') {
+      // TODO
+      return;
+    }
+
+    let node = this.procedure.getNode(trunkRef.id);
+
+    this.emit(
+      'config',
+      this.plugins.reduce<{[key in string]: NodePluginComponent}>(
+        (configObject, plugin) => {
+          let configComponent = plugin.node?.render.config;
+
+          if (configComponent) {
+            configObject[plugin.name] = configComponent;
+          }
+
+          return configObject;
+        },
+        {},
+      ),
+      {
+        editor: this,
+        node,
+      },
+      payload,
+    );
   }
 }
 
