@@ -1,14 +1,16 @@
-import {LeafId, NodeId, ProcedureId} from '@magicflow/core';
+import {JointId, NodeId, ProcedureId} from '@magicflow/core';
 import {Nominal} from 'tslang';
 
 export type TaskId = Nominal<string, 'task:id'>;
+
 export type TaskNodeId = Nominal<string, 'task-node:id'>;
+export type TaskJointId = Nominal<string, 'task-joint:id'>;
 export type TaskLeafId = Nominal<string, 'task-leaf:id'>;
 
 export type TaskStage = 'none' | 'in-progress' | 'done' | 'terminated';
-export type TaskNodeStage = 'none' | 'in-progress' | 'done';
+export type TaskNodeStage = 'none' | 'in-progress' | 'done' | 'terminated';
 
-export interface TaskMetadata {
+export interface TaskMetadata extends Magicflow.TaskMetadataExtension {
   id: TaskId;
   definition: ProcedureId;
 
@@ -16,24 +18,29 @@ export interface TaskMetadata {
   stage?: TaskStage;
 
   nodes: TaskNodeMetadata[];
-  leaves?: TaskLeafMetadata[];
 }
 
 export type TaskNodeNextMetadata =
   | TaskNodeNextNodeMetadata
-  | TaskNodeNextLeafMetadata;
-
-export interface TaskNodeNextLeafMetadata {
-  type: 'leaf';
-  id: TaskLeafId;
-}
+  | TaskNodeNextLeafMetadata
+  | TaskJointNextNodeMetadata;
 
 export interface TaskNodeNextNodeMetadata {
   type: 'node';
   id: TaskNodeId;
 }
 
-export interface TaskNodeMetadata {
+export interface TaskJointNextNodeMetadata {
+  type: 'joint';
+  id: TaskJointId;
+}
+
+export interface TaskNodeNextLeafMetadata {
+  type: 'leaf';
+  id: TaskLeafId;
+}
+
+export interface TaskNodeMetadata extends Magicflow.TaskNodeMetadataExtension {
   id: TaskNodeId;
   definition: NodeId;
   stage?: TaskNodeStage;
@@ -41,9 +48,8 @@ export interface TaskNodeMetadata {
   nexts?: TaskNodeNextMetadata[];
 }
 
-export interface TaskLeafMetadata {
-  id: TaskLeafId;
-  definition: LeafId;
-
-  lastArrivedAt?: number;
+export interface TaskJointMetadata
+  extends Magicflow.TaskJointMetadataExtension {
+  id: TaskJointId;
+  definition: JointId;
 }

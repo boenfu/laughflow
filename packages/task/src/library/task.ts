@@ -1,7 +1,7 @@
 import {LeafId, NodeId, ProcedureDefinition} from '@magicflow/core';
 import {createId} from '@magicflow/procedure';
 
-import {TaskLeafMetadata, TaskMetadata, TaskNodeMetadata} from './core';
+import {TaskMetadata, TaskNodeMetadata} from './core';
 
 export class Task {
   readonly nodeMetadataMap = new Map(
@@ -31,7 +31,6 @@ export class Task {
     let pendingBuildNodes: TaskNodeMetadata[] = [startTaskNode];
 
     let taskNodes: TaskNodeMetadata[] = [startTaskNode];
-    let taskLeaves: TaskLeafMetadata[] = [];
 
     while (pendingBuildNodes.length) {
       let buildingNode = pendingBuildNodes.shift()!;
@@ -65,15 +64,6 @@ export class Task {
             type: 'node',
             id: node.id,
           });
-        } else if (nextMetadata.type === 'leaf') {
-          let leaf = buildTaskLeaf(nextMetadata.id);
-
-          taskLeaves.push(leaf);
-
-          buildingNode.nexts.push({
-            type: 'leaf',
-            id: leaf.id,
-          });
         } else {
           // TODO (boen): joint
         }
@@ -85,7 +75,6 @@ export class Task {
       definition: this.definition.id,
       startNode: startTaskNode.id,
       nodes: taskNodes,
-      leaves: taskLeaves,
     };
   }
 
@@ -97,13 +86,6 @@ export class Task {
 }
 
 function buildTaskNode(definition: NodeId): TaskNodeMetadata {
-  return {
-    id: createId(),
-    definition,
-  };
-}
-
-function buildTaskLeaf(definition: LeafId): TaskLeafMetadata {
   return {
     id: createId(),
     definition,
