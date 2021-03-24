@@ -5,14 +5,15 @@ import styled from 'styled-components';
 import {transition} from '../components';
 import {INodePlugin, IPlugin} from '../plugin';
 
-import {CustomCondition, CustomConditionCandidate} from './@custom-condition';
+import {ConditionOrGroup, CustomConditionCandidate} from './@custom-condition';
 import {ConditionEditor} from './condition-editor';
 import {ConditionList} from './condition-list';
 
 declare global {
   namespace Magicflow {
     interface NodeMetadataExtension {
-      conditions?: CustomCondition[][];
+      enterConditions?: ConditionOrGroup;
+      visibleConditions?: ConditionOrGroup;
     }
   }
 }
@@ -92,45 +93,97 @@ export class ConditionPlugin implements IPlugin {
 
   private rightCandidates: CustomConditionCandidate[] = [];
 
-  node: INodePlugin = {
+  node: INodePlugin<{mode: 'enter' | 'visible'}> = {
     render: {
-      before: ({node, prevChildren}) => {
-        if (!node.conditions?.length) {
+      before: ({node, editor, prevChildren}) => {
+        if (!node.enterConditions?.length) {
           return <>{prevChildren}</>;
         }
 
         return (
-          <NodeBeforeWrapper>
-            <ConditionList conditions={node.conditions} />
+          <NodeBeforeWrapper
+            onClick={event => {
+              event.stopPropagation();
+              editor.emitConfig({type: 'node', id: node.id}, 'enter');
+            }}
+          >
+            <ConditionList
+              leftCandidates={this.leftCandidates}
+              rightCandidates={this.rightCandidates}
+              conditions={node.enterConditions}
+            />
             <ConnectArrow>
               <ArrowDown />
             </ConnectArrow>
           </NodeBeforeWrapper>
         );
       },
-      body: ({node, prevChildren}) => {
+      body: ({node, editor, prevChildren}) => {
         return (
           <>
-            {node.conditions?.length ? (
-              <NodeBodyWrapper>
+            {node.visibleConditions?.length ? (
+              <NodeBodyWrapper
+                onClick={event => {
+                  event.stopPropagation();
+                  editor.emitConfig({type: 'node', id: node.id}, 'visible');
+                }}
+              >
                 <ConditionName>展示条件</ConditionName>
-                <ConditionList conditions={node.conditions} />
+                <ConditionList
+                  leftCandidates={this.leftCandidates}
+                  rightCandidates={this.rightCandidates}
+                  conditions={node.visibleConditions}
+                />
               </NodeBodyWrapper>
             ) : undefined}
             {prevChildren}
           </>
         );
       },
-      config: ({node, onChange}) => {
+      config: ({mode, node, onChange}) => {
+        let conditionField: keyof typeof node =
+          mode === 'enter' ? 'visibleConditions' : 'enterConditions';
+
         return (
           <ConditionEditor
             leftCandidates={this.leftCandidates}
             rightCandidates={this.rightCandidates}
-            conditions={node.conditions}
-            onChange={conditions => onChange?.({...node, conditions})}
+            conditions={node[conditionField]}
+            onChange={conditions =>
+              onChange?.({...node, [conditionField]: conditions})
+            }
           />
         );
       },
+    },
+    onUpdate({nextNode: node}) {
+      const conditionFields = ['visibleConditions', 'enterConditions'] as const;
+
+      for (let key of conditionFields) {
+        if (!node[key]) {
+          continue;
+        }
+
+        let conditions: ConditionOrGroup = [];
+
+        for (let group of node[key] || []) {
+          group = group.filter(
+            condition =>
+              !!(condition.left && condition.operator && condition.right),
+          );
+
+          if (group.length) {
+            conditions.push(group);
+          }
+        }
+
+        if (!conditions.length) {
+          node[key] = undefined;
+          continue;
+        }
+
+        node[key] = conditions;
+      }
     },
   };
 }

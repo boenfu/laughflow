@@ -1,10 +1,10 @@
-import {Operant} from '@magicflow/condition';
+import {Operant, getOperatorDisplayName} from '@magicflow/condition';
 import classNames from 'classnames';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
 import {TextSeparator} from '../../components';
-import {ConditionOrGroup} from '../@custom-condition';
+import {ConditionOrGroup, CustomConditionCandidate} from '../@custom-condition';
 
 const Wrapper = styled.div``;
 
@@ -42,16 +42,37 @@ export interface CustomConditionOperantCandidate {
 export interface ConditionListProps {
   className?: string;
   conditions?: ConditionOrGroup;
-  operantCandidates?: CustomConditionOperantCandidate[];
+  leftCandidates?: CustomConditionCandidate[];
+  rightCandidates?: CustomConditionCandidate[];
 }
 
 export const ConditionList: FC<ConditionListProps> = ({
   className,
   conditions,
+  leftCandidates = [],
+  rightCandidates = leftCandidates,
 }) => {
   if (!conditions) {
     return <></>;
   }
+
+  let leftCandidatesKeyToDisplayNameMap = new Map(
+    leftCandidates.map(({operant, displayName}) => [
+      `${operant.type}:${
+        'value' in operant ? operant.value : operant.variable
+      }`,
+      displayName,
+    ]),
+  );
+
+  let rightCandidatesKeyToDisplayNameMap = new Map(
+    rightCandidates.map(({operant, displayName}) => [
+      `${operant.type}:${
+        'value' in operant ? operant.value : operant.variable
+      }`,
+      displayName,
+    ]),
+  );
 
   return (
     <Wrapper className={classNames('condition-list', className)}>
@@ -64,9 +85,21 @@ export const ConditionList: FC<ConditionListProps> = ({
           {orGroup.map(({left, right, operator}, conditionIndex) => {
             return (
               <ConditionLine key={conditionIndex}>
-                <DisplayText>{left.type}</DisplayText>
-                <OperatorText>{operator}</OperatorText>
-                <DisplayText>{right.type}</DisplayText>
+                <DisplayText>
+                  {leftCandidatesKeyToDisplayNameMap.get(
+                    `${left.type}:${
+                      'value' in left ? left.value : left.variable
+                    }`,
+                  ) || `变量:${(left as any).variable}`}
+                </DisplayText>
+                <OperatorText>{getOperatorDisplayName(operator)}</OperatorText>
+                <DisplayText>
+                  {rightCandidatesKeyToDisplayNameMap.get(
+                    `${right.type}:${
+                      'value' in right ? right.value : right.variable
+                    }`,
+                  ) || `变量:${(right as any).variable}`}
+                </DisplayText>
               </ConditionLine>
             );
           })}

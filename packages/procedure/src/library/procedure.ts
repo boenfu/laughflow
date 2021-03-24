@@ -23,33 +23,31 @@ type ProcedureBeforeListenerReturnType =
   | 'handled'
   | Promise<void | 'handled'>;
 
-export interface ProcedureListeners<
-  TProcedureDefinition extends ProcedureDefinition
-> {
-  afterDefinitionChange?(definition: TProcedureDefinition): void;
+export interface ProcedureListeners {
+  afterDefinitionChange?(definition: ProcedureDefinition): void;
 
   beforeLeafCreate?(
-    leaf: TProcedureDefinition['leaves'][number],
-    trunk:
-      | TProcedureDefinition['nodes'][number]
-      | TProcedureDefinition['joints'][number],
-    definition: TProcedureDefinition,
+    leaf: LeafMetadata,
+    trunk: NodeMetadata | JointMetadata,
+    definition: ProcedureDefinition,
   ): ProcedureBeforeListenerReturnType;
 
   beforeLeafDelete?(
-    leaf: TProcedureDefinition['leaves'][number],
-    node:
-      | TProcedureDefinition['nodes'][number]
-      | TProcedureDefinition['joints'][number],
-    definition: TProcedureDefinition,
+    leaf: LeafMetadata,
+    trunk: NodeMetadata | JointMetadata,
+    definition: ProcedureDefinition,
+  ): ProcedureBeforeListenerReturnType;
+
+  beforeNodeUpdate?(
+    currentNode: NodeMetadata,
+    nextNode: NodeMetadata,
+    definition: ProcedureDefinition,
   ): ProcedureBeforeListenerReturnType;
 }
 
-export interface IProcedure<
-  TProcedureDefinition extends ProcedureDefinition = ProcedureDefinition
-> {
-  definition: TProcedureDefinition;
-  listeners: ProcedureListeners<TProcedureDefinition>;
+export interface IProcedure {
+  definition: ProcedureDefinition;
+  listeners: ProcedureListeners;
 
   createLeaf(
     trunk: TrunkRef,
@@ -90,10 +88,8 @@ interface ProcedureActionStack {
   cursor: number;
 }
 
-export class Procedure<
-  TProcedureDefinition extends ProcedureDefinition = ProcedureDefinition
-> implements IProcedure {
-  private _definition!: TProcedureDefinition;
+export class Procedure implements IProcedure {
+  private _definition!: ProcedureDefinition;
 
   private actionStack: ProcedureActionStack = {
     undoes: [],
@@ -109,35 +105,33 @@ export class Procedure<
     return !!this.actionStack.redoes?.[this.actionStack.cursor];
   }
 
-  get definition(): TProcedureDefinition {
+  get definition(): ProcedureDefinition {
     return this._definition;
   }
 
   constructor(
-    definition: TProcedureDefinition,
-    readonly listeners: ProcedureListeners<TProcedureDefinition> = {},
+    definition: ProcedureDefinition,
+    readonly listeners: ProcedureListeners = {},
   ) {
     this.setDefinition(cloneDeep(definition), false);
   }
 
-  getNode(nodeId: NodeId): TProcedureDefinition['nodes'][number] | undefined {
+  getNode(nodeId: NodeId): NodeMetadata | undefined {
     return this.definition.nodes.find(node => node.id === nodeId);
   }
 
-  getLeaf(leafId: LeafId): TProcedureDefinition['leaves'][number] | undefined {
+  getLeaf(leafId: LeafId): ProcedureDefinition['leaves'][number] | undefined {
     return this.definition.leaves.find(leaf => leaf.id === leafId);
   }
 
-  getJoint(
-    jointId: JointId,
-  ): TProcedureDefinition['joints'][number] | undefined {
+  getJoint(jointId: JointId): JointMetadata | undefined {
     return this.definition.joints.find(joint => joint.id === jointId);
   }
 
   async createLeaf(
     trunk: TrunkRef,
     type: LeafType,
-    partial: Partial<TProcedureDefinition['leaves'][number]> = {},
+    partial: Partial<ProcedureDefinition['leaves'][number]> = {},
   ): Promise<void> {
     return this.update(async definition => {
       let trunkMetadata = requireTrunk(definition, trunk);
@@ -167,7 +161,7 @@ export class Procedure<
   }
 
   async updateLeaf(
-    metadata: TProcedureDefinition['leaves'][number],
+    metadata: ProcedureDefinition['leaves'][number],
   ): Promise<void> {
     return this.update(definition => {
       let leafIndex = definition.leaves.findIndex(({id}) => id === metadata.id);
@@ -320,11 +314,7 @@ export class Procedure<
   async createNode(
     trunk: TrunkRef,
     target: Ref | 'next' | undefined = undefined,
-    {
-      id: _id,
-      nexts = [],
-      ...partial
-    }: Partial<TProcedureDefinition['nodes'][number]> = {},
+    {id: _id, nexts = [], ...partial}: Partial<NodeMetadata> = {},
   ): Promise<void> {
     return this.update(definition => {
       let trunkMetadata = requireTrunk(definition, trunk);
@@ -386,17 +376,27 @@ export class Procedure<
     });
   }
 
-  async updateNode(
-    metadata: TProcedureDefinition['nodes'][number],
-  ): Promise<void> {
-    return this.update(definition => {
+  async updateNode(metadata: NodeMetadata): Promise<void> {
+    let nextNodeMetadata = cloneDeep(metadata);
+
+    return this.update(async definition => {
       let nodeIndex = definition.nodes.findIndex(({id}) => id === metadata.id);
 
       if (nodeIndex === -1) {
         throw Error(`Not found node metadata by id '${metadata.id}'`);
       }
 
-      definition.nodes.splice(nodeIndex, 1, metadata);
+      if (
+        (await this.listeners.beforeNodeUpdate?.(
+          definition.nodes[nodeIndex],
+          nextNodeMetadata,
+          definition,
+        )) === 'handled'
+      ) {
+        return;
+      }
+
+      definition.nodes.splice(nodeIndex, 1, nextNodeMetadata);
     });
   }
 
@@ -659,7 +659,7 @@ export class Procedure<
   }
 
   async update(
-    handler: (definition: TProcedureDefinition) => Promise<void> | void,
+    handler: (definition: ProcedureDefinition) => Promise<void> | void,
   ): Promise<void> {
     let definition = await produce(
       this._definition,
@@ -685,7 +685,7 @@ export class Procedure<
     this.setDefinition(definition);
   }
 
-  private setDefinition(definition: TProcedureDefinition, notify = true): void {
+  private setDefinition(definition: ProcedureDefinition, notify = true): void {
     this._definition = definition;
 
     if (!notify) {

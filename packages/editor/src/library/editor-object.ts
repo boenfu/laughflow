@@ -99,6 +99,25 @@ export class Editor extends Eventemitter<ProcedureEventType> {
         this.buildTreeNode(definition);
         this.emit('update');
       },
+      beforeNodeUpdate: async (
+        currentNode: NodeMetadata,
+        nextNode: NodeMetadata,
+        definition,
+      ) => {
+        if (
+          await nodeHandler(
+            'onUpdate',
+            definition,
+            this.plugins,
+            currentNode,
+            nextNode,
+          )
+        ) {
+          return;
+        }
+
+        return 'handled';
+      },
     });
   }
 
@@ -236,4 +255,44 @@ export class Editor extends Eventemitter<ProcedureEventType> {
       payload,
     );
   }
+}
+
+async function nodeHandler(
+  type: 'onUpdate',
+  definition: ProcedureDefinition,
+  plugins: IPlugin[],
+  currentNode: NodeMetadata,
+  nextNode: NodeMetadata,
+): Promise<boolean> {
+  let toPropagation = true;
+  let toExecuteDefault = true;
+
+  let stopPropagation = (): void => {
+    toPropagation = false;
+  };
+  let preventDefault = (): void => {
+    toExecuteDefault = false;
+  };
+
+  for (let plugin of plugins) {
+    let handler = plugin.node?.[type];
+
+    if (!handler) {
+      continue;
+    }
+
+    if (!toPropagation) {
+      break;
+    }
+
+    await handler({
+      definition,
+      currentNode,
+      nextNode,
+      stopPropagation,
+      preventDefault,
+    });
+  }
+
+  return toExecuteDefault;
 }
