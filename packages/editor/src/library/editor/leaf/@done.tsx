@@ -1,8 +1,11 @@
+import {LeafMetadata} from '@magicflow/core';
 import {Check} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-export interface DoneLeafProps {}
+export interface DoneLeafProps {
+  leaf: LeafMetadata;
+}
 
 const Content = styled.div`
   width: 32px;

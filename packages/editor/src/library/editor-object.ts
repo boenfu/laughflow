@@ -3,7 +3,6 @@ import {
   JointRef,
   LeafMetadata,
   LeafRef,
-  LeafType,
   NodeId,
   NodeMetadata,
   NodeRef,
@@ -13,22 +12,9 @@ import {
 } from '@magicflow/core';
 import {Procedure} from '@magicflow/procedure';
 import Eventemitter from 'eventemitter3';
-import {castArray, compact, sortBy} from 'lodash-es';
+import {castArray} from 'lodash-es';
 
-import {doneLeaf, terminateLeaf} from './editor';
-import {
-  ILeafPlugin,
-  ILeafPluginEventHandlers,
-  IPlugin,
-  IPluginEventHandlers,
-  LeafAction,
-  LeafPluginComponent,
-  LeafSelector,
-  NodePluginComponent,
-  NodePluginRenderObject,
-  PluginEventHandler,
-  PluginLeafEventType,
-} from './plugin';
+import {IPlugin, NodePluginComponent, NodePluginRenderObject} from './plugin';
 
 export interface IProcedureTreeNode<
   TRef extends Ref,
@@ -64,13 +50,6 @@ export type ProcedureLeafTreeNode = IProcedureTreeNode<
   false
 >;
 
-export interface LeafRenderDescriptor {
-  type: LeafType;
-  render: LeafPluginComponent;
-  selector: LeafSelector;
-  actions: LeafAction[];
-}
-
 export type NodeRenderDescriptor = Record<
   keyof NodePluginRenderObject,
   NodePluginComponent[]
@@ -92,8 +71,6 @@ export class Editor extends Eventemitter<ProcedureEventType> {
   plugins: IPlugin[] = [];
 
   procedureTreeNode!: ProcedureTreeNode;
-
-  private leafRenderDescriptors: Map<string, LeafRenderDescriptor> = new Map();
 
   nodeRenderDescriptor: NodeRenderDescriptor = {
     before: [],
@@ -122,68 +99,11 @@ export class Editor extends Eventemitter<ProcedureEventType> {
         this.buildTreeNode(definition);
         this.emit('update');
       },
-      async beforeLeafCreate(leaf, node, definition) {
-        if (await leafHandler('create', definition, plugins, node.id, leaf)) {
-          return;
-        }
-
-        return 'handled';
-      },
-      async beforeLeafDelete(leaf, node, definition) {
-        if (await leafHandler('delete', definition, plugins, node.id, leaf)) {
-          return;
-        }
-
-        return 'handled';
-      },
     });
   }
 
   setPlugins(plugins: IPlugin[]): void {
     this.plugins = plugins;
-
-    // leaf
-
-    let leavesMap = new Map<string, ILeafPlugin>([
-      ['done', doneLeaf],
-      ['terminate', terminateLeaf],
-    ]);
-
-    for (let plugin of castArray(plugins)) {
-      if (plugin?.leaves?.length) {
-        for (let {type, render, selector, actions = []} of plugin.leaves) {
-          let {
-            render: lastRender,
-            selector: lastSelector,
-            actions: lastActions = [],
-          } = leavesMap.get(type) || {};
-
-          leavesMap.set(type, {
-            type,
-            render: render || lastRender,
-            selector: selector || lastSelector,
-            actions: [...lastActions, ...actions],
-          });
-        }
-      }
-    }
-
-    for (let [type, plugin] of leavesMap) {
-      if (!plugin.selector || !plugin.render) {
-        leavesMap.delete(type);
-
-        continue;
-      }
-
-      leavesMap.set(type, {
-        ...plugin,
-        actions: sortBy(plugin.actions, ({order}) => order),
-      });
-    }
-
-    this.leafRenderDescriptors = new Map(
-      sortBy([...leavesMap.entries()], ([, {selector}]) => selector?.order),
-    ) as Map<string, LeafRenderDescriptor>;
 
     // node
 
@@ -198,14 +118,6 @@ export class Editor extends Eventemitter<ProcedureEventType> {
         );
       }
     }
-  }
-
-  getLeafRenderDescriptors(): LeafRenderDescriptor[] {
-    return [...this.leafRenderDescriptors.values()];
-  }
-
-  getLeafRenderDescriptor(type: LeafType): LeafRenderDescriptor | undefined {
-    return this.leafRenderDescriptors.get(type);
   }
 
   setActiveTrunk(activeTrunk: ActiveTrunk | undefined): void {
@@ -324,72 +236,4 @@ export class Editor extends Eventemitter<ProcedureEventType> {
       payload,
     );
   }
-}
-
-const LEAF_EVENT_TYPE_TO_KEY_DICT: {
-  [key in PluginLeafEventType]: [
-    keyof IPluginEventHandlers,
-    keyof ILeafPluginEventHandlers,
-  ];
-} = {
-  create: ['onLeafCreate', 'onCreate'],
-  delete: ['onLeafDelete', 'onDelete'],
-};
-
-async function leafHandler(
-  type: PluginLeafEventType,
-  definition: ProcedureDefinition,
-  plugins: IPlugin[],
-  trunk: TrunkRef['id'],
-  metadata: LeafMetadata,
-): Promise<boolean> {
-  let [globalEventKey, leafEventKey] = LEAF_EVENT_TYPE_TO_KEY_DICT[type];
-
-  let handlers = plugins
-    .reduce<[PluginEventHandler[], PluginEventHandler[]]>(
-      ([leafHandler, pluginHandler], plugin) => {
-        leafHandler.push(
-          ...compact(
-            plugin.leaves?.map(
-              leaf => leaf.type === metadata.type && leaf[leafEventKey],
-            ),
-          ),
-        );
-
-        if (plugin[globalEventKey]) {
-          pluginHandler.push(plugin[globalEventKey]!);
-        }
-
-        return [leafHandler, pluginHandler];
-      },
-      [[], []],
-    )
-    .flat();
-
-  let toPropagation = true;
-  let toExecuteDefault = true;
-
-  let stopPropagation = (): void => {
-    toPropagation = false;
-  };
-  let preventDefault = (): void => {
-    toExecuteDefault = false;
-  };
-
-  for (let handler of handlers) {
-    if (!toPropagation) {
-      break;
-    }
-
-    await handler({
-      type,
-      definition,
-      metadata,
-      trunk,
-      stopPropagation,
-      preventDefault,
-    });
-  }
-
-  return toExecuteDefault;
 }

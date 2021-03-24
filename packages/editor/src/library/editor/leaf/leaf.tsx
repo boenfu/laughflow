@@ -6,6 +6,9 @@ import styled from 'styled-components';
 import {TooltipActions, transition} from '../../components';
 import {EditorContext} from '../../context';
 
+import {DoneLeaf} from './@done';
+import {TerminateLeaf} from './@terminate';
+
 export interface LeafProps {
   leaf: LeafMetadata;
 }
@@ -28,18 +31,21 @@ const LeafContent = styled.div`
   display: inline-flex;
 `;
 
+const LeafTypeToRender = {
+  done: DoneLeaf,
+  terminate: TerminateLeaf,
+};
+
 export const Leaf: FC<LeafProps> = ({leaf}) => {
   const {editor} = useContext(EditorContext);
 
-  let renderDescriptor = editor.getLeafRenderDescriptor(leaf.type);
+  let Component = LeafTypeToRender[leaf.type];
 
-  if (!renderDescriptor) {
+  if (!Component) {
     return <></>;
   }
 
   const onDelete = (): void => void editor.procedure.deleteLeaf(leaf.id);
-
-  let {render: Component} = renderDescriptor;
 
   return (
     <Wrapper>
