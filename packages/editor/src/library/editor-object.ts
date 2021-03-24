@@ -13,7 +13,7 @@ import {
 } from '@magicflow/core';
 import {Procedure} from '@magicflow/procedure';
 import Eventemitter from 'eventemitter3';
-import {castArray, compact, merge, sortBy} from 'lodash-es';
+import {castArray, compact, sortBy} from 'lodash-es';
 
 import {doneLeaf, terminateLeaf} from './editor';
 import {
@@ -24,7 +24,8 @@ import {
   LeafAction,
   LeafPluginComponent,
   LeafSelector,
-  NodePluginComponentRender,
+  NodePluginComponent,
+  NodePluginRenderObject,
   PluginEventHandler,
   PluginLeafEventType,
 } from './plugin';
@@ -70,7 +71,10 @@ export interface LeafRenderDescriptor {
   actions: LeafAction[];
 }
 
-export type NodeRenderDescriptor = NodePluginComponentRender;
+export type NodeRenderDescriptor = Record<
+  keyof NodePluginRenderObject,
+  NodePluginComponent[]
+>;
 
 type ProcedureEventType = 'update';
 
@@ -91,12 +95,13 @@ export class Editor extends Eventemitter<ProcedureEventType> {
 
   private leafRenderDescriptors: Map<string, LeafRenderDescriptor> = new Map();
 
-  private nodeRenderDescriptor: {
-    descriptor: NodeRenderDescriptor;
-    fns: ((node: NodeMetadata) => NodeRenderDescriptor)[];
-  } = {
-    descriptor: {},
-    fns: [],
+  nodeRenderDescriptor: NodeRenderDescriptor = {
+    before: [],
+    after: [],
+    headLeft: [],
+    headRight: [],
+    body: [],
+    footer: [],
   };
 
   private _activeTrunk: ActiveTrunk | undefined;
@@ -181,27 +186,19 @@ export class Editor extends Eventemitter<ProcedureEventType> {
 
     // node
 
-    let descriptor = {};
-    let fns = [];
-
     for (let plugin of castArray(plugins)) {
       if (!plugin?.nodes?.length) {
         continue;
       }
 
       for (let node of plugin.nodes) {
-        if (typeof node.render === 'function') {
-          fns.push(node.render);
-        } else {
-          merge(descriptor, node.render);
+        for (let [name, component] of Object.entries(node.render)) {
+          this.nodeRenderDescriptor[name as keyof NodePluginRenderObject].push(
+            component,
+          );
         }
       }
     }
-
-    this.nodeRenderDescriptor = {
-      descriptor,
-      fns,
-    };
   }
 
   getLeafRenderDescriptors(): LeafRenderDescriptor[] {
@@ -210,13 +207,6 @@ export class Editor extends Eventemitter<ProcedureEventType> {
 
   getLeafRenderDescriptor(type: LeafType): LeafRenderDescriptor | undefined {
     return this.leafRenderDescriptors.get(type);
-  }
-
-  getNodeRenderDescriptor(node: NodeMetadata): NodeRenderDescriptor {
-    return merge(
-      this.nodeRenderDescriptor.descriptor,
-      ...this.nodeRenderDescriptor.fns.map(fn => fn(node)),
-    );
   }
 
   setActiveTrunk(activeTrunk: ActiveTrunk | undefined): void {

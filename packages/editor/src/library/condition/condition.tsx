@@ -137,7 +137,6 @@ export class ConditionPlugin implements IPlugin {
             </NodeBodyWrapper>
           );
         },
-        bodyAppend: true,
       },
     },
   ];

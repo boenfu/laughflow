@@ -5,7 +5,7 @@ import {
   ProcedureDefinition,
   TrunkRef,
 } from '@magicflow/core';
-import {ComponentType} from 'react';
+import {ComponentType, ReactNode} from 'react';
 import {Nominal} from 'tslang';
 
 export type LeafPluginType = Nominal<string, ['leaf-plugin-type']>;
@@ -83,32 +83,40 @@ export interface IPluginEventHandlers {
 
 export interface NodePluginComponentProps {
   node: NodeMetadata;
+  prevChildren?: ReactNode;
 }
 
 export type NodePluginComponent = ComponentType<NodePluginComponentProps>;
 
-export interface NodePluginComponentRender {
+export interface NodePluginRenderObject {
   before?: NodePluginComponent;
   after?: NodePluginComponent;
 
   headLeft?: NodePluginComponent;
   headRight?: NodePluginComponent;
 
+  /**
+   * default `flex-direction: column`
+   */
   body?: NodePluginComponent;
-  bodyAppend?: boolean;
-
+  /**
+   * default `flex-direction: row`
+   */
   footer?: NodePluginComponent;
 }
 
 export interface INodePlugin {
-  render:
-    | NodePluginComponentRender
-    | ((node: NodeMetadata) => NodePluginComponentRender);
+  render: NodePluginRenderObject;
 }
 
-export interface IPlugin extends IPluginEventHandlers {
-  name: string;
-  devDependencies?: string[];
+export interface IPluginConfig<TName = string> {
+  name: TName;
+  component: NodePluginComponent;
+}
+
+export interface IPlugin<TName = string> extends IPluginEventHandlers {
+  name: TName;
+  config?: IPluginConfig<TName>;
   nodes?: INodePlugin[];
   leaves?: ILeafPlugin[];
 }

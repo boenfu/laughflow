@@ -181,15 +181,6 @@ export const Node: FC<NodeProps> = ({
 }) => {
   const {editor} = useContext(EditorContext);
 
-  let {
-    before,
-    after,
-    headLeft,
-    headRight,
-    footer,
-    body,
-  } = editor.getNodeRenderDescriptor(node);
-
   let nodeRef: NodeRef = {type: 'node', id: node.id};
 
   let activeTrunk = editor.activeTrunk;
@@ -225,9 +216,26 @@ export const Node: FC<NodeProps> = ({
   let active = activeTrunk?.ref?.id === node.id;
   let selected = activeTrunk?.relationTrunks?.some(ref => ref.id === node.id);
 
+  let {
+    before,
+    after,
+    headLeft,
+    headRight,
+    footer,
+    body,
+  } = editor.nodeRenderDescriptor;
+
   return (
     <Container style={style}>
-      {before && <BeforeWrapper>{createElement(before, {node})}</BeforeWrapper>}
+      {before.length && (
+        <BeforeWrapper>
+          {before.reduce(
+            (reactNode, component) =>
+              createElement(component, {node, prevChildren: reactNode}),
+            <></>,
+          )}
+        </BeforeWrapper>
+      )}
       <Wrapper
         className={classnames([
           className,
@@ -240,23 +248,56 @@ export const Node: FC<NodeProps> = ({
         onClick={onContainerClick}
       >
         <Header>
-          {headLeft && (
-            <HeaderExtra>{createElement(headLeft, {node})}</HeaderExtra>
+          {headLeft.length && (
+            <HeaderExtra>
+              {headLeft.reduce(
+                (reactNode, component) =>
+                  createElement(component, {node, prevChildren: reactNode}),
+                <></>,
+              )}
+            </HeaderExtra>
           )}
+          <></>
 
           <DisplayName node={node} onChange={onNodeChange} />
-          {headRight && (
-            <HeaderExtra>{createElement(headRight, {node})}</HeaderExtra>
+          {headRight.length && (
+            <HeaderExtra>
+              {headRight.reduce(
+                (reactNode, component) =>
+                  createElement(component, {node, prevChildren: reactNode}),
+                <></>,
+              )}
+            </HeaderExtra>
           )}
         </Header>
-        <Body>{body && createElement(body, {node})}</Body>
-        <Footer>{footer && createElement(footer, {node})}</Footer>
+        <Body>
+          {body.reduce(
+            (reactNode, component) =>
+              createElement(component, {node, prevChildren: reactNode}),
+            <></>,
+          )}
+        </Body>
+        <Footer>
+          {footer.reduce(
+            (reactNode, component) =>
+              createElement(component, {node, prevChildren: reactNode}),
+            <></>,
+          )}
+        </Footer>
 
         {editing && active ? (
           <EditingIcon state={activeTrunk!.state} />
         ) : undefined}
       </Wrapper>
-      {after && <AfterWrapper>{createElement(after, {node})}</AfterWrapper>}
+      {after.length && (
+        <AfterWrapper>
+          {after.reduce(
+            (reactNode, component) =>
+              createElement(component, {node, prevChildren: reactNode}),
+            <></>,
+          )}
+        </AfterWrapper>
+      )}
       {children}
     </Container>
   );
