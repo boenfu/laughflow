@@ -54,8 +54,8 @@ export interface IProcedure {
     type: LeafType,
     partial?: Partial<LeafMetadata>,
   ): void;
-  updateLeaf(leaf: LeafMetadata): void;
-  deleteLeaf(leafId: LeafId): void;
+  updateLeaf(trunk: TrunkRef, leaf: LeafMetadata): void;
+  deleteLeaf(trunk: TrunkRef, leafId: LeafId): void;
 
   createJoint(trunk: TrunkRef, otherTrunks: TrunkRef | TrunkRef[]): void;
   connectJoint(joint: JointRef, otherTrunks: TrunkRef | TrunkRef[]): void;
@@ -120,10 +120,6 @@ export class Procedure implements IProcedure {
     return this.definition.nodes.find(node => node.id === nodeId);
   }
 
-  getLeaf(leafId: LeafId): ProcedureDefinition['leaves'][number] | undefined {
-    return this.definition.leaves.find(leaf => leaf.id === leafId);
-  }
-
   getJoint(jointId: JointId): JointMetadata | undefined {
     return this.definition.joints.find(joint => joint.id === jointId);
   }
@@ -131,7 +127,7 @@ export class Procedure implements IProcedure {
   async createLeaf(
     trunk: TrunkRef,
     type: LeafType,
-    partial: Partial<ProcedureDefinition['leaves'][number]> = {},
+    partial: Partial<LeafMetadata> = {},
   ): Promise<void> {
     return this.update(async definition => {
       let trunkMetadata = requireTrunk(definition, trunk);
@@ -153,49 +149,40 @@ export class Procedure implements IProcedure {
         return;
       }
 
-      trunkMetadata.nexts = trunkMetadata.nexts || [];
-      trunkMetadata.nexts.push({type: 'leaf', id});
-
-      definition.leaves.push(metadata);
+      trunkMetadata.leaves = trunkMetadata.leaves || [];
+      trunkMetadata.leaves.push(metadata);
     });
   }
 
-  async updateLeaf(
-    metadata: ProcedureDefinition['leaves'][number],
-  ): Promise<void> {
+  async updateLeaf(trunkRef: TrunkRef, metadata: LeafMetadata): Promise<void> {
     return this.update(definition => {
-      let leafIndex = definition.leaves.findIndex(({id}) => id === metadata.id);
+      let trunkMetadata = requireTrunk(definition, trunkRef);
 
-      if (leafIndex === -1) {
+      let leafIndex = trunkMetadata.leaves?.findIndex(
+        ({id}) => id === metadata.id,
+      );
+
+      if (leafIndex === undefined || leafIndex === -1) {
         throw Error(`Not found leaf metadata by id '${metadata.id}'`);
       }
 
-      definition.leaves.splice(leafIndex, 1, metadata);
+      trunkMetadata.leaves!.splice(leafIndex, 1, metadata);
     });
   }
 
-  async deleteLeaf(leafId: LeafId): Promise<void> {
+  async deleteLeaf(trunkRef: TrunkRef, leafId: LeafId): Promise<void> {
     return this.update(async definition => {
-      let leafIndex = definition.leaves.findIndex(leaf => leaf.id === leafId);
+      let trunkMetadata = requireTrunk(definition, trunkRef);
 
-      if (leafIndex === -1) {
+      let leafIndex = trunkMetadata.leaves?.findIndex(
+        leaf => leaf.id === leafId,
+      );
+
+      if (leafIndex === undefined || leafIndex === -1) {
         throw Error(`Not found leaf metadata by leaf '${leafId}'`);
       }
 
-      let trunkMetadata =
-        definition.nodes.find(({nexts}) =>
-          nexts?.some(({type, id}) => type === 'leaf' && id === leafId),
-        ) ||
-        definition.joints.find(({nexts}) =>
-          nexts?.some(({type, id}) => type === 'leaf' && id === leafId),
-        );
-
-      if (!trunkMetadata) {
-        definition.leaves.splice(leafIndex, 1);
-        return;
-      }
-
-      let leaf = definition.leaves[leafIndex];
+      let leaf = trunkMetadata.leaves![leafIndex];
 
       if (
         (await this.listeners.beforeLeafDelete?.(
@@ -207,11 +194,7 @@ export class Procedure implements IProcedure {
         return;
       }
 
-      definition.leaves.splice(leafIndex, 1);
-
-      trunkMetadata.nexts = trunkMetadata.nexts?.filter(
-        ({type, id}) => type !== 'leaf' || id !== leafId,
-      );
+      trunkMetadata.leaves!.splice(leafIndex, 1);
     });
   }
 
@@ -280,25 +263,10 @@ export class Procedure implements IProcedure {
         return;
       }
 
-      let trunkNexts: TrunkRef[] = [];
-      let leavesSet = new Set<LeafId>();
-
-      for (let next of jointMetadata.nexts) {
-        if (next.type === 'leaf') {
-          leavesSet.add(next.id);
-        } else {
-          trunkNexts.push(next);
-        }
-      }
-
-      definition.leaves = definition.leaves.filter(
-        leaf => !leavesSet.has(leaf.id),
-      );
-
       let masterTrunk = requireTrunk(definition, jointMetadata.master);
 
       masterTrunk.nexts = masterTrunk.nexts || [];
-      masterTrunk.nexts.push(...trunkNexts);
+      masterTrunk.nexts.push(...jointMetadata.nexts);
     });
   }
 
@@ -479,22 +447,7 @@ export class Procedure implements IProcedure {
         return;
       }
 
-      // 删除 nexts 中的 leaves
-      let nexts: Ref[] = [];
-      let leafNextsSet = new Set<LeafId>();
-
-      for (let next of node.nexts) {
-        if (next.type === 'leaf') {
-          leafNextsSet.add(next.id);
-        } else {
-          nexts.push(next);
-        }
-      }
-
-      (prevMetadata as NodeMetadata).nexts!.push(...nexts);
-      definition.leaves = definition.leaves.filter(
-        leaf => !leafNextsSet.has(leaf.id),
-      );
+      (prevMetadata as NodeMetadata).nexts!.push(...node.nexts);
     });
   }
 
@@ -516,19 +469,8 @@ export class Procedure implements IProcedure {
       let targetTrunk = requireTrunk(definition, target);
 
       let movingNodeNexts = movingNode.nexts || [];
-      let pendingTransferMovingNodeNexts = [];
 
       movingNode.nexts = [];
-
-      // The leaves will move with the node
-      for (let next of movingNodeNexts) {
-        if (next.type === 'leaf') {
-          movingNode.nexts.push(next);
-          continue;
-        }
-
-        pendingTransferMovingNodeNexts.push(next);
-      }
 
       if (prev) {
         let prevTrunk = requireTrunk(definition, prev);
@@ -545,31 +487,46 @@ export class Procedure implements IProcedure {
           );
         }
 
-        prevTrunk.nexts.splice(
-          movingNodeIndex,
-          1,
-          ...pendingTransferMovingNodeNexts,
-        );
+        prevTrunk.nexts.splice(movingNodeIndex, 1, ...movingNodeNexts);
       }
 
       targetTrunk.nexts = targetTrunk.nexts || [];
 
       if (targetNext) {
-        let targetNextIndex = targetTrunk.nexts.findIndex(
-          next => next.id === targetNext.id,
-        );
-
-        if (targetNextIndex === -1) {
-          throw Error(
-            `Not found targetNext ${JSON.stringify(
-              targetNext,
-            )} at nexts of targetNode '${targetTrunk.id}'`,
+        if (targetNext.type === 'leaf') {
+          let targetNextLeafIndex = targetTrunk.leaves?.findIndex(
+            next => next.id === targetNext.id,
           );
+
+          if (targetNextLeafIndex === undefined || targetNextLeafIndex === -1) {
+            throw Error(
+              `Not found targetNext ${JSON.stringify(
+                targetNext,
+              )} at leaves of targetNode '${targetTrunk.id}'`,
+            );
+          }
+
+          let [leaf] = targetTrunk.leaves!.splice(targetNextLeafIndex, 1);
+
+          movingNode.leaves = movingNode.leaves || [];
+          movingNode.leaves.push(leaf);
+        } else {
+          let targetNextIndex = targetTrunk.nexts.findIndex(
+            next => next.id === targetNext.id,
+          );
+
+          if (targetNextIndex === -1) {
+            throw Error(
+              `Not found targetNext ${JSON.stringify(
+                targetNext,
+              )} at nexts of targetNode '${targetTrunk.id}'`,
+            );
+          }
+
+          targetTrunk.nexts.splice(targetNextIndex, 1);
+
+          movingNode.nexts.push(targetNext);
         }
-
-        targetTrunk.nexts.splice(targetNextIndex, 1);
-
-        movingNode.nexts.push(targetNext);
       }
 
       targetTrunk.nexts.push({
@@ -609,23 +566,50 @@ export class Procedure implements IProcedure {
         return;
       }
 
-      let nextIndex = targetTrunk.nexts.findIndex(next =>
-        isEqual(next, targetNext),
-      );
-
-      if (nextIndex === -1) {
-        throw Error(
-          `Not found next metadata ${JSON.stringify(targetNext)} at node '${
-            targetTrunk.id
-          }'`,
+      if (targetNext.type === 'leaf') {
+        let leafIndex = targetTrunk.leaves?.findIndex(next =>
+          isEqual(next, targetNext),
         );
+
+        if (leafIndex === undefined || leafIndex === -1) {
+          throw Error(
+            `Not found leaf metadata ${JSON.stringify(targetNext)} at node '${
+              targetTrunk.id
+            }'`,
+          );
+        }
+
+        let [leaf] = targetTrunk.leaves!.splice(leafIndex, 1);
+
+        duplicateNode.leaves = duplicateNode.leaves || [];
+
+        duplicateNode.leaves.push(leaf);
+
+        targetTrunk.nexts.push({
+          type: 'node',
+          id: duplicateNodeId,
+        });
+      } else {
+        let nextIndex = targetTrunk.nexts.findIndex(next =>
+          isEqual(next, targetNext),
+        );
+
+        if (nextIndex === -1) {
+          throw Error(
+            `Not found next metadata ${JSON.stringify(targetNext)} at node '${
+              targetTrunk.id
+            }'`,
+          );
+        }
+
+        targetTrunk.nexts.splice(nextIndex, 1, {
+          type: 'node',
+          id: duplicateNodeId,
+        });
+
+        duplicateNode.nexts.push(targetNext);
       }
 
-      targetTrunk.nexts.splice(nextIndex, 1, {
-        type: 'node',
-        id: duplicateNodeId,
-      });
-      duplicateNode.nexts.push(targetNext);
       definition.nodes.push(duplicateNode);
     });
   }

@@ -1,5 +1,4 @@
 import {
-  LeafId,
   NodeId,
   NodeRef,
   ProcedureDefinition,
@@ -26,7 +25,6 @@ let node2Id = 'node2' as NodeId;
 let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
-  leaves: [],
   joints: [],
   nodes: [
     {
@@ -148,35 +146,35 @@ test('copy node error params', async () => {
     ),
   ).rejects.toThrow("Not found node metadata by id 'fakeTargetNode'");
 
-  void expect(
-    procedure.copyNode(
-      nodeId,
-      {
-        type: 'node',
-        id: startId,
-      },
-      {
-        type: 'leaf',
-        id: 'fakeTargetNext' as LeafId,
-      },
-    ),
-  ).rejects.toThrow(
-    'Not found next metadata {"type":"leaf","id":"fakeTargetNext"} at node \'start\'',
-  );
+  // void expect(
+  //   procedure.copyNode(
+  //     nodeId,
+  //     {
+  //       type: 'node',
+  //       id: startId,
+  //     },
+  //     {
+  //       type: 'leaf',
+  //       id: 'fakeTargetNext' as LeafId,
+  //     },
+  //   ),
+  // ).rejects.toThrow(
+  //   'Not found next metadata {"type":"leaf","id":"fakeTargetNext"} at node \'start\'',
+  // );
 
-  void expect(
-    procedure.copyNode(
-      nodeId,
-      {
-        type: 'node',
-        id: node2Id,
-      },
-      {
-        type: 'leaf',
-        id: 'fakeTargetNext' as LeafId,
-      },
-    ),
-  ).rejects.toThrow(
-    'Not found next metadata {"type":"leaf","id":"fakeTargetNext"} at node \'node2\'',
-  );
+  // void expect(
+  //   procedure.copyNode(
+  //     nodeId,
+  //     {
+  //       type: 'node',
+  //       id: node2Id,
+  //     },
+  //     {
+  //       type: 'leaf',
+  //       id: 'fakeTargetNext' as LeafId,
+  //     },
+  //   ),
+  // ).rejects.toThrow(
+  //   'Not found next metadata {"type":"leaf","id":"fakeTargetNext"} at node \'node2\'',
+  // );
 });

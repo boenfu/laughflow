@@ -8,7 +8,6 @@ let nodeId = 'node1' as NodeId;
 let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
-  leaves: [],
   joints: [],
   nodes: [
     {
@@ -42,7 +41,7 @@ test('undo action', async () => {
   // test branch
   procedure.undo();
 
-  expect(procedure.definition.leaves.length).toBe(0);
+  expect(procedure.getNode(nodeId)?.leaves?.length).toBe(0);
 });
 
 test('redo action', async () => {
@@ -51,5 +50,5 @@ test('redo action', async () => {
   // test branch
   procedure.redo();
 
-  expect(procedure.definition.leaves.length).toBe(1);
+  expect(procedure.getNode(nodeId)?.leaves?.length).toBe(1);
 });

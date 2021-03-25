@@ -19,7 +19,6 @@ let leafId = 'leaf' as LeafId;
 let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
-  leaves: [],
   joints: [],
   nodes: [
     {
@@ -44,11 +43,13 @@ let definition: ProcedureDefinition = {
     },
     {
       id: node2Id,
-      nexts: [
+      leaves: [
         {
-          type: 'leaf',
+          type: 'done',
           id: leafId,
         },
+      ],
+      nexts: [
         {
           type: 'node',
           id: node4Id,

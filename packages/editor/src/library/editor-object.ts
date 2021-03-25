@@ -152,7 +152,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
       >;
     } = {
       node: new Map(definition.nodes.map(node => [node.id, node])),
-      leaf: new Map(definition.leaves.map(leaf => [leaf.id, leaf])),
+      leaf: new Map(),
       joint: new Map(definition.joints.map(joint => [joint.id, joint])),
     };
 
@@ -191,12 +191,20 @@ export class Editor extends Eventemitter<ProcedureEventType> {
       let links: ProcedureNodeTreeNode[] = [];
       let joints: ProcedureJointTreeNode[] = [];
 
-      for (let next of (metadata as NodeMetadata | JointMetadata).nexts || []) {
-        if (next.type === 'leaf') {
-          leaves.push(buildTreeNode(next, node, visitedNodeSet, false));
-          continue;
-        }
+      for (let leafMetadata of (metadata as NodeMetadata | JointMetadata)
+        .leaves || []) {
+        refTypeToMetadataMapDict['leaf'].set(leafMetadata.id, leafMetadata);
+        leaves.push(
+          buildTreeNode(
+            {type: 'leaf', id: leafMetadata.id},
+            node,
+            visitedNodeSet,
+            false,
+          ),
+        );
+      }
 
+      for (let next of (metadata as NodeMetadata | JointMetadata).nexts || []) {
         if (next.type === 'joint') {
           joints.push(
             buildTreeNode(

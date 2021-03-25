@@ -33,7 +33,6 @@ declare global {
 let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
-  leaves: [],
   joints: [],
   nodes: [
     {
@@ -64,9 +63,7 @@ test('create leaf', async () => {
 
   expect(procedure.getNode(nodeId)?.nexts?.length).toBe(1);
 
-  expect(
-    procedure.getLeaf(procedure.getNode(nodeId)?.nexts?.[0].id as LeafId),
-  ).toBeTruthy();
+  expect(procedure.getNode(nodeId)?.leaves?.[0].id as LeafId).toBeTruthy();
 });
 
 test('create leaf at fakeNode', () => {
@@ -104,7 +101,7 @@ test('no-handle beforeCreateLeaf & update metadata', async () => {
     'done',
   );
 
-  expect(procedure.definition.leaves[0].name).toBe('leafName');
+  expect(procedure.getNode(nodeId)?.leaves?.[0].name).toBe('leafName');
 
   expect(procedure.getNode(nodeId)?.name).toBe('nodeName');
 
@@ -128,7 +125,7 @@ test('handle beforeCreateLeaf', async () => {
     'done',
   );
 
-  expect(procedure.definition.leaves?.length).toBeFalsy();
+  expect(procedure.getNode(nodeId)?.leaves?.length).toBeFalsy();
 
   expect(procedure.getNode(nodeId)?.nexts?.length).toBeFalsy();
 });

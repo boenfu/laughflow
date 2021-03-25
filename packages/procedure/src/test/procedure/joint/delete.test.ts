@@ -25,7 +25,6 @@ let definition: ProcedureDefinition = {
       },
     },
   ],
-  leaves: [],
   nodes: [
     {
       id: startId,

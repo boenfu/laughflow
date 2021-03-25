@@ -1,5 +1,5 @@
 import {
-  LeafId,
+  // LeafId,
   NodeId,
   ProcedureDefinition,
   ProcedureId,
@@ -12,12 +12,11 @@ let nodeId = 'node1' as NodeId;
 let node2Id = 'node2' as NodeId;
 let node3Id = 'node3' as NodeId;
 let node4Id = 'node4' as NodeId;
-let leafId = 'leaf' as LeafId;
+// let leafId = 'leaf' as LeafId;
 
 let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
-  leaves: [],
   joints: [],
   nodes: [
     {
@@ -43,10 +42,11 @@ let definition: ProcedureDefinition = {
     {
       id: node2Id,
       nexts: [
-        {
-          type: 'leaf',
-          id: leafId,
-        },
+        // TODO
+        // {
+        //   type: 'leaf',
+        //   id: leafId,
+        // },
         {
           type: 'node',
           id: node4Id,

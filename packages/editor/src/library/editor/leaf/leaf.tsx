@@ -1,4 +1,4 @@
-import {LeafMetadata} from '@magicflow/core';
+import {LeafMetadata, TrunkRef} from '@magicflow/core';
 import {Trash} from '@magicflow/icons';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
@@ -10,6 +10,7 @@ import {DoneLeaf} from './@done';
 import {TerminateLeaf} from './@terminate';
 
 export interface LeafProps {
+  prev: TrunkRef;
   leaf: LeafMetadata;
 }
 
@@ -36,7 +37,7 @@ const LeafTypeToRender = {
   terminate: TerminateLeaf,
 };
 
-export const Leaf: FC<LeafProps> = ({leaf}) => {
+export const Leaf: FC<LeafProps> = ({prev, leaf}) => {
   const {editor} = useContext(EditorContext);
 
   let Component = LeafTypeToRender[leaf.type];
@@ -45,7 +46,7 @@ export const Leaf: FC<LeafProps> = ({leaf}) => {
     return <></>;
   }
 
-  const onDelete = (): void => void editor.procedure.deleteLeaf(leaf.id);
+  const onDelete = (): void => void editor.procedure.deleteLeaf(prev, leaf.id);
 
   return (
     <Wrapper>

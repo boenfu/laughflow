@@ -1,9 +1,4 @@
-import {
-  LeafId,
-  NodeId,
-  ProcedureDefinition,
-  ProcedureId,
-} from '@magicflow/core';
+import {NodeId, ProcedureDefinition, ProcedureId} from '@magicflow/core';
 import {cloneDeep} from 'lodash-es';
 
 import {Procedure} from '../../../library';
@@ -14,18 +9,18 @@ let node2Id = 'node2' as NodeId;
 let node3Id = 'node3' as NodeId;
 let node4Id = 'node4' as NodeId;
 
-let leaf = 'leaf' as LeafId;
+// let leaf = 'leaf' as LeafId;
 
 let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
   joints: [],
-  leaves: [
-    {
-      type: 'done',
-      id: leaf,
-    },
-  ],
+  // leaves: [
+  //   {
+  //     type: 'done',
+  //     id: leaf,
+  //   },
+  // ],
   nodes: [
     {
       id: startId,
@@ -56,10 +51,11 @@ let definition: ProcedureDefinition = {
           type: 'node',
           id: node3Id,
         },
-        {
-          type: 'leaf',
-          id: leaf,
-        },
+        // TODO
+        // {
+        //   type: 'leaf',
+        //   id: leaf,
+        // },
       ],
     },
     {
@@ -166,7 +162,7 @@ test('delete node error params', async () => {
     });
 
   clonedDefinition3.nodes.find(node => node.id === node3Id)!.nexts = [
-    {type: 'leaf', id: leaf},
+    // {type: 'leaf', id: leaf},
     {
       type: 'node',
       id: node4Id,

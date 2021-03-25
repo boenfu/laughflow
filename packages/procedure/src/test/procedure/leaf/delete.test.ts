@@ -4,7 +4,6 @@ import {
   ProcedureDefinition,
   ProcedureId,
 } from '@magicflow/core';
-import {cloneDeep} from 'lodash-es';
 
 import {Procedure} from '../../../library';
 
@@ -16,12 +15,6 @@ let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
   joints: [],
-  leaves: [
-    {
-      type: 'done',
-      id: leafId,
-    },
-  ],
   nodes: [
     {
       id: startId,
@@ -30,8 +23,10 @@ let definition: ProcedureDefinition = {
           type: 'node',
           id: nodeId,
         },
+      ],
+      leaves: [
         {
-          type: 'leaf',
+          type: 'done',
           id: leafId,
         },
       ],
@@ -45,31 +40,19 @@ let definition: ProcedureDefinition = {
 test('delete leaf', async () => {
   let procedure = new Procedure(definition);
 
-  await procedure.deleteLeaf(leafId);
+  await procedure.deleteLeaf({type: 'node', id: startId}, leafId);
 
-  expect(procedure.definition.leaves.length).toBe(0);
+  expect(procedure.definition.nodes[0].leaves?.length).toBe(0);
 
   expect(procedure.definition.nodes[0].nexts?.length).toBe(1);
-});
-
-test('delete non-used leaf', async () => {
-  let clonedDefinition = cloneDeep(definition);
-  clonedDefinition.nodes[0].nexts = clonedDefinition.nodes[0].nexts?.filter(
-    next => next.type !== 'leaf',
-  );
-
-  let procedure = new Procedure(clonedDefinition);
-
-  await procedure.deleteLeaf(leafId);
-  expect(procedure.definition.leaves.length).toBe(0);
 });
 
 test('delete non-existent leaf', () => {
   let procedure = new Procedure(definition);
 
-  void expect(() => procedure.deleteLeaf('fakeLeaf' as LeafId)).rejects.toThrow(
-    "Not found leaf metadata by leaf 'fakeLeaf'",
-  );
+  void expect(() =>
+    procedure.deleteLeaf({type: 'node', id: startId}, 'fakeLeaf' as LeafId),
+  ).rejects.toThrow("Not found leaf metadata by leaf 'fakeLeaf'");
 });
 
 test('handle beforeDeleteLeaf', async () => {
@@ -79,9 +62,9 @@ test('handle beforeDeleteLeaf', async () => {
     },
   });
 
-  await procedure.deleteLeaf(leafId);
+  await procedure.deleteLeaf({type: 'node', id: startId}, leafId);
 
-  expect(procedure.definition.leaves?.length).toBe(1);
+  expect(procedure.definition.nodes[0].leaves?.length).toBe(1);
 
   expect(procedure.definition.nodes[0].nexts?.length).toBe(2);
 });
@@ -93,9 +76,9 @@ test('no-handle beforeDeleteLeaf and delete node nexts', async () => {
     },
   });
 
-  await procedure.deleteLeaf(leafId);
+  await procedure.deleteLeaf({type: 'node', id: startId}, leafId);
 
-  expect(procedure.definition.leaves?.length).toBe(0);
+  expect(procedure.definition.nodes[0].leaves?.length).toBe(0);
 
   expect(procedure.definition.nodes[0].nexts).toBeUndefined();
 });

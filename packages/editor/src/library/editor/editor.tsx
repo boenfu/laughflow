@@ -98,7 +98,7 @@ export const FlowEditor: FC<EditorProps> = ({
 
   function renderNode(node: ProcedureTreeNode): ReactNode {
     if (isTypeTreeNode(node, 'leaf')) {
-      return <Leaf leaf={node.metadata} />;
+      return <Leaf prev={node.prev!.ref} leaf={node.metadata} />;
     }
 
     let nexts = node.nexts;

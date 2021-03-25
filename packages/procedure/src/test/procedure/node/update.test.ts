@@ -19,7 +19,6 @@ let nodeId = 'node1' as NodeId;
 let definition: ProcedureDefinition = {
   id: 'procedure1' as ProcedureId,
   metadata: {},
-  leaves: [],
   joints: [],
   nodes: [
     {

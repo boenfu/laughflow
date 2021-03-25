@@ -12,7 +12,6 @@ test('construct a procedure', () => {
       id: 'procedure1' as ProcedureId,
       nodes: [],
       joints: [],
-      leaves: [],
     }),
   ).toBeInstanceOf(Procedure);
 });
@@ -22,7 +21,6 @@ test('update definition', async () => {
     id: 'procedure1' as ProcedureId,
     nodes: [],
     joints: [],
-    leaves: [],
   };
   let procedure = new Procedure(definition, {
     afterDefinitionChange() {},
