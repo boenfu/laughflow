@@ -1,93 +1,171 @@
-import {LeafId, NodeId, ProcedureDefinition} from '@magicflow/core';
+import {NodeId, NodeMetadata, ProcedureDefinition} from '@magicflow/core';
 import {createId} from '@magicflow/procedure';
+import {Patch, applyPatches, enableAllPlugins, produce} from 'immer';
+import {Dict} from 'tslang';
 
-import {TaskMetadata, TaskNodeMetadata} from './core';
+import {TaskMetadata, TaskNodeMetadata, TaskNodeStage} from './core';
+
+enableAllPlugins();
+
+interface Context {
+  targetStage?: TaskNodeStage;
+  inputs?: any;
+  definition?: NodeMetadata;
+}
+
+type NextProcessor = (
+  node: TaskNodeMetadata,
+  context: Context,
+) => TaskNodeMetadata;
 
 export class Task {
   readonly nodeMetadataMap = new Map(
     this.definition.nodes.map(node => [node.id, node]),
   );
 
+  readonly nodesMap = new Map(
+    this.metadata?.nodes.map(node => [node.id, node]),
+  );
+
   get metadata(): TaskMetadata | undefined {
     return this._metadata;
   }
 
+  get startNodes(): TaskNode[] {
+    let metadata = this.metadata;
+
+    if (!metadata) {
+      return [];
+    }
+
+    let nodesMap = this.nodesMap;
+
+    return metadata.startIds.map(id => {
+      let metadata = nodesMap.get(id);
+
+      if (!metadata) {
+        // throw
+        throw Error('');
+      }
+
+      return new TaskNode(
+        this.nodeMetadataMap.get(metadata.definition)!,
+        nodesMap.get(id)!,
+        this,
+        metadata?.outputs || {},
+      );
+    });
+  }
+
   constructor(
     readonly definition: ProcedureDefinition,
+    private processors: NextProcessor[],
     private _metadata?: TaskMetadata,
   ) {}
 
-  startup(nodeId: NodeId): void {
+  startup(nodeIds: NodeId[]): void {
     if (this._metadata) {
       throw Error('Task has started');
     }
 
+    let definition = this.definition;
     let nodeMetadataMap = this.nodeMetadataMap;
 
-    let visitedEdge = new Set<`${NodeId}-${NodeId | LeafId}`>();
+    let taskMetadata: TaskMetadata = {
+      id: createId(),
+      definition: definition.id,
+      stage: 'none',
+      startIds: [],
+      nodes: [],
+      outputs: definition?.outputs,
+    };
 
-    let startTaskNode = buildTaskNode(nodeId);
+    //  beforeStartup(taskMetadata, definition):void;
 
-    let pendingBuildNodes: TaskNodeMetadata[] = [startTaskNode];
+    for (let node of nodeIds) {
+      let nodeDefinition = nodeMetadataMap.get(node);
 
-    let taskNodes: TaskNodeMetadata[] = [startTaskNode];
+      let metadata: TaskNodeMetadata = {
+        id: createId(),
+        definition: node,
+        stage: 'none',
+      };
 
-    while (pendingBuildNodes.length) {
-      let buildingNode = pendingBuildNodes.shift()!;
+      metadata = {
+        ...this.next(
+          {...metadata},
+          {
+            targetStage: 'none',
+            inputs: taskMetadata.outputs,
+            definition: nodeDefinition,
+          },
+        ),
+        id: metadata.id,
+        definition: metadata.definition,
+      };
 
-      buildingNode.nexts = buildingNode.nexts || [];
-
-      let nodeMetadata = nodeMetadataMap.get(buildingNode.definition);
-
-      if (!nodeMetadata) {
-        throw Error(
-          `Not found node metadata by id '${buildingNode.definition}'`,
-        );
-      }
-
-      for (let nextMetadata of nodeMetadata.nexts || []) {
-        let edge = `${nodeMetadata.id}-${nextMetadata.id}`;
-
-        if (visitedEdge.has(edge)) {
-          continue;
-        }
-
-        visitedEdge.add(edge);
-
-        if (nextMetadata.type === 'node') {
-          let node = buildTaskNode(nextMetadata.id);
-
-          taskNodes.push(node);
-          pendingBuildNodes.push(node);
-
-          buildingNode.nexts.push({
-            type: 'node',
-            id: node.id,
-          });
-        } else {
-          // TODO (boen): joint
-        }
-      }
+      taskMetadata.startIds.push(metadata.id);
+      taskMetadata.nodes.push(metadata);
     }
 
-    this._metadata = {
-      id: createId(),
-      definition: this.definition.id,
-      startNode: startTaskNode.id,
-      nodes: taskNodes,
-    };
+    // afterStartup(taskMetadata, definition):void;
+
+    this._metadata = taskMetadata;
   }
 
-  buildViewState(): void {
-    // 检查进行中节点
-    // 检查 terminated leaf
-    // 检查 all done leaf
+  next(node: TaskNodeMetadata, context: Context): TaskNodeMetadata {
+    return this.processors.reduce(
+      (node, processor) => processor(node, context),
+      node,
+    );
   }
 }
 
-function buildTaskNode(definition: NodeId): TaskNodeMetadata {
-  return {
-    id: createId(),
-    definition,
-  };
+export class TaskNode {
+  get nexts(): (TaskNode | TaskJoint)[] {
+    let nodeMetadataMap = this.task.nodeMetadataMap;
+    let nodesMap = this.task.nodesMap;
+
+    return (
+      this.metadata.nexts?.map(next => {
+        if (next.type === 'node') {
+          let metadata = nodesMap.get(next.id);
+
+          if (!metadata) {
+            // throw
+            throw Error('');
+          }
+
+          return new TaskNode(
+            nodeMetadataMap.get(metadata.definition)!,
+            nodesMap.get(next.id)!,
+            this.task,
+            this.outputs,
+          );
+        } else {
+          return new TaskJoint();
+        }
+      }) || []
+    );
+  }
+
+  get outputs(): Dict<any> {
+    return {...this.inputs, ...this.metadata.outputs};
+  }
+
+  constructor(
+    readonly definition: NodeMetadata,
+    private metadata: TaskNodeMetadata,
+    private task: Task,
+    private inputs: Dict<any>,
+  ) {}
+}
+
+export class TaskJoint {
+  // constructor(
+  // readonly definition: NodeMetadata,
+  // private metadata: TaskJointMetadata,
+  // private task: Task,
+  // private inputs: Dict<any>,
+  // ) {}
 }

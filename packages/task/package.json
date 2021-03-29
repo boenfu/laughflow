@@ -9,6 +9,7 @@
   "dependencies": {
     "@magicflow/core": "*",
     "@magicflow/procedure": "*",
+    "immer": "^8.0.0",
     "memorize-decorator": "^0.2.4",
     "tslang": "^0.1.23",
     "tslib": "^2.1.0"

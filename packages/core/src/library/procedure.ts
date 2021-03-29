@@ -1,4 +1,4 @@
-import {Nominal} from 'tslang';
+import {Dict, Nominal} from 'tslang';
 
 import {JointMetadata} from './joint';
 import {NodeMetadata} from './node';
@@ -13,4 +13,5 @@ export interface ProcedureDefinition {
   nodes: NodeMetadata[];
   joints: JointMetadata[];
   metadata?: ProcedureMetadata;
+  outputs?: Dict<any>;
 }

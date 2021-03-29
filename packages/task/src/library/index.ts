@@ -8,5 +8,7 @@ declare global {
     interface TaskNodeMetadataExtension {}
 
     interface TaskJointMetadataExtension {}
+
+    interface TaskLeafMetadataExtension {}
   }
 }
