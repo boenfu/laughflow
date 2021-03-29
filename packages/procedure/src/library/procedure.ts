@@ -662,7 +662,7 @@ export class Procedure implements IProcedure {
       },
     );
 
-    if (definition === this._definition) {
+    if (isEqual(definition, this._definition)) {
       return;
     }
 

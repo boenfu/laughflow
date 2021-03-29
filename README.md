@@ -16,3 +16,20 @@ MIT License.
 // blocked 代表不可执行，线路 entered，
 // in-progress
 // done | terminated
+
+// 开始节点：
+// 暂停节点：
+// 完成节点：
+// 获取可开始节点
+// 获取进行中节点
+// 更新节点内容
+// 不满足导致 ignored
+// 已进入后变 非 entering
+// terminated
+//
+
+分支节点
+分支
+
+单个分支可以在分支节点内 横向扩展
+单个分支（多个节点）内的某个节点想要横向扩展，就要把单个节点变成一个只有一个 branch 的 branchesNode 且 branch 里就一个节点，就满足了能横向扩展的功能

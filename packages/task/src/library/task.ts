@@ -1,7 +1,7 @@
 import {NodeId, NodeMetadata, ProcedureDefinition} from '@magicflow/core';
 import {createId} from '@magicflow/procedure';
-import {Patch, applyPatches, enableAllPlugins, produce} from 'immer';
-import {Dict} from 'tslang';
+import {enableAllPlugins, produce} from 'immer';
+import {isEqual} from 'lodash-es';
 
 import {TaskMetadata, TaskNodeMetadata, TaskNodeStage} from './core';
 
@@ -13,53 +13,20 @@ interface Context {
   definition?: NodeMetadata;
 }
 
-type NextProcessor = (
-  node: TaskNodeMetadata,
-  context: Context,
-) => TaskNodeMetadata;
+type Processor = (node: TaskNodeMetadata, context: Context) => TaskNodeMetadata;
 
 export class Task {
   readonly nodeMetadataMap = new Map(
     this.definition.nodes.map(node => [node.id, node]),
   );
 
-  readonly nodesMap = new Map(
-    this.metadata?.nodes.map(node => [node.id, node]),
-  );
-
   get metadata(): TaskMetadata | undefined {
     return this._metadata;
   }
 
-  get startNodes(): TaskNode[] {
-    let metadata = this.metadata;
-
-    if (!metadata) {
-      return [];
-    }
-
-    let nodesMap = this.nodesMap;
-
-    return metadata.startIds.map(id => {
-      let metadata = nodesMap.get(id);
-
-      if (!metadata) {
-        // throw
-        throw Error('');
-      }
-
-      return new TaskNode(
-        this.nodeMetadataMap.get(metadata.definition)!,
-        nodesMap.get(id)!,
-        this,
-        metadata?.outputs || {},
-      );
-    });
-  }
-
   constructor(
     readonly definition: ProcedureDefinition,
-    private processors: NextProcessor[],
+    private processors: Processor[],
     private _metadata?: TaskMetadata,
   ) {}
 
@@ -74,7 +41,7 @@ export class Task {
     let taskMetadata: TaskMetadata = {
       id: createId(),
       definition: definition.id,
-      stage: 'none',
+      stage: 'in-progress',
       startIds: [],
       nodes: [],
       outputs: definition?.outputs,
@@ -85,23 +52,14 @@ export class Task {
     for (let node of nodeIds) {
       let nodeDefinition = nodeMetadataMap.get(node);
 
+      if (!nodeDefinition) {
+        continue;
+      }
+
       let metadata: TaskNodeMetadata = {
         id: createId(),
         definition: node,
-        stage: 'none',
-      };
-
-      metadata = {
-        ...this.next(
-          {...metadata},
-          {
-            targetStage: 'none',
-            inputs: taskMetadata.outputs,
-            definition: nodeDefinition,
-          },
-        ),
-        id: metadata.id,
-        definition: metadata.definition,
+        stage: 'in-progress',
       };
 
       taskMetadata.startIds.push(metadata.id);
@@ -110,62 +68,50 @@ export class Task {
 
     // afterStartup(taskMetadata, definition):void;
 
-    this._metadata = taskMetadata;
+    this.setMetadata(taskMetadata);
+
+    this.nextState();
   }
 
-  next(node: TaskNodeMetadata, context: Context): TaskNodeMetadata {
-    return this.processors.reduce(
-      (node, processor) => processor(node, context),
-      node,
-    );
-  }
-}
+  nextState(handler?: (metadata: TaskMetadata) => void): void {
+    if (!this._metadata) {
+      throw Error('Task not started');
+    }
 
-export class TaskNode {
-  get nexts(): (TaskNode | TaskJoint)[] {
-    let nodeMetadataMap = this.task.nodeMetadataMap;
-    let nodesMap = this.task.nodesMap;
+    let metadata = await produce(this._metadata, async metadata => {
+      // hook: preload inputs,
+      // 如标签提供的预置变量, 流程的预置 outputs 合并起来
+      // 存入 metadata outputs
 
-    return (
-      this.metadata.nexts?.map(next => {
-        if (next.type === 'node') {
-          let metadata = nodesMap.get(next.id);
+      handler?.(metadata);
 
-          if (!metadata) {
-            // throw
-            throw Error('');
-          }
+      let nodesMap = new Map(this.metadata?.nodes.map(node => [node.id, node]));
 
-          return new TaskNode(
-            nodeMetadataMap.get(metadata.definition)!,
-            nodesMap.get(next.id)!,
-            this.task,
-            this.outputs,
-          );
-        } else {
-          return new TaskJoint();
+      for (let startId of this._metadata?.startIds || []) {
+        let startMetadata = nodesMap.get(startId);
+
+        if (!startMetadata) {
+          throw Error('todo');
         }
-      }) || []
-    );
+
+        let pendingCheckNodes = [startMetadata];
+
+        while (pendingCheckNodes.length) {
+          let nodeMetadata = pendingCheckNodes.shift()!;
+        }
+      }
+    });
+
+    if (isEqual(metadata, this._metadata)) {
+      return;
+    }
+
+    this.setMetadata(metadata);
+
+    // after task change
   }
 
-  get outputs(): Dict<any> {
-    return {...this.inputs, ...this.metadata.outputs};
+  setMetadata(metadata: TaskMetadata): void {
+    this._metadata = metadata;
   }
-
-  constructor(
-    readonly definition: NodeMetadata,
-    private metadata: TaskNodeMetadata,
-    private task: Task,
-    private inputs: Dict<any>,
-  ) {}
-}
-
-export class TaskJoint {
-  // constructor(
-  // readonly definition: NodeMetadata,
-  // private metadata: TaskJointMetadata,
-  // private task: Task,
-  // private inputs: Dict<any>,
-  // ) {}
 }
