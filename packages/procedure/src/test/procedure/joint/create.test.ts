@@ -1,17 +1,12 @@
-import {
-  JointId,
-  NodeId,
-  ProcedureDefinition,
-  ProcedureId,
-} from '@magicflow/core';
+import {Flow, FlowId, JointId, NodeId} from '@magicflow/core';
 
-import {Procedure} from '../../../library';
+import {ProcedureDefinition} from '../../../library';
 
 let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
   nodes: [
@@ -31,7 +26,7 @@ let definition: ProcedureDefinition = {
 };
 
 test('create joint', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.createJoint(
     {
@@ -52,7 +47,7 @@ test('create joint', async () => {
 });
 
 test('create joint with next', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.createJoint(
     {
@@ -74,7 +69,7 @@ test('create joint with next', async () => {
 });
 
 test('create joint error params', () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   void expect(
     procedure.createJoint(

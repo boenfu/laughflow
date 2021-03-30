@@ -1,17 +1,25 @@
+import {Dict} from 'tslang';
+
 export * from './leaf';
 export * from './node';
-export * from './procedure';
-export * from './joint';
+export * from './flow';
 export * from './ref';
+export * from './procedure';
+
+interface IFlowEntity<TOutputs = any> {
+  outputs?: Dict<TOutputs>;
+}
 
 declare global {
   namespace Magicflow {
-    interface ProcedureMetadataExtension {}
+    interface ProcedureExtension extends IFlowEntity {}
 
-    interface NodeMetadataExtension {}
+    interface FlowExtension extends IFlowEntity {}
 
-    interface LeafMetadataExtension {}
+    interface NodeExtension extends IFlowEntity {}
 
-    interface JointMetadataExtension {}
+    interface BranchesNodeExtension extends IFlowEntity {}
+
+    interface LeafExtension {}
   }
 }

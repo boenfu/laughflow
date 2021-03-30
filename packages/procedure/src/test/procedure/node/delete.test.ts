@@ -1,7 +1,7 @@
-import {NodeId, ProcedureDefinition, ProcedureId} from '@magicflow/core';
+import {Flow, FlowId, NodeId} from '@magicflow/core';
 import {cloneDeep} from 'lodash-es';
 
-import {Procedure} from '../../../library';
+import {ProcedureDefinition} from '../../../library';
 
 let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
@@ -11,8 +11,8 @@ let node4Id = 'node4' as NodeId;
 
 // let leaf = 'leaf' as LeafId;
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
   // leaves: [
@@ -68,7 +68,7 @@ let definition: ProcedureDefinition = {
 };
 
 test('delete node', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.deleteNode(nodeId, undefined);
 
@@ -77,7 +77,7 @@ test('delete node', async () => {
 });
 
 test('delete node with prevNode', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.deleteNode(nodeId, {
     type: 'node',
@@ -89,7 +89,7 @@ test('delete node with prevNode', async () => {
 });
 
 test('delete node error params', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   void expect(
     procedure.deleteNode(nodeId, {
@@ -126,7 +126,7 @@ test('delete node error params', async () => {
       id: startId,
     },
   ];
-  let procedureWithCycle = new Procedure(clonedDefinition);
+  let procedureWithCycle = new ProcedureDefinition(clonedDefinition);
 
   void expect(
     procedureWithCycle.deleteNode(nodeId, {
@@ -144,7 +144,7 @@ test('delete node error params', async () => {
       id: 'fakeNode' as NodeId,
     },
   ];
-  let procedureWithFakeNext = new Procedure(clonedDefinition2);
+  let procedureWithFakeNext = new ProcedureDefinition(clonedDefinition2);
 
   void expect(
     procedureWithFakeNext.deleteNode(nodeId, {
@@ -169,7 +169,7 @@ test('delete node error params', async () => {
     },
   ];
 
-  let procedureWithVisited = new Procedure(clonedDefinition3);
+  let procedureWithVisited = new ProcedureDefinition(clonedDefinition3);
 
   void expect(
     procedureWithVisited.deleteNode(nodeId, {

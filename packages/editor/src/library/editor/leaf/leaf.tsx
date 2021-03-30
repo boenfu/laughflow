@@ -1,4 +1,4 @@
-import {LeafMetadata, TrunkRef} from '@magicflow/core';
+import {Leaf, TrunkRef} from '@magicflow/core';
 import {Trash} from '@magicflow/icons';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
@@ -11,7 +11,7 @@ import {TerminateLeaf} from './@terminate';
 
 export interface LeafProps {
   prev: TrunkRef;
-  leaf: LeafMetadata;
+  leaf: Leaf;
 }
 
 const Wrapper = styled.div`

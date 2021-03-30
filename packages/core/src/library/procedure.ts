@@ -1,17 +1,13 @@
-import {Dict, Nominal} from 'tslang';
+import {Nominal} from 'tslang';
 
-import {JointMetadata} from './joint';
-import {NodeMetadata} from './node';
+import {Flow, FlowId} from './flow';
+import {BranchesNode, Node} from './node';
 
 export type ProcedureId = Nominal<string, 'procedure:id'>;
 
-export interface ProcedureMetadata
-  extends Magicflow.ProcedureMetadataExtension {}
-
-export interface ProcedureDefinition {
+export interface Procedure extends Magicflow.ProcedureExtension {
   id: ProcedureId;
-  nodes: NodeMetadata[];
-  joints: JointMetadata[];
-  metadata?: ProcedureMetadata;
-  outputs?: Dict<any>;
+  start: FlowId;
+  nodes: (Node | BranchesNode)[];
+  flows: Flow[];
 }

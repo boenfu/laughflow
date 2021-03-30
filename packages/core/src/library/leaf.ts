@@ -1,10 +1,10 @@
 import {Nominal} from 'tslang';
 
-export type LeafType = 'done' | 'terminate';
-
 export type LeafId = Nominal<string, 'leaf:id'>;
 
-export interface LeafMetadata extends Magicflow.LeafMetadataExtension {
+export type LeafType = 'done' | 'terminate';
+
+export interface Leaf extends Magicflow.LeafExtension {
   id: LeafId;
   type: LeafType;
 }

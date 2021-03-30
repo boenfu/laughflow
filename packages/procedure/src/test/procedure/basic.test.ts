@@ -1,6 +1,6 @@
-import {NodeId, ProcedureDefinition, ProcedureId} from '@magicflow/core';
+import {Flow, FlowId, NodeId} from '@magicflow/core';
 
-import {Procedure, createId} from '../../library';
+import {ProcedureDefinition, createId} from '../../library';
 
 test('create 8 length of nanoid', () => {
   expect(String(createId()).length).toBe(8);
@@ -8,21 +8,21 @@ test('create 8 length of nanoid', () => {
 
 test('construct a procedure', () => {
   expect(
-    new Procedure({
-      id: 'procedure1' as ProcedureId,
+    new ProcedureDefinition({
+      id: 'procedure1' as FlowId,
       nodes: [],
       joints: [],
     }),
-  ).toBeInstanceOf(Procedure);
+  ).toBeInstanceOf(ProcedureDefinition);
 });
 
 test('update definition', async () => {
-  let definition: ProcedureDefinition = {
-    id: 'procedure1' as ProcedureId,
+  let definition: Flow = {
+    id: 'procedure1' as FlowId,
     nodes: [],
     joints: [],
   };
-  let procedure = new Procedure(definition, {
+  let procedure = new ProcedureDefinition(definition, {
     afterDefinitionChange() {},
   });
 

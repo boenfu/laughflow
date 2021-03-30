@@ -1,4 +1,4 @@
-import {ProcedureDefinition} from '@magicflow/core';
+import {Flow} from '@magicflow/core';
 
 import {
   IPlugin,
@@ -11,7 +11,7 @@ export interface EditorConfigObject {
 }
 
 export interface EditorProps {
-  definition: ProcedureDefinition;
+  definition: Flow;
   plugins?: IPlugin[];
   onConfig?<TPayload>(
     config: EditorConfigObject,

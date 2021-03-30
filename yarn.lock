@@ -4286,6 +4286,11 @@ get-intrinsic@^1.0.0, get-intrinsic@^1.0.1:
     has "^1.0.3"
     has-symbols "^1.0.1"
 
+get-or-create@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.npm.taobao.org/get-or-create/download/get-or-create-0.1.2.tgz#d33447e25969b22a0b6bb3d374769f87fe47ad45"
+  integrity sha1-0zRH4llpsioLa7PTdHafh/5HrUU=
+
 get-package-type@^0.1.0:
   version "0.1.0"
   resolved "https://registry.npm.taobao.org/get-package-type/download/get-package-type-0.1.0.tgz#8de2d803cff44df3bc6c456e6668b36c3926e11a"

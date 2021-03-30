@@ -1,9 +1,4 @@
-import {
-  LeafId,
-  NodeId,
-  ProcedureDefinition,
-  ProcedureId,
-} from '@magicflow/core';
+import {Flow, FlowId, LeafId, NodeId} from '@magicflow/core';
 
 import {Task} from '../../library';
 
@@ -16,8 +11,8 @@ let node5Id = 'node5' as NodeId;
 
 let leafId = 'leaf' as LeafId;
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
   nodes: [

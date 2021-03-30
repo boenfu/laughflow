@@ -1,4 +1,4 @@
-import {NodeMetadata} from '@magicflow/core';
+import {Node} from '@magicflow/core';
 import {useDebounceFn} from 'ahooks';
 import React, {ChangeEvent, FC, MouseEvent, useEffect, useRef} from 'react';
 import styled from 'styled-components';
@@ -56,9 +56,9 @@ const DisplayNameInput = styled.div`
 `;
 
 export interface HeaderProps {
-  node: NodeMetadata;
+  node: Node;
   readOnly?: boolean;
-  onChange?(node: NodeMetadata): void;
+  onChange?(node: Node): void;
 }
 
 export const DisplayName: FC<HeaderProps> = ({node, readOnly, onChange}) => {

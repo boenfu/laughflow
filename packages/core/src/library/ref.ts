@@ -1,10 +1,7 @@
-import {JointId} from './joint';
 import {LeafId} from './leaf';
-import {NodeId} from './node';
+import {NodeId, NodeType} from './node';
 
-export type Ref = TrunkRef | LeafRef;
-
-export type TrunkRef = NodeRef | JointRef;
+export type Ref = NodeRef | LeafRef;
 
 export interface LeafRef {
   type: 'leaf';
@@ -12,11 +9,6 @@ export interface LeafRef {
 }
 
 export interface NodeRef {
-  type: 'node';
+  type: NodeType;
   id: NodeId;
-}
-
-export interface JointRef {
-  type: 'joint';
-  id: JointId;
 }

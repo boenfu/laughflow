@@ -11,7 +11,7 @@ import {ConditionList} from './condition-list';
 
 declare global {
   namespace Magicflow {
-    interface NodeMetadataExtension {
+    interface NodeExtension {
       enterConditions?: ConditionOrGroup;
       visibleConditions?: ConditionOrGroup;
     }

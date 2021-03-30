@@ -1,26 +1,21 @@
-import {
-  LeafId,
-  NodeId,
-  ProcedureDefinition,
-  ProcedureId,
-} from '@magicflow/core';
+import {Flow, FlowId, LeafId, NodeId} from '@magicflow/core';
 
-import {Procedure} from '../../../library';
+import {ProcedureDefinition} from '../../../library';
 
 let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
 
 declare global {
   namespace Magicflow {
-    interface ProcedureMetadataExtension {
+    interface FlowExtension {
       name?: string;
     }
 
-    interface NodeMetadataExtension {
+    interface NodeExtension {
       name?: string;
     }
 
-    interface LeafMetadataExtension {
+    interface LeafExtension {
       name?: string;
     }
 
@@ -30,8 +25,8 @@ declare global {
   }
 }
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
   nodes: [
@@ -51,7 +46,7 @@ let definition: ProcedureDefinition = {
 };
 
 test('create leaf', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.createLeaf(
     {
@@ -67,7 +62,7 @@ test('create leaf', async () => {
 });
 
 test('create leaf at fakeNode', () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   void expect(() =>
     procedure.createLeaf(
@@ -81,7 +76,7 @@ test('create leaf at fakeNode', () => {
 });
 
 test('no-handle beforeCreateLeaf & update metadata', async () => {
-  let procedure = new Procedure(definition, {
+  let procedure = new ProcedureDefinition(definition, {
     beforeLeafCreate(leaf, node, definition) {
       definition.nodes.push({
         id: 'extraNodeId' as NodeId,
@@ -111,7 +106,7 @@ test('no-handle beforeCreateLeaf & update metadata', async () => {
 });
 
 test('handle beforeCreateLeaf', async () => {
-  let procedure = new Procedure(definition, {
+  let procedure = new ProcedureDefinition(definition, {
     beforeLeafCreate() {
       return 'handled';
     },

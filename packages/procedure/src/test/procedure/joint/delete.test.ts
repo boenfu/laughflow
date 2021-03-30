@@ -1,11 +1,6 @@
-import {
-  JointId,
-  NodeId,
-  ProcedureDefinition,
-  ProcedureId,
-} from '@magicflow/core';
+import {Flow, FlowId, JointId, NodeId} from '@magicflow/core';
 
-import {Procedure} from '../../../library';
+import {ProcedureDefinition} from '../../../library';
 
 let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
@@ -13,8 +8,8 @@ let node2Id = 'node2' as NodeId;
 let node3Id = 'node3' as NodeId;
 let jointId = 'joint1' as JointId;
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [
     {
@@ -61,7 +56,7 @@ let definition: ProcedureDefinition = {
 };
 
 test('delete joint', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.deleteJoint(jointId);
 
@@ -79,7 +74,7 @@ test('delete joint have nexts', async () => {
     },
   ];
 
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.deleteJoint(jointId);
 
@@ -90,7 +85,7 @@ test('delete joint have nexts', async () => {
 });
 
 test('delete joint error params', () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   void expect(procedure.deleteJoint('fakeJoint' as JointId)).rejects.toThrow(
     "Not found joint metadata by id 'fakeJoint'",

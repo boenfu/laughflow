@@ -1,4 +1,4 @@
-import {NodeId, NodeMetadata, ProcedureDefinition} from '@magicflow/core';
+import {Flow, Node, NodeId} from '@magicflow/core';
 import {createId} from '@magicflow/procedure';
 import {enableAllPlugins, produce} from 'immer';
 import {isEqual} from 'lodash-es';
@@ -10,7 +10,7 @@ enableAllPlugins();
 interface Context {
   targetStage?: TaskNodeStage;
   inputs?: any;
-  definition?: NodeMetadata;
+  definition?: Node;
 }
 
 type Processor = (node: TaskNodeMetadata, context: Context) => TaskNodeMetadata;
@@ -25,7 +25,7 @@ export class Task {
   }
 
   constructor(
-    readonly definition: ProcedureDefinition,
+    readonly definition: Flow,
     private processors: Processor[],
     private _metadata?: TaskMetadata,
   ) {}

@@ -1,10 +1,10 @@
-import {LeafMetadata} from '@magicflow/core';
+import {Leaf} from '@magicflow/core';
 import {Wrong} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
 export interface TerminateLeafProps {
-  leaf: LeafMetadata;
+  leaf: Leaf;
 }
 
 const Content = styled.div`

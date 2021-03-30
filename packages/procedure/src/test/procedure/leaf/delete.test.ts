@@ -1,18 +1,13 @@
-import {
-  LeafId,
-  NodeId,
-  ProcedureDefinition,
-  ProcedureId,
-} from '@magicflow/core';
+import {Flow, FlowId, LeafId, NodeId} from '@magicflow/core';
 
-import {Procedure} from '../../../library';
+import {ProcedureDefinition} from '../../../library';
 
 let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
 let leafId = 'leaf1' as LeafId;
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
   nodes: [
@@ -38,7 +33,7 @@ let definition: ProcedureDefinition = {
 };
 
 test('delete leaf', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.deleteLeaf({type: 'node', id: startId}, leafId);
 
@@ -48,7 +43,7 @@ test('delete leaf', async () => {
 });
 
 test('delete non-existent leaf', () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   void expect(() =>
     procedure.deleteLeaf({type: 'node', id: startId}, 'fakeLeaf' as LeafId),
@@ -56,7 +51,7 @@ test('delete non-existent leaf', () => {
 });
 
 test('handle beforeDeleteLeaf', async () => {
-  let procedure = new Procedure(definition, {
+  let procedure = new ProcedureDefinition(definition, {
     beforeLeafDelete() {
       return 'handled';
     },
@@ -70,7 +65,7 @@ test('handle beforeDeleteLeaf', async () => {
 });
 
 test('no-handle beforeDeleteLeaf and delete node nexts', async () => {
-  let procedure = new Procedure(definition, {
+  let procedure = new ProcedureDefinition(definition, {
     beforeLeafDelete(_definition, node) {
       node.nexts = undefined;
     },

@@ -33,3 +33,21 @@ MIT License.
 
 单个分支可以在分支节点内 横向扩展
 单个分支（多个节点）内的某个节点想要横向扩展，就要把单个节点变成一个只有一个 branch 的 branchesNode 且 branch 里就一个节点，就满足了能横向扩展的功能
+
+实体
+node 和 branchesNode,其中 branchesNode 中每个 branch 是一个 flow
+
+<!-- 整个流程也是一个 flow -->
+
+node next 只能为 branchesNode 或 node
+
+flow 只存了 nexts id
+
+流程有一个根 flow
+
+node：具体执行节点，nexts 中 维护着对某几个 node/branchesNode 的引用（ID）
+branchesNode：分支节点，nexts 中 维护着对某几个 node/branchesNode 的引用（ID），flows 中 维护着节点内的 flow 的引用
+flow: 维护着对某几个 node/branchesNode 的引用（ID）
+
+flow 的 done 是无可执行节点
+branchesNode 的 done 是 所有 flow 都 done

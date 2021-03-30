@@ -1,19 +1,14 @@
-import {
-  NodeId,
-  NodeRef,
-  ProcedureDefinition,
-  ProcedureId,
-} from '@magicflow/core';
+import {Flow, FlowId, NodeId, NodeRef} from '@magicflow/core';
 import {cloneDeep, unionBy} from 'lodash-es';
 
-import {Procedure} from '../../../library';
+import {ProcedureDefinition} from '../../../library';
 
 declare module '@magicflow/core' {
-  interface NodeMetadata {
+  interface Node {
     name?: string;
   }
 
-  interface LeafMetadata {
+  interface Leaf {
     name?: string;
   }
 }
@@ -22,8 +17,8 @@ let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
 let node2Id = 'node2' as NodeId;
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
   nodes: [
@@ -51,7 +46,7 @@ let definition: ProcedureDefinition = {
 };
 
 test('copy node', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.copyNode(
     nodeId,
@@ -88,7 +83,7 @@ test('copy node to between two nodes', async () => {
   clonedDefinition.nodes.push({id: node3Id});
   clonedDefinition.nodes.find(node => node.id === node2Id)!.nexts = [node3Next];
 
-  let procedure = new Procedure(clonedDefinition);
+  let procedure = new ProcedureDefinition(clonedDefinition);
 
   await procedure.copyNode(
     nodeId,
@@ -113,7 +108,7 @@ test('copy node to between two nodes', async () => {
 });
 
 test('copy node error params', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.copyNode(
     nodeId,

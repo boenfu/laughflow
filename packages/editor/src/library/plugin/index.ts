@@ -1,18 +1,18 @@
-import {LeafMetadata, NodeMetadata, ProcedureDefinition} from '@magicflow/core';
+import {Flow, Leaf, Node} from '@magicflow/core';
 import {ComponentType, ReactNode} from 'react';
 
 import {Editor} from '../editor-object';
 
 export interface IPluginEvent {
-  definition: ProcedureDefinition;
+  definition: Flow;
 
   stopPropagation(): void;
   preventDefault(): void;
 }
 
 export interface PluginNodeEvent extends IPluginEvent {
-  currentNode: NodeMetadata;
-  nextNode: NodeMetadata;
+  currentNode: Node;
+  nextNode: Node;
 }
 
 export type PluginNodeEventHandler = (
@@ -20,16 +20,16 @@ export type PluginNodeEventHandler = (
 ) => Promise<void> | void;
 
 export interface LeafPluginComponentProps {
-  leaf: LeafMetadata;
+  leaf: Leaf;
 }
 
 export type LeafPluginComponent = ComponentType<LeafPluginComponentProps>;
 
 export interface NodePluginComponentProps {
-  node: NodeMetadata;
+  node: Node;
   editor: Editor;
   prevChildren?: ReactNode;
-  onChange?(next: NodeMetadata): void;
+  onChange?(next: Node): void;
 }
 
 export type NodePluginComponent<TProps = {}> = ComponentType<

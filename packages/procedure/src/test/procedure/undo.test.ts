@@ -1,12 +1,12 @@
-import {NodeId, ProcedureDefinition, ProcedureId} from '@magicflow/core';
+import {Flow, FlowId, NodeId} from '@magicflow/core';
 
-import {Procedure} from '../../library';
+import {ProcedureDefinition} from '../../library';
 
 let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
   nodes: [
@@ -25,7 +25,7 @@ let definition: ProcedureDefinition = {
   ],
 };
 
-let procedure = new Procedure(definition);
+let procedure = new ProcedureDefinition(definition);
 
 test('undo action', async () => {
   await procedure.createLeaf(

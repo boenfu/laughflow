@@ -1,16 +1,16 @@
 import {
+  Flow,
   JointMetadata,
   JointRef,
-  LeafMetadata,
+  Leaf,
   LeafRef,
+  Node,
   NodeId,
-  NodeMetadata,
   NodeRef,
-  ProcedureDefinition,
   Ref,
   TrunkRef,
 } from '@magicflow/core';
-import {Procedure} from '@magicflow/procedure';
+import {ProcedureDefinition} from '@magicflow/procedure';
 import Eventemitter from 'eventemitter3';
 import {castArray} from 'lodash-es';
 
@@ -32,11 +32,7 @@ export type ProcedureTreeNode =
   | ProcedureJointTreeNode
   | ProcedureLeafTreeNode;
 
-export type ProcedureNodeTreeNode = IProcedureTreeNode<
-  NodeRef,
-  NodeMetadata,
-  true
->;
+export type ProcedureNodeTreeNode = IProcedureTreeNode<NodeRef, Node, true>;
 
 export type ProcedureJointTreeNode = IProcedureTreeNode<
   JointRef,
@@ -44,11 +40,7 @@ export type ProcedureJointTreeNode = IProcedureTreeNode<
   true
 >;
 
-export type ProcedureLeafTreeNode = IProcedureTreeNode<
-  LeafRef,
-  LeafMetadata,
-  false
->;
+export type ProcedureLeafTreeNode = IProcedureTreeNode<LeafRef, Leaf, false>;
 
 export type NodeRenderDescriptor = Record<
   keyof NodePluginRenderObject,
@@ -66,7 +58,7 @@ export interface ActiveTrunk {
 }
 
 export class Editor extends Eventemitter<ProcedureEventType> {
-  readonly procedure: Procedure;
+  readonly procedure: ProcedureDefinition;
 
   plugins: IPlugin[] = [];
 
@@ -88,20 +80,20 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     return this._activeTrunk;
   }
 
-  constructor(definition: ProcedureDefinition, plugins: IPlugin[] = []) {
+  constructor(definition: Flow, plugins: IPlugin[] = []) {
     super();
 
     this.setPlugins(plugins);
     this.buildTreeNode(definition);
 
-    this.procedure = new Procedure(definition, {
+    this.procedure = new ProcedureDefinition(definition, {
       afterDefinitionChange: definition => {
         this.buildTreeNode(definition);
         this.emit('update');
       },
       beforeNodeUpdate: async (
-        currentNode: NodeMetadata,
-        nextNode: NodeMetadata,
+        currentNode: Node,
+        nextNode: Node,
         definition,
       ) => {
         if (
@@ -144,7 +136,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
     this.emit('update');
   }
 
-  buildTreeNode(definition: ProcedureDefinition): void {
+  buildTreeNode(definition: Flow): void {
     let refTypeToMetadataMapDict: {
       [TType in Ref['type']]: Map<
         string,
@@ -191,8 +183,8 @@ export class Editor extends Eventemitter<ProcedureEventType> {
       let links: ProcedureNodeTreeNode[] = [];
       let joints: ProcedureJointTreeNode[] = [];
 
-      for (let leafMetadata of (metadata as NodeMetadata | JointMetadata)
-        .leaves || []) {
+      for (let leafMetadata of (metadata as Node | JointMetadata).leaves ||
+        []) {
         refTypeToMetadataMapDict['leaf'].set(leafMetadata.id, leafMetadata);
         leaves.push(
           buildTreeNode(
@@ -204,7 +196,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
         );
       }
 
-      for (let next of (metadata as NodeMetadata | JointMetadata).nexts || []) {
+      for (let next of (metadata as Node | JointMetadata).nexts || []) {
         if (next.type === 'joint') {
           joints.push(
             buildTreeNode(
@@ -267,10 +259,10 @@ export class Editor extends Eventemitter<ProcedureEventType> {
 
 async function nodeHandler(
   type: 'onUpdate',
-  definition: ProcedureDefinition,
+  definition: Flow,
   plugins: IPlugin[],
-  currentNode: NodeMetadata,
-  nextNode: NodeMetadata,
+  currentNode: Node,
+  nextNode: Node,
 ): Promise<boolean> {
   let toPropagation = true;
   let toExecuteDefault = true;

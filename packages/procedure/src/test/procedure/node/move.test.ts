@@ -1,11 +1,11 @@
 import {
   // LeafId,
+  Flow,
+  FlowId,
   NodeId,
-  ProcedureDefinition,
-  ProcedureId,
 } from '@magicflow/core';
 
-import {Procedure} from '../../../library';
+import {ProcedureDefinition} from '../../../library';
 
 let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
@@ -14,8 +14,8 @@ let node3Id = 'node3' as NodeId;
 let node4Id = 'node4' as NodeId;
 // let leafId = 'leaf' as LeafId;
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
   nodes: [
@@ -69,7 +69,7 @@ let definition: ProcedureDefinition = {
 };
 
 test('move node', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.moveNode(
     node2Id,
@@ -89,7 +89,7 @@ test('move node', async () => {
 });
 
 test('move node to self', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.moveNode(
     node2Id,
@@ -108,7 +108,7 @@ test('move node to self', async () => {
 });
 
 test('move node to between two nodes', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.moveNode(
     node2Id,
@@ -132,7 +132,7 @@ test('move node to between two nodes', async () => {
 });
 
 test('move node error params', () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   void expect(
     procedure.moveNode(

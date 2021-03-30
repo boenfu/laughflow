@@ -1,4 +1,4 @@
-import {JointId, NodeId, ProcedureId} from '@magicflow/core';
+import {FlowId, JointId, NodeId} from '@magicflow/core';
 import {Dict, Nominal} from 'tslang';
 
 export type TaskId = Nominal<string, 'task:id'>;
@@ -19,7 +19,7 @@ export interface TaskMetadata
   extends Magicflow.TaskMetadataExtension,
     IOutputsResource {
   id: TaskId;
-  definition: ProcedureId;
+  definition: FlowId;
   stage: TaskStage;
 
   startIds: TaskNodeId[];

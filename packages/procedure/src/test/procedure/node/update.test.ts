@@ -1,14 +1,14 @@
-import {NodeId, ProcedureDefinition, ProcedureId} from '@magicflow/core';
+import {Flow, FlowId, NodeId} from '@magicflow/core';
 
-import {Procedure} from '../../../library';
+import {ProcedureDefinition} from '../../../library';
 
 declare global {
   namespace Magicflow {
-    interface NodeMetadataExtension {
+    interface NodeExtension {
       name?: string;
     }
 
-    interface LeafMetadataExtension {
+    interface LeafExtension {
       name?: string;
     }
   }
@@ -16,8 +16,8 @@ declare global {
 
 let nodeId = 'node1' as NodeId;
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
   nodes: [
@@ -28,7 +28,7 @@ let definition: ProcedureDefinition = {
 };
 
 test('update node', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.updateNode({id: nodeId, name: 'hello'});
 
@@ -36,7 +36,7 @@ test('update node', async () => {
 });
 
 test('update node error params', () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   void expect(
     procedure.updateNode({id: 'node2' as NodeId, name: 'hello'}),

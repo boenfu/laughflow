@@ -1,12 +1,12 @@
-import {NodeId, ProcedureDefinition, ProcedureId} from '@magicflow/core';
+import {Flow, FlowId, NodeId} from '@magicflow/core';
 
-import {Procedure} from '../../../library';
+import {ProcedureDefinition} from '../../../library';
 
 let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
   nodes: [
@@ -26,7 +26,7 @@ let definition: ProcedureDefinition = {
 };
 
 test('create normal subnode', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.createNode({
     type: 'node',
@@ -37,7 +37,7 @@ test('create normal subnode', async () => {
 });
 
 test('create node at fakeNode', () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   void expect(() =>
     procedure.createNode({
@@ -48,7 +48,7 @@ test('create node at fakeNode', () => {
 });
 
 test('create subnode and move nexts', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.createNode(
     {
@@ -70,7 +70,7 @@ test('create subnode and move nexts', async () => {
 });
 
 test('create node between two nodes', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.createNode(
     {
@@ -95,7 +95,7 @@ test('create node between two nodes', async () => {
 });
 
 test('create node between node and fakeNext', () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   void expect(() =>
     procedure.createNode(

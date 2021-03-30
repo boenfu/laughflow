@@ -1,4 +1,4 @@
-import {LeafId, LeafMetadata, Ref} from '@magicflow/core';
+import {Leaf, LeafId, Ref} from '@magicflow/core';
 import {useCreation, useUpdate} from 'ahooks';
 import classNames from 'classnames';
 import React, {FC, Fragment, ReactNode, useEffect, useRef} from 'react';
@@ -18,14 +18,14 @@ import {LinkNode, Node} from './node';
 
 const PlaceholderLeafId = 'placeholder' as LeafId;
 
-const PlaceholderLeaf: LeafMetadata = {
+const PlaceholderLeaf: Leaf = {
   type: 'done',
   id: PlaceholderLeafId,
 };
 
 declare global {
   namespace Magicflow {
-    interface NodeMetadataExtension {
+    interface NodeExtension {
       displayName?: string;
     }
   }

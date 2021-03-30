@@ -1,12 +1,12 @@
-import {NodeId, ProcedureDefinition, ProcedureId} from '@magicflow/core';
+import {Flow, FlowId, NodeId} from '@magicflow/core';
 
-import {Procedure} from '../../../library';
+import {ProcedureDefinition} from '../../../library';
 
 let startId = 'start' as NodeId;
 let nodeId = 'node1' as NodeId;
 
-let definition: ProcedureDefinition = {
-  id: 'procedure1' as ProcedureId,
+let definition: Flow = {
+  id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
   nodes: [
@@ -26,7 +26,7 @@ let definition: ProcedureDefinition = {
 };
 
 test('connect node', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.connectNode(
     {
@@ -43,7 +43,7 @@ test('connect node', async () => {
 });
 
 test('connect node at fakeNode', () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   void expect(() =>
     procedure.connectNode(
@@ -60,7 +60,7 @@ test('connect node at fakeNode', () => {
 });
 
 test('disconnect node', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.disconnectNode(
     {
@@ -77,7 +77,7 @@ test('disconnect node', async () => {
 });
 
 test('disconnect node at no-nexts node', async () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   await procedure.disconnectNode(
     {
@@ -94,7 +94,7 @@ test('disconnect node at no-nexts node', async () => {
 });
 
 test('disconnect node at fakeNode', () => {
-  let procedure = new Procedure(definition);
+  let procedure = new ProcedureDefinition(definition);
 
   void expect(() =>
     procedure.disconnectNode(
