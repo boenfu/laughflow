@@ -10,8 +10,8 @@ export type NodeType = 'node' | 'branchesNode';
 export interface INode {
   type: NodeType;
   id: NodeId;
-  leaves: Leaf[] | undefined;
-  nexts: NodeId[] | undefined;
+  nexts: NodeId[];
+  leaves?: Leaf[];
 }
 
 export interface Node extends Magicflow.NodeExtension, INode {

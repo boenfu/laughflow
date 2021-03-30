@@ -376,7 +376,7 @@ export class Procedure implements IProcedure {
           );
         }
 
-        let checkingNode = nodesMap.get(checkingNodeId)!;
+        let checkingNode = nodesMap.get(checkingNodeId);
 
         if (!checkingNode) {
           throw Error(`Not found node metadata by id '${checkingNodeId}'`);
@@ -409,7 +409,7 @@ export class Procedure implements IProcedure {
         return;
       }
 
-      prevMetadata.nexts!.push(...node.nexts);
+      prevMetadata.nexts.push(...node.nexts);
     });
   }
 
@@ -639,15 +639,15 @@ export class Procedure implements IProcedure {
           throw Error(`Not found node next by ${JSON.stringify(position)}`);
         }
 
-        newNode.nexts!.push(targetNode.nexts![nextIndex]);
-        targetNode.nexts!.splice(nextIndex, 1, id);
+        newNode.nexts.push(targetNode.nexts[nextIndex]);
+        targetNode.nexts.splice(nextIndex, 1, id);
       } else {
         if (
           position === 'next' &&
           targetNode.nexts &&
           targetNode.nexts.length
         ) {
-          newNode.nexts!.push(...targetNode.nexts);
+          newNode.nexts.push(...targetNode.nexts);
           targetNode.nexts = [];
         }
 
