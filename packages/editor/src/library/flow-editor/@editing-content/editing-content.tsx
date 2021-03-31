@@ -5,7 +5,7 @@ import React, {FC, useContext} from 'react';
 import styled from 'styled-components';
 
 import {EditorContext} from '../../context';
-import {ActiveTrunk} from '../../editor-object';
+import {ActiveTrunk} from '../../procedure-editor';
 
 export interface EditingContentProps
   extends React.HTMLAttributes<HTMLDivElement> {
