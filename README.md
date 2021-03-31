@@ -51,3 +51,26 @@ flow: 维护着对某几个 node/branchesNode 的引用（ID）
 
 flow 的 done 是无可执行节点
 branchesNode 的 done 是 所有 flow 都 done
+
+branchesNode 可移动不可复制
+
+// 交互细节
+
+flow 行首没有，直接有个 + ，点了之后 + 变成 两个 node | branchesNode，再次点击创建
+行首有的时候 hover flow 右侧线上有 +，同上
+
+// 代码细节
+
+没有明确删除各资源 definition 的方法（如 unlinkNode），实际就不会删除 node definition，所以可能存在流程中 未被任何地方使用的野节点
+
+pure
+
+// procedure 变 procedure modifier
+
+// undo redo 搬 procedure editor
+
+// procedure 仅为对象的相关 getter， 比如 treeNode
+
+// procedure editor 自己组装 modifier，提供把多个 合成一次 undo
+
+// 把 复制粘贴 这种拆成两个 modifier

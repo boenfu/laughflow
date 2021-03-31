@@ -77,15 +77,14 @@ test('create leaf at fakeNode', () => {
 
 test('no-handle beforeCreateLeaf & update metadata', async () => {
   let procedure = new ProcedureDefinition(definition, {
-    beforeLeafCreate(leaf, node, definition) {
-      definition.nodes.push({
-        id: 'extraNodeId' as NodeId,
-        name: 'extraNodeName',
-      });
-
-      node.name = 'nodeName';
-      leaf.name = 'leafName';
-    },
+    // beforeLeafCreate(leaf, node, definition) {
+    //   definition.nodes.push({
+    //     id: 'extraNodeId' as NodeId,
+    //     name: 'extraNodeName',
+    //   });
+    //   node.name = 'nodeName';
+    //   leaf.name = 'leafName';
+    // },
   });
 
   await procedure.createLeaf(
@@ -107,9 +106,9 @@ test('no-handle beforeCreateLeaf & update metadata', async () => {
 
 test('handle beforeCreateLeaf', async () => {
   let procedure = new ProcedureDefinition(definition, {
-    beforeLeafCreate() {
-      return 'handled';
-    },
+    // beforeLeafCreate() {
+    //   return 'handled';
+    // },
   });
 
   await procedure.createLeaf(

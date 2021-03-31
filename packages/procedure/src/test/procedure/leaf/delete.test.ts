@@ -52,9 +52,9 @@ test('delete non-existent leaf', () => {
 
 test('handle beforeDeleteLeaf', async () => {
   let procedure = new ProcedureDefinition(definition, {
-    beforeLeafDelete() {
-      return 'handled';
-    },
+    // beforeLeafDelete() {
+    //   return 'handled';
+    // },
   });
 
   await procedure.deleteLeaf({type: 'node', id: startId}, leafId);
@@ -66,9 +66,9 @@ test('handle beforeDeleteLeaf', async () => {
 
 test('no-handle beforeDeleteLeaf and delete node nexts', async () => {
   let procedure = new ProcedureDefinition(definition, {
-    beforeLeafDelete(_definition, node) {
-      node.nexts = undefined;
-    },
+    // beforeLeafDelete(_definition, node) {
+    //   node.nexts = undefined;
+    // },
   });
 
   await procedure.deleteLeaf({type: 'node', id: startId}, leafId);
