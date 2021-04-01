@@ -5,7 +5,6 @@
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "source": "src/library/index.ts",
   "main": "bld/library/index.js",
-  "module": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
   "scripts": {
     "test": "jest"

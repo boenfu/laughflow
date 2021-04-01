@@ -79,11 +79,10 @@ let xxx;
 
 pipe(
 merge(),
-out(multiResults, (a, b, c) => {
-
-    })
-
+out(multiResults, (a, b, c) => {})
 )
+
+compose
 
 definition
 |> addNode(1, 2)
@@ -91,7 +90,65 @@ definition
 
 addNode(createBranchesNode())(procedureDefinition)
 
-edit(
-addNode(createBranchesNode()),
-addFlowStart()
+function addNode() {
+return ([definition, context]) => {
+
+}
+}
+
+function out(operator, callback) {
+return ([definition, context]) => {
+let ret = operator([definition, context]);
+
+    context = callback(...ret) ?? context;
+
+    return [ret[0], context];
+
+}
+}
+
+editor.edit(
+[addNode(createBranchesNode()),
+addFlowStart(),
+out(del(), (...args) => [
+removeNode(),
+addNode(),
+out(xxx(), () => [
+
+])
+]),
+addNext(node)]
 )
+
+compose()
+
+edit 只 支持 一个 operator，多个自己用 compose 包裹
+
+out(addNode1(1), () => {});
+
+out(addNode1(1), () => {
+console.log();
+
+return [
+deleteNode1(1),
+addNode1(2),
+out(deleteNode1(2), a => {
+console.log(a);
+
+      return [
+        deleteAny(),
+        out(deleteAny(), (node, flow) => {
+          console.log(node, flow);
+        }),
+      ];
+    }),
+    addNode1(3),
+    addNode1(4),
+
+];
+});
+
+高封装度的函数 ->
+粒度细的函数 ->
+modifier ->
+operator

@@ -26,10 +26,9 @@ test('requireNode error', () => {
 
   expect(() =>
     ProcedureUtil.requireNode(
-      ProcedureModifier.addNode(
+      ProcedureModifier.addNode(ProcedureUtil.createBranchesNode({id: node1}))(
         ProcedureUtil.createEmptyProcedure(),
-        ProcedureUtil.createBranchesNode({id: node1}),
-      ),
+      )[0],
       node1,
       'node',
     ),

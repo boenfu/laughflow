@@ -2,7 +2,7 @@ import {Flow, Procedure} from '@magicflow/core';
 import {castArray} from 'lodash-es';
 import {nanoid} from 'nanoid';
 
-import {ProcedureModifier} from '../modifier';
+import {ProcedureModifier} from '../operators';
 
 export function createId<TId>(): TId {
   return (nanoid(8) as unknown) as TId;
@@ -24,26 +24,19 @@ export function createEmptyProcedure(): Procedure {
 
 export type ProcedureChain = {
   [TKey in keyof typeof ProcedureModifier]: (
-    ...args: Parameters<typeof ProcedureModifier[TKey]> extends [
-      any,
-      ...infer TParameters
-    ]
-      ? TParameters
-      : never
+    ...args: Parameters<typeof ProcedureModifier[TKey]>
   ) => ProcedureChain;
 } & {
-  exec(): Procedure;
+  exec(definition: Procedure): Procedure;
 };
 
-export function chain(definition: Procedure): ProcedureChain {
+export function chain(): ProcedureChain {
   type ProcedureChainInternal = {
-    _definition: Procedure;
     _fns: [string | symbol, any[]][];
   } & ProcedureChain;
 
   return new Proxy<ProcedureChainInternal>(
     ({
-      _definition: definition,
       _fns: [],
     } as unknown) as ProcedureChainInternal,
     {
@@ -55,15 +48,13 @@ export function chain(definition: Procedure): ProcedureChain {
           };
         }
 
-        return () => {
-          let definition = target._definition;
-
+        return (definition: Procedure) => {
           for (let [fnName, params] of target._fns) {
             let fn = ((ProcedureModifier as unknown) as {
               [key in string]: (...args: any[]) => any;
             })[String(fnName)];
 
-            definition = castArray(fn(definition, ...params))[0];
+            definition = castArray(fn(...params)(definition))[0];
           }
 
           return definition;

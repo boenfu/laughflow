@@ -10,7 +10,7 @@ test('procedure chian', () => {
   let flow1 = 'flow1' as FlowId;
   let leaf1 = 'leaf1' as LeafId;
 
-  let nextProcedure = ProcedureUtil.chain(procedure)
+  let nextProcedure = ProcedureUtil.chain()
     .addNode(ProcedureUtil.createBranchesNode({id: branchesNode1}))
     .addFlowStart(procedure.start, branchesNode1)
     .addNode(ProcedureUtil.createNode({id: node1}))
@@ -18,7 +18,7 @@ test('procedure chian', () => {
     .addFlowStart(flow1, node1)
     .addNodeLeaves(node1, [ProcedureUtil.createLeaf({id: leaf1})])
     .addNodeNexts(node1, [node1])
-    .exec();
+    .exec(procedure);
 
   let procedureId = procedure.id;
   let procedureStartId = procedure.start;
@@ -27,7 +27,7 @@ test('procedure chian', () => {
     `{"id":"${procedureId}","start":"${procedureStartId}","flows":[{"id":"${procedureStartId}","nodes":["branchesNode1"]},{"id":"flow1","nodes":["node1"]}],"nodes":[{"id":"branchesNode1","type":"branchesNode","flows":["flow1"],"nexts":[]},{"id":"node1","type":"node","nexts":["node1"],"leaves":[{"id":"leaf1","type":"done"}]}]}`,
   );
 
-  nextProcedure = ProcedureUtil.chain(nextProcedure)
+  nextProcedure = ProcedureUtil.chain()
     .updateFlow({
       ...ProcedureUtil.requireFlow(nextProcedure, flow1),
       outputs: {hello: 'thank you'},
@@ -43,7 +43,7 @@ test('procedure chian', () => {
       ),
       type: 'terminate',
     })
-    .exec();
+    .exec(nextProcedure);
 
   expect(JSON.stringify(nextProcedure)).toBe(
     `{"id":"${procedureId}","start":"${procedureStartId}","flows":[{"id":"${procedureStartId}","nodes":["branchesNode1"]},{"id":"flow1","nodes":["node1"],"outputs":{"hello":"thank you"}}],"nodes":[{"id":"branchesNode1","type":"branchesNode","flows":["flow1"],"nexts":[]},{"id":"node1","type":"node","nexts":["node1"],"leaves":[{"id":"leaf1","type":"terminate"}],"outputs":{"hello":"thank you"}}]}`,
@@ -51,16 +51,16 @@ test('procedure chian', () => {
 
   let leaf2 = 'leaf2' as LeafId;
 
-  nextProcedure = ProcedureUtil.chain(nextProcedure)
+  nextProcedure = ProcedureUtil.chain()
     .replaceNodeNexts(node1, [branchesNode1])
     .replaceNodeLeaves(node1, [ProcedureUtil.createLeaf({id: leaf2})])
-    .exec();
+    .exec(nextProcedure);
 
   expect(JSON.stringify(nextProcedure)).toBe(
     `{"id":"${procedureId}","start":"${procedureStartId}","flows":[{"id":"${procedureStartId}","nodes":["branchesNode1"]},{"id":"flow1","nodes":["node1"],"outputs":{"hello":"thank you"}}],"nodes":[{"id":"branchesNode1","type":"branchesNode","flows":["flow1"],"nexts":[]},{"id":"node1","type":"node","nexts":["branchesNode1"],"leaves":[{"id":"leaf2","type":"done"}],"outputs":{"hello":"thank you"}}]}`,
   );
 
-  nextProcedure = ProcedureUtil.chain(nextProcedure)
+  nextProcedure = ProcedureUtil.chain()
     .removeNodeLeaf(node1, leaf2)
     .removeNodeLeaves(node1)
     .removeNodeNext(node1, branchesNode1)
@@ -69,13 +69,13 @@ test('procedure chian', () => {
     .removeAllFlowStart(procedureStartId, branchesNode1)
     .removeFlowStart(flow1, node1)
     .removeFlow(branchesNode1, flow1)
-    .exec();
+    .exec(nextProcedure);
 
   expect(JSON.stringify(nextProcedure)).toBe(
     `{"id":"${procedureId}","start":"${procedureStartId}","flows":[{"id":"${procedureStartId}","nodes":[]}],"nodes":[{"id":"branchesNode1","type":"branchesNode","flows":[],"nexts":[]}]}`,
   );
 
-  nextProcedure = ProcedureUtil.chain(nextProcedure).purge().exec();
+  nextProcedure = ProcedureUtil.chain().purge().exec(nextProcedure);
 
   expect(JSON.stringify(nextProcedure)).toBe(
     `{"id":"${procedureId}","start":"${procedureStartId}","flows":[{"id":"${procedureStartId}","nodes":[]}],"nodes":[]}`,
