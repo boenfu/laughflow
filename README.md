@@ -74,3 +74,24 @@ pure
 // procedure editor 自己组装 modifier，提供把多个 合成一次 undo
 
 // 把 复制粘贴 这种拆成两个 modifier
+
+let xxx;
+
+pipe(
+merge(),
+out(multiResults, (a, b, c) => {
+
+    })
+
+)
+
+definition
+|> addNode(1, 2)
+|>
+
+addNode(createBranchesNode())(procedureDefinition)
+
+edit(
+addNode(createBranchesNode()),
+addFlowStart()
+)

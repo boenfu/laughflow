@@ -3,11 +3,12 @@ import getOrCreate from 'get-or-create';
 import {produce} from 'immer';
 import {cloneDeep} from 'lodash-es';
 
-import {ProcedureUtil} from '../procedure-util';
+import {ProcedureUtil} from '../util';
 
 export function addFlow(
   definition: Procedure,
   branchesNodeId: NodeId,
+  flow: Flow,
 ): Procedure {
   return produce(definition, definition => {
     let branchesNode = ProcedureUtil.requireNode(
@@ -15,8 +16,6 @@ export function addFlow(
       branchesNodeId,
       'branchesNode',
     );
-
-    let flow = ProcedureUtil.createFlow();
 
     getOrCreate(definition).property('flows', []).exec().push(flow);
     getOrCreate(branchesNode).property('flows', []).exec().push(flow.id);
@@ -45,7 +44,7 @@ export function removeFlow(
   return [
     produce(definition, definition => {
       if (flowId === definition.start) {
-        // can not delete start flow
+        // can not remove start flow
         return;
       }
 

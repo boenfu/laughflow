@@ -23,12 +23,12 @@ export function requireNode<TNodeType extends NodeType>(
 }
 
 export function createNode({
-  id: _id,
+  id = createId()!,
   nexts = [],
   ...partial
 }: Partial<Node> = {}): Node {
   return {
-    id: createId(),
+    id,
     type: 'node',
     nexts,
     ...partial,
@@ -36,13 +36,13 @@ export function createNode({
 }
 
 export function createBranchesNode({
-  id: _id,
+  id = createId()!,
   nexts = [],
   flows = [],
   ...partial
 }: Partial<BranchesNode> = {}): BranchesNode {
   return {
-    id: createId(),
+    id,
     type: 'branchesNode',
     flows,
     nexts,
@@ -50,11 +50,10 @@ export function createBranchesNode({
   };
 }
 
-export function copyNode<TNode extends Node | BranchesNode>(
-  node: TNode,
-): TNode {
+export function copyNode(node: Node): Node {
   return {
     ...node,
     id: createId(),
+    leaves: node.leaves?.map(leaf => ({...leaf, id: createId()})),
   };
 }

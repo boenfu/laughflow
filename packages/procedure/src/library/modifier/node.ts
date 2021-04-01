@@ -8,15 +8,18 @@ import {
 } from '@magicflow/core';
 import getOrCreate from 'get-or-create';
 import produce from 'immer';
-import {cloneDeep} from 'lodash-es';
+import {cloneDeep, compact} from 'lodash-es';
 
-import {ProcedureUtil} from '../procedure-util';
+import {ProcedureUtil} from '../util';
 
 export function addNode(
   definition: Procedure,
   node: Node | BranchesNode,
 ): Procedure {
-  return produce(definition, definition => void definition.nodes.push(node));
+  return produce(
+    definition,
+    definition => void definition.nodes.push(cloneDeep(node)),
+  );
 }
 
 export function updateNode(
@@ -29,18 +32,18 @@ export function updateNode(
     let nodeIndex = definition.nodes.findIndex(node => node.id === nextNode.id);
 
     if (nodeIndex === -1) {
-      throw Error('TODO');
+      throw Error(`Not found node definition by id '${node.id}'`);
     }
 
     definition.nodes.splice(nodeIndex, 1, nextNode);
   });
 }
 
-export function deleteNode(
+export function removeNode(
   definition: Procedure,
   nodeId: NodeId,
 ): [Procedure, Node | BranchesNode] {
-  let deletedNode!: Node | BranchesNode;
+  let removedNode!: Node | BranchesNode;
 
   return [
     produce(definition, definition => {
@@ -48,15 +51,17 @@ export function deleteNode(
 
       for (let node of definition.nodes) {
         if (node.id === nodeId) {
-          deletedNode = node;
+          removedNode = cloneDeep(node);
         } else {
           nodes.push(node);
         }
 
         node.nexts = node.nexts.filter(next => next !== nodeId);
       }
+
+      definition.nodes = nodes;
     }),
-    deletedNode,
+    removedNode,
   ];
 }
 
@@ -118,7 +123,7 @@ export function removeNodeNext(
     let nextIndex = node.nexts.findIndex(id => id === next);
 
     if (nextIndex === -1) {
-      throw Error('TODO');
+      throw Error(`Not found node next by id '${next}'`);
     }
 
     node.nexts.splice(nextIndex, 1);
@@ -150,13 +155,13 @@ export function updateNodeLeaf(
     let node = ProcedureUtil.requireNode(definition, nodeId);
 
     if (!node.leaves) {
-      throw Error('TODO');
+      throw Error(`Not found leaf definition by id '${leaf.id}'`);
     }
 
     let leafIndex = node.leaves.findIndex(({id}) => id === leaf.id);
 
     if (leafIndex === -1) {
-      throw Error('TODO');
+      throw Error(`Not found leaf definition by id '${leaf.id}'`);
     }
 
     node.leaves.splice(leafIndex, 1, leaf);
@@ -175,16 +180,16 @@ export function removeNodeLeaf(
       let node = ProcedureUtil.requireNode(definition, nodeId);
 
       if (!node.leaves) {
-        throw Error('TODO');
+        throw Error(`Not found leaf definition by id '${leafId}'`);
       }
 
       let leafIndex = node.leaves.findIndex(({id}) => id === leafId);
 
       if (leafIndex === -1) {
-        throw Error('TODO');
+        throw Error(`Not found leaf definition by id '${leafId}'`);
       }
 
-      [leaf] = node.leaves.splice(leafIndex, 1);
+      leaf = cloneDeep(node.leaves.splice(leafIndex, 1)[0]);
     }),
     leaf,
   ];
@@ -199,7 +204,7 @@ export function removeNodeLeaves(
   return [
     produce(definition, definition => {
       let node = ProcedureUtil.requireNode(definition, nodeId);
-      leaves = [...(node.leaves ?? [])];
+      leaves = cloneDeep(compact(node.leaves));
       node.leaves = undefined;
     }),
     leaves,
