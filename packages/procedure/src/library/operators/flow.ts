@@ -72,7 +72,7 @@ export function removeFlow(
           ({id}) => id === flowId,
         );
 
-        if (flowIndex === -1) {
+        if (flowDefinitionIndex === -1) {
           throw Error(`Not found flow definition by id '${flowId}'`);
         }
 
@@ -100,7 +100,7 @@ export function removeFlowStart(flowId: FlowId, nodeId: NodeId): Operator {
       let nodeIndex = flow.nodes.findIndex(id => id === nodeId);
 
       if (nodeIndex === -1) {
-        return;
+        throw Error(`Not found flow start by id '${nodeId}'`);
       }
 
       flow.nodes.splice(nodeIndex, 1);

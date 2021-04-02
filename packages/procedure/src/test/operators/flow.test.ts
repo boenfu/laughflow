@@ -36,6 +36,12 @@ test('updateFlow', () => {
   ).toBe('thank you');
 });
 
+test('updateFlow error', () => {
+  expect(() =>
+    updateFlow(createFlow({id: 'fakeFlow' as FlowId}))(procedure),
+  ).toThrow("Not found flow definition by id 'fakeFlow'");
+});
+
 test('removeFlow', () => {
   let flow1 = 'flow1' as FlowId;
 
@@ -47,6 +53,29 @@ test('removeFlow', () => {
       }),
     ])(procedure).flows.length,
   ).toBe(1);
+});
+
+test('removeFlow error', () => {
+  let branchesNodeId = 'branchesNode' as NodeId;
+  expect(
+    removeFlow(branchesNodeId, procedure.start)(procedure)[0].flows.length,
+  ).toBe(1);
+
+  expect(() =>
+    compose([
+      out(addNode(createBranchesNode({id: branchesNodeId})), node =>
+        removeFlow(node.id, 'fakeFlow' as FlowId),
+      ),
+    ])(procedure),
+  ).toThrow(`Not found flow 'fakeFlow' in branchesNode '${branchesNodeId}'`);
+
+  expect(() =>
+    compose([
+      out(addNode(createBranchesNode({flows: ['fakeFlow' as FlowId]})), node =>
+        removeFlow(node.id, 'fakeFlow' as FlowId),
+      ),
+    ])(procedure),
+  ).toThrow("Not found flow definition by id 'fakeFlow'");
 });
 
 test('addFlowStart', () => {
@@ -65,6 +94,12 @@ test('removeFlowStart', () => {
       removeFlowStart(procedure.start, node1),
     ])(procedure).flows[0].nodes.length,
   ).toBe(0);
+});
+
+test('removeFlowStart error', () => {
+  expect(() =>
+    compose([removeFlowStart(procedure.start, node1)])(procedure),
+  ).toThrow("Not found flow start by id 'node1'");
 });
 
 test('removeAllFlowStart', () => {
