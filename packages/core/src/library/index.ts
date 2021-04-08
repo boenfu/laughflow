@@ -4,7 +4,7 @@ export * from './node';
 export * from './flow';
 export * from './procedure';
 
-interface IOutputsEntity<TOutputs = any> {
+export interface IOutputsEntity<TOutputs = any> {
   outputs?: Dict<TOutputs>;
 }
 

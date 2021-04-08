@@ -2,7 +2,6 @@ import {
   BranchesNode,
   Flow,
   FlowId,
-  Leaf,
   NodeId,
   Procedure as ProcedureDefinition,
   SingleNode,
@@ -16,7 +15,6 @@ import {Dict} from 'tslang';
 import {
   TaskBranchesNodeMetadata,
   TaskFlowMetadata,
-  TaskLeafMetadata,
   TaskMetadata,
   TaskNodeMetadata,
   TaskStage,
@@ -54,19 +52,6 @@ export class Task {
   constructor(readonly procedure: Procedure, private metadata: TaskMetadata) {}
 }
 
-export class TaskLeaf {
-  get active(): boolean {
-    return true;
-  }
-
-  constructor(
-    public task: Task,
-    readonly definition: Leaf,
-    public metadata: TaskLeafMetadata,
-    public inputs: Dict<any>,
-  ) {}
-}
-
 export class TaskNode {
   get stage(): TaskStage {
     if (this.broken) {
@@ -100,29 +85,6 @@ export class TaskNode {
     return true;
   }
 
-  get leaves(): TaskLeaf[] {
-    let {leaves = []} = this.metadata;
-
-    let task = this.task;
-    let leafDefinitionMap = new Map(
-      getNodeDefinition(task, this.metadata.definition)!.leaves?.map(leaf => [
-        leaf.id,
-        leaf,
-      ]),
-    );
-    let inputs = this.outputs;
-
-    return leaves.map(
-      leaf =>
-        new TaskLeaf(
-          task,
-          leafDefinitionMap.get(leaf.definition)!,
-          leaf,
-          inputs,
-        ),
-    );
-  }
-
   get nextNodes(): (TaskNode | TaskBranchesNode)[] {
     let {nexts = []} = this.metadata;
 
@@ -130,7 +92,7 @@ export class TaskNode {
     let inputs = this.outputs;
 
     return nexts.map(node => {
-      return node.type === 'node'
+      return node.type === 'singleNode'
         ? new TaskNode(
             task,
             getNodeDefinition(task, node.definition)!,
@@ -220,7 +182,7 @@ export class TaskBranchesNode {
     let inputs = this.outputs;
 
     return nexts.map(node => {
-      return node.type === 'node'
+      return node.type === 'singleNode'
         ? new TaskNode(
             task,
             getNodeDefinition(task, node.definition)!,
@@ -323,7 +285,7 @@ export class TaskFlow {
     let inputs = this.inputs;
 
     return nodes.map(node => {
-      return node.type === 'node'
+      return node.type === 'singleNode'
         ? new TaskNode(
             task,
             getNodeDefinition(task, node.definition)!,
@@ -396,7 +358,7 @@ export function initTask({
 
       let node = nodesMap.get(nodeId)!;
       nodes.push(
-        node.type === 'node' ? initNode(node) : initBranchesNode(node),
+        node.type === 'singleNode' ? initNode(node) : initBranchesNode(node),
       );
       edgeSet.add(edge);
     }
@@ -409,12 +371,7 @@ export function initTask({
     };
   }
 
-  function initNode({
-    id,
-    type,
-    nexts: nextIds,
-    leaves,
-  }: SingleNode): TaskNodeMetadata {
+  function initNode({id, type, nexts: nextIds}: SingleNode): TaskNodeMetadata {
     let nexts: (TaskNodeMetadata | TaskBranchesNodeMetadata)[] = [];
 
     for (let nextId of nextIds) {
@@ -426,7 +383,7 @@ export function initTask({
 
       let node = nodesMap.get(nextId)!;
       nexts.push(
-        node.type === 'node' ? initNode(node) : initBranchesNode(node),
+        node.type === 'singleNode' ? initNode(node) : initBranchesNode(node),
       );
       edgeSet.add(edge);
     }
@@ -437,7 +394,6 @@ export function initTask({
       type,
       stage: 'none',
       nexts,
-      leaves: leaves?.map(initLeaf),
     };
   }
 
@@ -463,13 +419,6 @@ export function initTask({
       }),
       type: 'branchesNode',
       flows,
-    };
-  }
-
-  function initLeaf({id}: Leaf): TaskLeafMetadata {
-    return {
-      id: createId(),
-      definition: id,
     };
   }
 }
@@ -517,7 +466,7 @@ export function upgradeTask(
 
       let node = nodesMap.get(nodeId)!;
 
-      if (node.type === 'node') {
+      if (node.type === 'singleNode') {
         checkNode(node, definitionIdToNodesMap.get(nodeId) as TaskNodeMetadata);
       } else {
         checkBranchesNode(
@@ -531,7 +480,7 @@ export function upgradeTask(
   }
 
   function checkNode(
-    {id, type, nexts: nextIds, leaves}: SingleNode,
+    {id, type, nexts: nextIds}: SingleNode,
     node: TaskNodeMetadata,
   ): void {
     let definitionIdToNodesMap = new Map(
@@ -552,7 +501,7 @@ export function upgradeTask(
 
       let node = nodesMap.get(nextId)!;
 
-      if (node.type === 'node') {
+      if (node.type === 'singleNode') {
         checkNode(node, definitionIdToNodesMap.get(nextId) as TaskNodeMetadata);
       } else {
         checkBranchesNode(
@@ -563,8 +512,6 @@ export function upgradeTask(
 
       edgeSet.add(edge);
     }
-
-    leaves?.map(checkLeaf);
   }
 
   function checkBranchesNode(
@@ -588,8 +535,6 @@ export function upgradeTask(
     //   type: 'node',
     // });
   }
-
-  function checkLeaf({id}: Leaf): void {}
 }
 
 function getFlowDefinition(task: Task, flow: FlowId): Flow | undefined {
@@ -598,7 +543,7 @@ function getFlowDefinition(task: Task, flow: FlowId): Flow | undefined {
 
 function getNodeDefinition(task: Task, id: NodeId): SingleNode | undefined {
   let node = task.procedure.nodesMap.get(id);
-  return node?.type === 'node' ? node : undefined;
+  return node?.type === 'singleNode' ? node : undefined;
 }
 
 function getBranchesDefinition(

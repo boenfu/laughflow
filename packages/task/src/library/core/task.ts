@@ -1,5 +1,11 @@
-import {FlowId, LeafId, NodeId, NodeType, ProcedureId} from '@magicflow/core';
-import {Dict, Nominal} from 'tslang';
+import {
+  FlowId,
+  IOutputsEntity,
+  NodeId,
+  NodeType,
+  ProcedureId,
+} from '@magicflow/core';
+import {Nominal} from 'tslang';
 
 export type TaskId = Nominal<string, 'task:id'>;
 
@@ -11,13 +17,9 @@ export type TaskLeafId = Nominal<string, 'task-leaf:id'>;
 
 export type TaskStage = 'none' | 'in-progress' | 'done' | 'terminated';
 
-export interface IOutputsResource {
-  outputs?: Dict<any>;
-}
-
 export interface TaskMetadata
   extends Magicflow.TaskMetadataExtension,
-    IOutputsResource {
+    IOutputsEntity {
   id: TaskId;
   definition: ProcedureId;
   stage: TaskStage;
@@ -26,7 +28,7 @@ export interface TaskMetadata
 
 export interface TaskFlowMetadata
   extends Magicflow.TaskFlowMetadataExtension,
-    IOutputsResource {
+    IOutputsEntity {
   id: TaskFlowId;
   definition: FlowId;
   stage: TaskStage;
@@ -35,7 +37,7 @@ export interface TaskFlowMetadata
 
 export interface ITaskNodeMetadata
   extends Magicflow.TaskNodeMetadataExtension,
-    IOutputsResource {
+    IOutputsEntity {
   id: TaskNodeId;
   definition: NodeId;
   type: NodeType;
@@ -49,8 +51,6 @@ export interface ITaskNodeMetadata
    * 将跳过节点执行之后节点
    */
   ignored?: boolean;
-
-  leaves?: TaskLeafMetadata[];
   nexts?: (TaskNodeMetadata | TaskBranchesNodeMetadata)[];
 }
 
@@ -61,9 +61,4 @@ export interface TaskNodeMetadata extends ITaskNodeMetadata {
 export interface TaskBranchesNodeMetadata extends ITaskNodeMetadata {
   type: 'branchesNode';
   flows: TaskFlowMetadata[];
-}
-
-export interface TaskLeafMetadata extends Magicflow.TaskLeafMetadataExtension {
-  id: TaskLeafId;
-  definition: LeafId;
 }
