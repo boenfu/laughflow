@@ -175,12 +175,16 @@ node: NodeId
 // 子任务
 
 // 条件
+（控制 ignore 和 broken）
 
 // 分配待接收
+(没有接受分配设置 ableToBeStart 是 false)
 
 // 流程项未完成
+（ableToBeDone false）
 
 // 未点完成
+（ableToBeDone false）
 
 // 审批被拒绝
 
@@ -217,3 +221,8 @@ flow 没有完成时 outputs 没有 metadata 的 outputs，但是 leafNode 的 o
 leaf 展示出来 可以在 线上渲染条件
 实际 条件就变成四种
 进入，展示，完成，中止
+
+{
+getTaskAbleToBeStart();
+preload();
+}

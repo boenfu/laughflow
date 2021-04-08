@@ -7,7 +7,7 @@ declare global {
 
     interface TaskFlowMetadataExtension {}
 
-    interface TaskNodeMetadataExtension {}
+    interface TaskSingleNodeMetadataExtension {}
 
     interface TaskBranchesNodeMetadataExtension {}
   }
