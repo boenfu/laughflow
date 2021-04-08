@@ -193,3 +193,27 @@ node: NodeId
 
 上一个节点完成就会创建下一个的 metadata
 任务创建时就会把所有边走一次（有循环的也是只会走第一次），生成 metadata
+
+memorize getter
+task metadata data 不变就 cache
+
+ignored 视为完成
+broken 视为未开始
+
+flow 里没有能继续就算 done 了
+
+原来的中断 变成 branchesNode 的 flow 的 starts 都 broken， flow 就 done 了 ，branchesNode 也 done 了
+
+节点如果没有 leaf stage 为 done 了就 done
+否则 得看 leave
+
+node 的 leafNodes 表示的是 node 走到的第一个未 done 的节点
+
+flow 没有完成时 outputs 没有 metadata 的 outputs，但是 leafNode 的 outputs 是有的
+
+没有实际的 leaf 了，或者说每个节点都有完成和中止的 leaf
+渲染时是控制要不要展示
+
+leaf 展示出来 可以在 线上渲染条件
+实际 条件就变成四种
+进入，展示，完成，中止

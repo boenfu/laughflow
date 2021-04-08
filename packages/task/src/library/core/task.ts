@@ -11,8 +11,6 @@ export type TaskLeafId = Nominal<string, 'task-leaf:id'>;
 
 export type TaskStage = 'none' | 'in-progress' | 'done' | 'terminated';
 
-export type TaskNodeStage = TaskStage;
-
 export interface IOutputsResource {
   outputs?: Dict<any>;
 }
@@ -41,7 +39,7 @@ export interface ITaskNodeMetadata
   id: TaskNodeId;
   definition: NodeId;
   type: NodeType;
-  stage: TaskNodeStage;
+  stage: TaskStage;
 
   /**
    * 将不进入节点

@@ -2,7 +2,6 @@ import {
   BranchesNode,
   Flow,
   FlowId,
-  INode,
   Leaf,
   Node,
   NodeId,
@@ -11,27 +10,33 @@ import {
 import {Procedure} from '@magicflow/procedure';
 import {createId} from '@magicflow/procedure/utils';
 import {enableAllPlugins} from 'immer';
+import {cloneDeep} from 'lodash-es';
 import {Dict} from 'tslang';
 
 import {
-  ITaskNodeMetadata,
   TaskBranchesNodeMetadata,
   TaskFlowMetadata,
   TaskLeafMetadata,
   TaskMetadata,
   TaskNodeMetadata,
-  TaskNodeStage,
+  TaskStage,
 } from './core';
 
 enableAllPlugins();
 
 export class Task {
+  get stage(): TaskStage {
+    // plugin:
+
+    return this.startFlow.stage;
+  }
+
   get startFlow(): TaskFlow {
     let {start} = this.metadata;
 
     return new TaskFlow(
       this,
-      this.getFlowDefinition(start.definition)!,
+      getFlowDefinition(this, start.definition)!,
       start,
       this.outputs,
     );
@@ -40,76 +45,85 @@ export class Task {
   get outputs(): Dict<any> {
     let {outputs = {}} = this.metadata;
 
-    // preload outputs
+    // plugin:preload outputs
+    // such as tag
 
     return outputs;
   }
 
-  constructor(
-    private readonly procedure: Procedure,
-    private metadata: TaskMetadata,
-  ) {}
-
-  getFlowDefinition(flow: FlowId): Flow | undefined {
-    return this.procedure.flowsMap.get(flow);
-  }
-
-  getNodeDefinition(id: NodeId): Node | undefined {
-    let node = this.procedure.nodesMap.get(id);
-    return node?.type === 'node' ? node : undefined;
-  }
-
-  getBranchesDefinition(id: NodeId): BranchesNode | undefined {
-    let node = this.procedure.nodesMap.get(id);
-    return node?.type === 'branchesNode' ? node : undefined;
-  }
+  constructor(readonly procedure: Procedure, private metadata: TaskMetadata) {}
 }
 
-export class TaskFlow {
-  get nodes(): (TaskNode | TaskBranchesNode)[] {
-    let {nodes} = this.metadata;
+export class TaskLeaf {
+  get active(): boolean {
+    return true;
+  }
+
+  constructor(
+    public task: Task,
+    readonly definition: Leaf,
+    public metadata: TaskLeafMetadata,
+    public inputs: Dict<any>,
+  ) {}
+}
+
+export class TaskNode {
+  get stage(): TaskStage {
+    if (this.broken) {
+      return 'none';
+    }
+
+    if (this.ignored) {
+      return 'done';
+    }
+
+    return this.metadata.stage;
+  }
+
+  get broken(): boolean {
+    // plugin:
+    return false;
+  }
+
+  get ignored(): boolean {
+    // plugin:
+    return false;
+  }
+
+  get ableToBeDone(): boolean {
+    if (this.stage !== 'in-progress') {
+      return false;
+    }
+
+    // plugin:
+
+    return true;
+  }
+
+  get leaves(): TaskLeaf[] {
+    let {leaves = []} = this.metadata;
 
     let task = this.task;
+    let leafDefinitionMap = new Map(
+      getNodeDefinition(task, this.metadata.definition)!.leaves?.map(leaf => [
+        leaf.id,
+        leaf,
+      ]),
+    );
     let inputs = this.outputs;
 
-    return nodes.map(node => {
-      return node.type === 'node'
-        ? new TaskNode(
-            task,
-            task.getNodeDefinition(node.definition)!,
-            node,
-            inputs,
-          )
-        : new TaskBranchesNode(
-            task,
-            task.getBranchesDefinition(node.definition)!,
-            node,
-            inputs,
-          );
-    });
+    return leaves.map(
+      leaf =>
+        new TaskLeaf(
+          task,
+          leafDefinitionMap.get(leaf.definition)!,
+          leaf,
+          inputs,
+        ),
+    );
   }
 
-  get outputs(): Dict<any> {
-    let {outputs = {}} = this.metadata;
-
-    return {
-      ...this.inputs,
-      ...outputs,
-    };
-  }
-
-  constructor(
-    private task: Task,
-    private readonly definition: Flow,
-    private metadata: TaskFlowMetadata,
-    private inputs: Dict<any>,
-  ) {}
-}
-
-abstract class TaskGeneralNode {
-  abstract get stage(): TaskNodeStage;
-
-  get nodes(): (TaskNode | TaskBranchesNode)[] {
+  get nextNodes(): (TaskNode | TaskBranchesNode)[] {
     let {nexts = []} = this.metadata;
 
     let task = this.task;
@@ -119,54 +133,138 @@ abstract class TaskGeneralNode {
       return node.type === 'node'
         ? new TaskNode(
             task,
-            task.getNodeDefinition(node.definition)!,
+            getNodeDefinition(task, node.definition)!,
             node,
             inputs,
           )
         : new TaskBranchesNode(
             task,
-            task.getBranchesDefinition(node.definition)!,
+            getBranchesDefinition(task, node.definition)!,
             node,
             inputs,
           );
     });
   }
 
+  // 此节点所能抵达的第一个未完成节点
+  get leafNodes(): (TaskNode | TaskBranchesNode)[] {
+    if (this.stage !== 'done') {
+      return [this];
+    }
+
+    return this.nextNodes.flatMap(node => node.leafNodes);
+  }
+
   get outputs(): Dict<any> {
+    if (this.ignored || this.stage !== 'done') {
+      return this.inputs;
+    }
+
     let {outputs = {}} = this.metadata;
 
     return {
       ...this.inputs,
-      // 完成了才会输出 outputs
-      ...(this.stage === 'done' ? outputs : {}),
+      ...outputs,
     };
   }
 
   constructor(
     public task: Task,
-    readonly definition: INode,
-    public metadata: ITaskNodeMetadata,
+    readonly definition: Node,
+    public metadata: TaskNodeMetadata,
     public inputs: Dict<any>,
   ) {}
 }
 
-export class TaskBranchesNode extends TaskGeneralNode {
-  get stage(): TaskNodeStage {
-    return this.metadata.stage;
+export class TaskBranchesNode {
+  get stage(): TaskStage {
+    if (this.broken) {
+      return 'none';
+    }
+
+    if (this.ignored) {
+      return 'done';
+    }
+
+    let stageSet = new Set<TaskStage>(this.flows.map(flow => flow.stage));
+
+    if (stageSet.size === 1) {
+      return Array.from(stageSet.values())[0];
+    }
+
+    if (stageSet.has('terminated')) {
+      return 'terminated';
+    }
+
+    if (stageSet.has('in-progress')) {
+      return 'in-progress';
+    }
+
+    return 'none';
+  }
+
+  get broken(): boolean {
+    // plugin:
+    return false;
+  }
+
+  get ignored(): boolean {
+    // plugin:
+    return false;
+  }
+
+  get nextNodes(): (TaskNode | TaskBranchesNode)[] {
+    let {nexts = []} = this.metadata;
+
+    let task = this.task;
+    let inputs = this.outputs;
+
+    return nexts.map(node => {
+      return node.type === 'node'
+        ? new TaskNode(
+            task,
+            getNodeDefinition(task, node.definition)!,
+            node,
+            inputs,
+          )
+        : new TaskBranchesNode(
+            task,
+            getBranchesDefinition(task, node.definition)!,
+            node,
+            inputs,
+          );
+    });
+  }
+
+  // 此节点所能抵达的第一个未完成节点
+  get leafNodes(): (TaskNode | TaskBranchesNode)[] {
+    if (this.stage !== 'done') {
+      return [this];
+    }
+
+    return this.nextNodes.flatMap(node => node.leafNodes);
+  }
+
+  get outputs(): Dict<any> {
+    if (this.ignored || this.stage !== 'done') {
+      return this.inputs;
+    }
+
+    return this.flows[this.flows.length - 1].outputs;
   }
 
   get flows(): TaskFlow[] {
     let {flows = []} = this.metadata;
 
     let task = this.task;
-    let inputs = this.outputs;
+    let inputs = this.inputs;
 
     let taskFlows: TaskFlow[] = [];
 
     for (let flow of flows) {
       let taskFlow = new TaskFlow(
         task,
-        task.getFlowDefinition(flow.definition)!,
+        getFlowDefinition(task, flow.definition)!,
         flow,
         inputs,
       );
@@ -182,27 +280,93 @@ export class TaskBranchesNode extends TaskGeneralNode {
     readonly definition: BranchesNode,
     public metadata: TaskBranchesNodeMetadata,
     public inputs: Dict<any>,
-  ) {
-    super(task, definition, metadata, inputs);
-  }
+  ) {}
 }
 
-export class TaskNode extends TaskGeneralNode {
-  get stage(): TaskNodeStage {
-    return this.metadata.stage;
+export class TaskFlow {
+  get stage(): TaskStage {
+    let broken = true;
+    let stageSet = new Set<TaskStage>();
+
+    for (let node of this.nodes) {
+      broken = !broken || node.broken;
+
+      for (let leafNode of node.leafNodes) {
+        stageSet.add(leafNode.stage);
+      }
+    }
+
+    if (broken) {
+      return 'done';
+    }
+
+    if (stageSet.size === 1) {
+      return Array.from(stageSet.values())[0];
+    }
+
+    if (stageSet.has('terminated')) {
+      return 'terminated';
+    }
+
+    if (stageSet.has('in-progress')) {
+      return 'in-progress';
+    }
+
+    return 'none';
+  }
+
+  get nodes(): (TaskNode | TaskBranchesNode)[] {
+    let {nodes} = this.metadata;
+
+    let task = this.task;
+    // 同一个 Flow 的多个开始 inputs 应该一致
+    let inputs = this.inputs;
+
+    return nodes.map(node => {
+      return node.type === 'node'
+        ? new TaskNode(
+            task,
+            getNodeDefinition(task, node.definition)!,
+            node,
+            inputs,
+          )
+        : new TaskBranchesNode(
+            task,
+            getBranchesDefinition(task, node.definition)!,
+            node,
+            inputs,
+          );
+    });
+  }
+
+  get leafNodes(): (TaskNode | TaskBranchesNode)[] {
+    return this.nodes.flatMap(node => node.leafNodes);
+  }
+
+  get outputs(): Dict<any> {
+    let {outputs = {}} = this.metadata;
+
+    return Object.assign(
+      {},
+      ...this.leafNodes.map(node => node.outputs),
+      this.stage === 'done' ? outputs : {},
+    );
   }
 
   constructor(
-    public task: Task,
-    readonly definition: Node,
-    public metadata: TaskNodeMetadata,
-    public inputs: Dict<any>,
-  ) {
-    super(task, definition, metadata, inputs);
-  }
+    private task: Task,
+    private readonly definition: Flow,
+    private metadata: TaskFlowMetadata,
+    private inputs: Dict<any>,
+  ) {}
 }
 
-function initTask({
+/**
+ * 初始化任务
+ * @param param0
+ * @returns
+ */
+export function initTask({
   id,
   start,
   flows,
@@ -308,4 +472,136 @@ function initTask({
       definition: id,
     };
   }
+}
+
+/**
+ * 升级任务流程
+ * @param param0
+ * @param task
+ * @returns
+ */
+export function upgradeTask(
+  {id, start, flows, nodes}: ProcedureDefinition,
+  _task: TaskMetadata,
+): TaskMetadata {
+  let task = cloneDeep(_task);
+
+  let nodesMap = new Map(nodes.map(node => [node.id, node]));
+  let flowsMap = new Map(flows.map(flow => [flow.id, flow]));
+
+  let edgeSet = new Set();
+
+  checkFlow(flowsMap.get(start)!, task.start);
+
+  return task;
+
+  function checkFlow({id, nodes: nodeIds}: Flow, flow: TaskFlowMetadata): void {
+    let definitionIdToNodesMap = new Map(
+      flow.nodes.map(node => [node.definition, node]),
+    );
+
+    for (let nodeId of nodeIds) {
+      let edge = `${id}-${nodeId}`;
+
+      if (definitionIdToNodesMap.has(nodeId)) {
+        edgeSet.add(edge);
+        continue;
+      }
+
+      if (edgeSet.has(edge)) {
+        continue;
+      }
+
+      let node = nodesMap.get(nodeId)!;
+
+      if (node.type === 'node') {
+        checkNode(node, definitionIdToNodesMap.get(nodeId) as TaskNodeMetadata);
+      } else {
+        checkBranchesNode(
+          node,
+          definitionIdToNodesMap.get(nodeId) as TaskBranchesNodeMetadata,
+        );
+      }
+
+      edgeSet.add(edge);
+    }
+  }
+
+  function checkNode(
+    {id, type, nexts: nextIds, leaves}: Node,
+    node: TaskNodeMetadata,
+  ): void {
+    let definitionIdToNodesMap = new Map(
+      node.nexts?.map(node => [node.definition, node]),
+    );
+
+    for (let nextId of nextIds) {
+      let edge = `${id}-${nextId}`;
+
+      if (definitionIdToNodesMap.has(nextId)) {
+        edgeSet.add(edge);
+        continue;
+      }
+
+      if (edgeSet.has(edge)) {
+        continue;
+      }
+
+      let node = nodesMap.get(nextId)!;
+
+      if (node.type === 'node') {
+        checkNode(node, definitionIdToNodesMap.get(nextId) as TaskNodeMetadata);
+      } else {
+        checkBranchesNode(
+          node,
+          definitionIdToNodesMap.get(nextId) as TaskBranchesNodeMetadata,
+        );
+      }
+
+      edgeSet.add(edge);
+    }
+
+    leaves?.map(checkLeaf);
+  }
+
+  function checkBranchesNode(
+    node: BranchesNode,
+    branchedNode: TaskBranchesNodeMetadata,
+  ): void {
+    for (let flowId of node.flows) {
+      let edge = `${id}-${flowId}`;
+
+      if (edgeSet.has(edge)) {
+        continue;
+      }
+
+      let flow = flowsMap.get(flowId)!;
+      // checkFlow(flow);
+      edgeSet.add(edge);
+    }
+
+    // checkNode({
+    //   ...node,
+    //   type: 'node',
+    // });
+  }
+
+  function checkLeaf({id}: Leaf): void {}
+}
+
+function getFlowDefinition(task: Task, flow: FlowId): Flow | undefined {
+  return task.procedure.flowsMap.get(flow);
+}
+
+function getNodeDefinition(task: Task, id: NodeId): Node | undefined {
+  let node = task.procedure.nodesMap.get(id);
+  return node?.type === 'node' ? node : undefined;
+}
+
+function getBranchesDefinition(
+  task: Task,
+  id: NodeId,
+): BranchesNode | undefined {
+  let node = task.procedure.nodesMap.get(id);
+  return node?.type === 'branchesNode' ? node : undefined;
 }
