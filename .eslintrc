@@ -35,14 +35,6 @@
       "extends": ["plugin:@mufan/override-dev"]
     },
     {
-      "files": ["packages/converter/src/test/**/*.{ts,tsx}"],
-      "extends": ["plugin:@mufan/override-dev"]
-    },
-    {
-      "files": ["packages/utils/src/test/**/*.{ts,tsx}"],
-      "extends": ["plugin:@mufan/override-dev"]
-    },
-    {
       "files": ["packages/plugins/src/test/**/*.{ts,tsx}"],
       "extends": ["plugin:@mufan/override-dev"]
     }

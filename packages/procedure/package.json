@@ -17,7 +17,7 @@
     "memorize-decorator": "^0.2.4",
     "nanoid": "^3.1.20",
     "tslang": "^0.1.23",
-    "tslib": "^2.1.0"
+    "tslib": "^2.2.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",

@@ -14,10 +14,10 @@
       "path": "../../../core/src/library"
     },
     {
-      "path": "../../../editor/src/library"
+      "path": "../../../procedure/src/library"
     },
     {
-      "path": "../../../icons/src/library"
+      "path": "../../../task/src/library"
     }
   ]
 }

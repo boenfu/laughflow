@@ -13,18 +13,8 @@
   },
   "dependencies": {
     "@magicflow/core": "*",
-    "@magicflow/editor": "*",
-    "@magicflow/icons": "*",
-    "rc-dropdown": "^3.2.0",
-    "rc-menu": "^8.10.2",
-    "styled-components": "^5.2.1",
-    "tslib": "^2.1.0"
-  },
-  "devDependencies": {
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
-    "@types/styled-components": "^5.1.5",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "@magicflow/procedure": "*",
+    "@magicflow/task": "*",
+    "tslib": "^2.2.0"
   }
 }

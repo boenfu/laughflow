@@ -7,6 +7,6 @@
   "types": "bld/library/index.d.ts",
   "dependencies": {
     "tslang": "^0.1.23",
-    "tslib": "^2.1.0"
+    "tslib": "^2.2.0"
   }
 }
