@@ -2,11 +2,6 @@ import {Nominal} from 'tslang';
 
 import {FlowId} from './flow';
 
-export interface NodeRef {
-  type: NodeType;
-  id: NodeId;
-}
-
 export type NodeId = Nominal<string, 'node:id'>;
 
 export type NodeType = 'singleNode' | 'branchesNode';
