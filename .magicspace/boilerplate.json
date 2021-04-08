@@ -105,28 +105,6 @@
         ]
       },
       {
-        "name": "@magicflow/converter",
-        "tsProjects": [
-          {
-            "name": "library"
-          },
-          {
-            "name": "test"
-          }
-        ]
-      },
-      {
-        "name": "@magicflow/utils",
-        "tsProjects": [
-          {
-            "name": "library"
-          },
-          {
-            "name": "test"
-          }
-        ]
-      },
-      {
         "name": "@magicflow/plugins",
         "tsProjects": [
           {
@@ -137,11 +115,11 @@
                 "project": "library"
               },
               {
-                "package": "@magicflow/editor",
+                "package": "@magicflow/procedure",
                 "project": "library"
               },
               {
-                "package": "@magicflow/icons",
+                "package": "@magicflow/task",
                 "project": "library"
               }
             ]

@@ -1,1 +1,1 @@
-export * from './assignment';
+export const a = 1;
