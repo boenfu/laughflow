@@ -4,7 +4,7 @@ import {ProcedureUtil} from '../../library';
 
 test('createFlow params', () => {
   expect(ProcedureUtil.createFlow()).toBeTruthy();
-  expect(ProcedureUtil.createFlow({nodes: []})).toBeTruthy();
+  expect(ProcedureUtil.createFlow({starts: []})).toBeTruthy();
 });
 
 test('requireFlow error', () => {

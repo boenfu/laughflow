@@ -88,7 +88,7 @@ export function addFlowStart(flowId: FlowId, nodeId: NodeId): Operator {
   return definition =>
     produce(definition, definition => {
       ProcedureUtil.requireNode(definition, nodeId);
-      ProcedureUtil.requireFlow(definition, flowId).nodes.push(nodeId);
+      ProcedureUtil.requireFlow(definition, flowId).starts.push(nodeId);
     });
 }
 
@@ -97,13 +97,13 @@ export function removeFlowStart(flowId: FlowId, nodeId: NodeId): Operator {
     produce(definition, definition => {
       let flow = ProcedureUtil.requireFlow(definition, flowId);
 
-      let nodeIndex = flow.nodes.findIndex(id => id === nodeId);
+      let nodeIndex = flow.starts.findIndex(id => id === nodeId);
 
       if (nodeIndex === -1) {
         throw Error(`Not found flow start by id '${nodeId}'`);
       }
 
-      flow.nodes.splice(nodeIndex, 1);
+      flow.starts.splice(nodeIndex, 1);
     });
 }
 
@@ -111,6 +111,6 @@ export function removeAllFlowStart(flowId: FlowId, nodeId: NodeId): Operator {
   return definition =>
     produce(definition, definition => {
       let flow = ProcedureUtil.requireFlow(definition, flowId);
-      flow.nodes = flow.nodes.filter(id => id !== nodeId);
+      flow.starts = flow.starts.filter(id => id !== nodeId);
     });
 }

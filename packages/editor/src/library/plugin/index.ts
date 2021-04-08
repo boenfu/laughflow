@@ -1,4 +1,4 @@
-import {Flow, Leaf, Node} from '@magicflow/core';
+import {Flow, Leaf, SingleNode} from '@magicflow/core';
 import {ComponentType, ReactNode} from 'react';
 
 import {Editor} from '../procedure-editor';
@@ -11,8 +11,8 @@ export interface IPluginEvent {
 }
 
 export interface PluginNodeEvent extends IPluginEvent {
-  currentNode: Node;
-  nextNode: Node;
+  currentNode: SingleNode;
+  nextNode: SingleNode;
 }
 
 export type PluginNodeEventHandler = (
@@ -26,10 +26,10 @@ export interface LeafPluginComponentProps {
 export type LeafPluginComponent = ComponentType<LeafPluginComponentProps>;
 
 export interface NodePluginComponentProps {
-  node: Node;
+  node: SingleNode;
   editor: Editor;
   prevChildren?: ReactNode;
-  onChange?(next: Node): void;
+  onChange?(next: SingleNode): void;
 }
 
 export type NodePluginComponent<TProps = {}> = ComponentType<

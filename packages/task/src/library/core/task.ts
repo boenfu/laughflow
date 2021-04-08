@@ -55,7 +55,7 @@ export interface ITaskNodeMetadata
 }
 
 export interface TaskNodeMetadata extends ITaskNodeMetadata {
-  type: 'node';
+  type: 'singleNode';
 }
 
 export interface TaskBranchesNodeMetadata extends ITaskNodeMetadata {

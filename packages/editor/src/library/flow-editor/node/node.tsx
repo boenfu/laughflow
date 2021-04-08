@@ -1,4 +1,4 @@
-import {Node, NodeRef, TrunkRef} from '@magicflow/core';
+import {NodeRef, SingleNode, TrunkRef} from '@magicflow/core';
 import {Connect, Copy, Cut, Jump} from '@magicflow/icons';
 import classnames from 'classnames';
 import React, {
@@ -18,7 +18,7 @@ import {DisplayName} from './@header';
 
 export interface NodeProps {
   prev: TrunkRef | undefined;
-  node: Node;
+  node: SingleNode;
   className?: string;
   readOnly?: boolean;
   style?: CSSProperties;
@@ -187,11 +187,11 @@ export const Node: FC<NodeProps> = ({
 }) => {
   const {editor} = useContext(EditorContext);
 
-  let nodeRef: NodeRef = {type: 'node', id: node.id};
+  let nodeRef: NodeRef = {type: 'singleNode', id: node.id};
 
   let activeTrunk = editor.activeTrunk;
 
-  const onNodeChange = (node: Node): void =>
+  const onNodeChange = (node: SingleNode): void =>
     void editor.procedure.updateNode(node);
 
   const onContainerClick = (event: MouseEvent<HTMLDivElement>): void => {

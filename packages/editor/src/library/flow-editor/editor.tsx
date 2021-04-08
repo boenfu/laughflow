@@ -14,7 +14,7 @@ import {ConnectionLine, LINE_HEIGHT_DEFAULT} from './connection-line';
 import {EditorProps} from './editor.doc';
 import {Joint} from './joint';
 import {Leaf} from './leaf';
-import {LinkNode, Node} from './node';
+import {LinkNode, SingleNode} from './node';
 
 const PlaceholderLeafId = 'placeholder' as LeafId;
 
@@ -25,7 +25,7 @@ const PlaceholderLeaf: Leaf = {
 
 declare global {
   namespace Magicflow {
-    interface NodeExtension {
+    interface SingleNodeExtension {
       displayName?: string;
     }
   }

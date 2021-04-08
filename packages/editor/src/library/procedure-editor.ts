@@ -4,10 +4,10 @@ import {
   JointRef,
   Leaf,
   LeafRef,
-  Node,
   NodeId,
   NodeRef,
   Ref,
+  SingleNode,
   TrunkRef,
 } from '@magicflow/core';
 import {ProcedureDefinition} from '@magicflow/procedure';
@@ -32,7 +32,11 @@ export type ProcedureTreeNode =
   | ProcedureJointTreeNode
   | ProcedureLeafTreeNode;
 
-export type ProcedureNodeTreeNode = IProcedureTreeNode<NodeRef, Node, true>;
+export type ProcedureNodeTreeNode = IProcedureTreeNode<
+  NodeRef,
+  SingleNode,
+  true
+>;
 
 export type ProcedureJointTreeNode = IProcedureTreeNode<
   JointRef,
@@ -92,8 +96,8 @@ export class Editor extends Eventemitter<ProcedureEventType> {
         this.emit('update');
       },
       beforeNodeUpdate: async (
-        currentNode: Node,
-        nextNode: Node,
+        currentNode: SingleNode,
+        nextNode: SingleNode,
         definition,
       ) => {
         if (
@@ -143,7 +147,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
         Extract<ProcedureTreeNode, {ref: {type: TType}}>['metadata']
       >;
     } = {
-      node: new Map(definition.nodes.map(node => [node.id, node])),
+      node: new Map(definition.starts.map(node => [node.id, node])),
       leaf: new Map(),
       joint: new Map(definition.joints.map(joint => [joint.id, joint])),
     };
@@ -183,8 +187,8 @@ export class Editor extends Eventemitter<ProcedureEventType> {
       let links: ProcedureNodeTreeNode[] = [];
       let joints: ProcedureJointTreeNode[] = [];
 
-      for (let leafMetadata of (metadata as Node | JointMetadata).leaves ||
-        []) {
+      for (let leafMetadata of (metadata as SingleNode | JointMetadata)
+        .leaves || []) {
         refTypeToMetadataMapDict['leaf'].set(leafMetadata.id, leafMetadata);
         leaves.push(
           buildTreeNode(
@@ -196,7 +200,7 @@ export class Editor extends Eventemitter<ProcedureEventType> {
         );
       }
 
-      for (let next of (metadata as Node | JointMetadata).nexts || []) {
+      for (let next of (metadata as SingleNode | JointMetadata).nexts || []) {
         if (next.type === 'joint') {
           joints.push(
             buildTreeNode(
@@ -261,8 +265,8 @@ async function nodeHandler(
   type: 'onUpdate',
   definition: Flow,
   plugins: IPlugin[],
-  currentNode: Node,
-  nextNode: Node,
+  currentNode: SingleNode,
+  nextNode: SingleNode,
 ): Promise<boolean> {
   let toPropagation = true;
   let toExecuteDefault = true;

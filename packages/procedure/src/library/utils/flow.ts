@@ -14,12 +14,12 @@ export function requireFlow(definition: Procedure, flowId: FlowId): Flow {
 
 export function createFlow({
   id = createId()!,
-  nodes = [],
+  starts: nodes = [],
   ...partial
 }: Partial<Flow> = {}): Flow {
   return {
     id,
-    nodes,
+    starts: nodes,
     ...partial,
   };
 }

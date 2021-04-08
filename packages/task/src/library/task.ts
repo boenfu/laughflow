@@ -3,9 +3,9 @@ import {
   Flow,
   FlowId,
   Leaf,
-  Node,
   NodeId,
   Procedure as ProcedureDefinition,
+  SingleNode,
 } from '@magicflow/core';
 import {Procedure} from '@magicflow/procedure';
 import {createId} from '@magicflow/procedure/utils';
@@ -170,7 +170,7 @@ export class TaskNode {
 
   constructor(
     public task: Task,
-    readonly definition: Node,
+    readonly definition: SingleNode,
     public metadata: TaskNodeMetadata,
     public inputs: Dict<any>,
   ) {}
@@ -384,7 +384,7 @@ export function initTask({
     start: initFlow(flowsMap.get(start)!),
   };
 
-  function initFlow({id, nodes: nodeIds}: Flow): TaskFlowMetadata {
+  function initFlow({id, starts: nodeIds}: Flow): TaskFlowMetadata {
     let nodes: (TaskNodeMetadata | TaskBranchesNodeMetadata)[] = [];
 
     for (let nodeId of nodeIds) {
@@ -414,7 +414,7 @@ export function initTask({
     type,
     nexts: nextIds,
     leaves,
-  }: Node): TaskNodeMetadata {
+  }: SingleNode): TaskNodeMetadata {
     let nexts: (TaskNodeMetadata | TaskBranchesNodeMetadata)[] = [];
 
     for (let nextId of nextIds) {
@@ -459,7 +459,7 @@ export function initTask({
     return {
       ...initNode({
         ...node,
-        type: 'node',
+        type: 'singleNode',
       }),
       type: 'branchesNode',
       flows,
@@ -495,7 +495,10 @@ export function upgradeTask(
 
   return task;
 
-  function checkFlow({id, nodes: nodeIds}: Flow, flow: TaskFlowMetadata): void {
+  function checkFlow(
+    {id, starts: nodeIds}: Flow,
+    flow: TaskFlowMetadata,
+  ): void {
     let definitionIdToNodesMap = new Map(
       flow.nodes.map(node => [node.definition, node]),
     );
@@ -528,7 +531,7 @@ export function upgradeTask(
   }
 
   function checkNode(
-    {id, type, nexts: nextIds, leaves}: Node,
+    {id, type, nexts: nextIds, leaves}: SingleNode,
     node: TaskNodeMetadata,
   ): void {
     let definitionIdToNodesMap = new Map(
@@ -593,7 +596,7 @@ function getFlowDefinition(task: Task, flow: FlowId): Flow | undefined {
   return task.procedure.flowsMap.get(flow);
 }
 
-function getNodeDefinition(task: Task, id: NodeId): Node | undefined {
+function getNodeDefinition(task: Task, id: NodeId): SingleNode | undefined {
   let node = task.procedure.nodesMap.get(id);
   return node?.type === 'node' ? node : undefined;
 }

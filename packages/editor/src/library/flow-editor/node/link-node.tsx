@@ -1,4 +1,4 @@
-import {Node, TrunkRef} from '@magicflow/core';
+import {SingleNode, TrunkRef} from '@magicflow/core';
 import {Trash} from '@magicflow/icons';
 import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
@@ -8,7 +8,7 @@ import {EditorContext} from '../../context';
 
 export interface LinkNodeProps {
   prev: TrunkRef;
-  node: Node;
+  node: SingleNode;
   className?: string;
   readOnly?: boolean;
   style?: CSSProperties;

@@ -6,5 +6,5 @@ export type FlowId = Nominal<string, 'flow:id'>;
 
 export interface Flow extends Magicflow.FlowExtension {
   id: FlowId;
-  nodes: NodeId[];
+  starts: NodeId[];
 }

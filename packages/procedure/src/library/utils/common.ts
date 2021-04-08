@@ -11,7 +11,7 @@ export function createId<TId>(): TId {
 export function createEmptyProcedure(): Procedure {
   let flow: Flow = {
     id: createId(),
-    nodes: [],
+    starts: [],
   };
 
   return {

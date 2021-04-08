@@ -1,21 +1,26 @@
 import {Nominal} from 'tslang';
 
 import {FlowId} from './flow';
-import {Leaf} from './leaf';
+
+export interface NodeRef {
+  type: NodeType;
+  id: NodeId;
+}
 
 export type NodeId = Nominal<string, 'node:id'>;
 
-export type NodeType = 'node' | 'branchesNode';
+export type NodeType = 'singleNode' | 'branchesNode';
 
 export interface INode {
-  type: NodeType;
   id: NodeId;
+  type: NodeType;
   nexts: NodeId[];
-  leaves?: Leaf[];
 }
 
-export interface Node extends Magicflow.NodeExtension, INode {
-  type: 'node';
+export type Node = SingleNode | BranchesNode;
+
+export interface SingleNode extends Magicflow.SingleNodeExtension, INode {
+  type: 'singleNode';
 }
 
 export interface BranchesNode extends Magicflow.BranchesNodeExtension, INode {

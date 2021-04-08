@@ -7,7 +7,6 @@ test('copy params', () => {
   expect(
     ProcedureUtil.copyNode({
       ...ProcedureUtil.createNode(),
-      leaves: [ProcedureUtil.createLeaf()],
     }),
   ).toBeTruthy();
 });
@@ -30,7 +29,7 @@ test('requireNode error', () => {
         ProcedureUtil.createEmptyProcedure(),
       )[0],
       node1,
-      'node',
+      'singleNode',
     ),
-  ).toThrow(`Not found node definition by id 'node1'`);
+  ).toThrow(`Not found singleNode definition by id 'node1'`);
 });

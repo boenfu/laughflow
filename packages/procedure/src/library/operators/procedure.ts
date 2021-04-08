@@ -1,4 +1,4 @@
-import {BranchesNode, Flow, FlowId, Node, NodeId} from '@magicflow/core';
+import {BranchesNode, Flow, FlowId, NodeId, SingleNode} from '@magicflow/core';
 import {produce} from 'immer';
 
 import {Operator} from './common';
@@ -9,7 +9,7 @@ import {Operator} from './common';
 export function purge(): Operator {
   return definition =>
     produce(definition, definition => {
-      let unusedNodeMap = new Map<NodeId, Node | BranchesNode>(
+      let unusedNodeMap = new Map<NodeId, SingleNode | BranchesNode>(
         definition.nodes.map(node => [node.id, node]),
       );
 
@@ -17,7 +17,7 @@ export function purge(): Operator {
         definition.flows.map(flow => [flow.id, flow]),
       );
 
-      let pendingCheckNodes = [...unusedFlowMap.get(definition.start)!.nodes];
+      let pendingCheckNodes = [...unusedFlowMap.get(definition.start)!.starts];
 
       unusedFlowMap.delete(definition.start);
 
@@ -43,7 +43,7 @@ export function purge(): Operator {
 
           unusedFlowMap.delete(flowId);
 
-          pendingCheckNodes.push(...flow!.nodes);
+          pendingCheckNodes.push(...flow!.starts);
         }
       }
 

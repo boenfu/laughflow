@@ -15,7 +15,7 @@ let definition: Flow = {
   id: 'procedure1' as FlowId,
   metadata: {},
   joints: [],
-  nodes: [
+  starts: [
     {
       id: startId,
       nexts: [

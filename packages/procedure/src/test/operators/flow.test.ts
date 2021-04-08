@@ -83,7 +83,7 @@ test('addFlowStart', () => {
     compose([
       addFlowStart(procedure.start, node1),
       addFlowStart(procedure.start, node1),
-    ])(procedure).flows[0].nodes.length,
+    ])(procedure).flows[0].starts.length,
   ).toBe(2);
 });
 
@@ -92,7 +92,7 @@ test('removeFlowStart', () => {
     compose([
       addFlowStart(procedure.start, node1),
       removeFlowStart(procedure.start, node1),
-    ])(procedure).flows[0].nodes.length,
+    ])(procedure).flows[0].starts.length,
   ).toBe(0);
 });
 
@@ -108,6 +108,6 @@ test('removeAllFlowStart', () => {
       addFlowStart(procedure.start, node1),
       addFlowStart(procedure.start, node1),
       removeAllFlowStart(procedure.start, node1),
-    ])(procedure).flows[0].nodes.length,
+    ])(procedure).flows[0].starts.length,
   ).toBe(0);
 });

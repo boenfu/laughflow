@@ -4,7 +4,7 @@ import React from 'react';
 
 declare global {
   namespace Magicflow {
-    interface NodeExtension {
+    interface SingleNodeExtension {
       assignment?: boolean;
     }
   }

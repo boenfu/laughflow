@@ -1,4 +1,10 @@
-import {BranchesNode, Node, NodeId, NodeType, Procedure} from '@magicflow/core';
+import {
+  BranchesNode,
+  NodeId,
+  NodeType,
+  Procedure,
+  SingleNode,
+} from '@magicflow/core';
 
 import {createId} from './common';
 
@@ -7,8 +13,8 @@ export function requireNode<TNodeType extends NodeType>(
   nodeId: NodeId,
   type?: TNodeType,
 ): TNodeType extends NodeType
-  ? Extract<Node | BranchesNode, {type: TNodeType}>
-  : Node | BranchesNode {
+  ? Extract<SingleNode | BranchesNode, {type: TNodeType}>
+  : SingleNode | BranchesNode {
   let node = definition.nodes.find(node => node.id === nodeId);
 
   if (!node) {
@@ -26,10 +32,10 @@ export function createNode({
   id = createId()!,
   nexts = [],
   ...partial
-}: Partial<Node> = {}): Node {
+}: Partial<SingleNode> = {}): SingleNode {
   return {
     id,
-    type: 'node',
+    type: 'singleNode',
     nexts,
     ...partial,
   };
@@ -50,10 +56,9 @@ export function createBranchesNode({
   };
 }
 
-export function copyNode(node: Node): Node {
+export function copyNode(node: SingleNode): SingleNode {
   return {
     ...node,
     id: createId(),
-    leaves: node.leaves?.map(leaf => ({...leaf, id: createId()})),
   };
 }

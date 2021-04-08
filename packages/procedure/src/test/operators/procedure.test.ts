@@ -4,7 +4,6 @@ import {
   addFlow,
   addFlowStart,
   addNode,
-  addNodeLeaves,
   addNodeNexts,
   compose,
   out,
@@ -15,7 +14,6 @@ import {
   createBranchesNode,
   createEmptyProcedure,
   createFlow,
-  createLeaf,
   createNode,
 } from '../../library/utils/namespace';
 
@@ -25,10 +23,7 @@ test('purge', () => {
   procedure = compose([
     out(addNode(createBranchesNode()), branchesNode =>
       out(addFlow(branchesNode.id, createFlow()), flow =>
-        out(addNode(createNode()), node => [
-          addFlowStart(flow.id, node.id),
-          addNodeLeaves(node.id, [createLeaf()]),
-        ]),
+        out(addNode(createNode()), node => [addFlowStart(flow.id, node.id)]),
       ),
     ),
     out(addNode(createNode()), node => [
