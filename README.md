@@ -152,3 +152,44 @@ console.log(a);
 粒度细的函数 ->
 modifier ->
 operator
+
+// 初始化任务就把 start flow 创建好，
+
+plugin ableToBeStart 'broken' | 'ignored'
+
+// next 的时候就调所有插件的
+plugin ableToBeDone boolean
+
+// 要更新 task 直接就 update
+
+// 父任务 / 标签 有更新
+
+{super: {
+stage: 'done',
+node: NodeId
+}}
+
+触发一次 next
+两次 next 间如无任何资源或相关资源更新，应无变化
+
+// 子任务
+
+// 条件
+
+// 分配待接收
+
+// 流程项未完成
+
+// 未点完成
+
+// 审批被拒绝
+
+// flow stage
+没有 next 可以执行的
+
+// 获取 进行中的节点，可开始的节点，可完成的节点。
+
+////// 描述
+
+上一个节点完成就会创建下一个的 metadata
+任务创建时就会把所有边走一次（有循环的也是只会走第一次），生成 metadata

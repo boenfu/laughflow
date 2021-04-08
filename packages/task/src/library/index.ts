@@ -5,9 +5,11 @@ declare global {
   namespace Magicflow {
     interface TaskMetadataExtension {}
 
+    interface TaskFlowMetadataExtension {}
+
     interface TaskNodeMetadataExtension {}
 
-    interface TaskJointMetadataExtension {}
+    interface TaskBranchesNodeMetadataExtension {}
 
     interface TaskLeafMetadataExtension {}
   }
