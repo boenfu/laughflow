@@ -5,8 +5,8 @@
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "dependencies": {
     "@magicflow/core": "*",
-    "@magicflow/editor": "*",
-    "@magicflow/icons": "*",
-    "tslib": "^2.1.0"
+    "@magicflow/procedure": "*",
+    "@magicflow/task": "*",
+    "tslib": "^2.2.0"
   }
 }

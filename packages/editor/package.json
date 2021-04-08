@@ -8,6 +8,6 @@
     "@magicflow/core": "*",
     "@magicflow/icons": "*",
     "@magicflow/procedure": "*",
-    "tslib": "^2.1.0"
+    "tslib": "^2.2.0"
   }
 }
