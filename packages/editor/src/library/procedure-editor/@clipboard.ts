@@ -1,36 +1,51 @@
-export interface ClipboardValue<TValue> {
+export interface ClipboardValue<TValue, TOrigin = any> {
   type: 'clip' | 'copy';
   value: TValue;
+  origin?: TOrigin;
 }
 
-export class Clipboard<TValue> {
-  constructor(private target: ClipboardValue<TValue> | undefined = undefined) {}
+export class Clipboard<TValue, TOrigin = any> {
+  constructor(
+    private target: ClipboardValue<TValue, TOrigin> | undefined = undefined,
+  ) {}
 
-  clip(value: TValue): void {
-    this.target = {
+  clip(value: TValue, origin?: TOrigin): void {
+    this.setTarget({
       type: 'clip',
       value,
-    };
+      origin,
+    });
   }
 
-  copy(value: TValue): void {
-    this.target = {
+  copy(value: TValue, origin?: TOrigin): void {
+    this.setTarget({
       type: 'copy',
       value,
-    };
+      origin,
+    });
   }
 
-  paste(): TValue | undefined {
-    let {type, value} = this.target || {};
+  paste(): ClipboardValue<TValue, TOrigin> | undefined {
+    let target = this.target;
+
+    if (!target) {
+      return undefined;
+    }
+
+    let {type, value} = target;
 
     if (type === 'clip') {
       this.clear();
     }
 
-    return value;
+    return {type, value};
   }
 
   clear(): void {
-    this.target = undefined;
+    this.setTarget(undefined);
+  }
+
+  private setTarget(target: ClipboardValue<TValue, TOrigin> | undefined): void {
+    this.target = target;
   }
 }

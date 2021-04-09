@@ -1,4 +1,4 @@
-import {Procedure} from '@magicflow/core';
+import {NodeId, Procedure} from '@magicflow/core';
 import {Operator} from '@magicflow/procedure/operators';
 import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
@@ -12,7 +12,7 @@ type ProcedureEventType = 'update' | 'config';
 export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   readonly undoStack = new UndoStack();
 
-  private clipboard = new Clipboard();
+  private clipboard = new Clipboard<NodeId, NodeId>();
 
   get procedure(): Procedure {
     return this._procedure;

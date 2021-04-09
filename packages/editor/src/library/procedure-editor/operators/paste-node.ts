@@ -1,53 +1,70 @@
-import {Node, NodeId} from '@magicflow/core';
-// import {
-//   OperatorFunction,
-//   addNode as _addNode,
-//   addNodeNexts,
-//   out,
-// } from '@magicflow/procedure/operators';
+import {NodeId} from '@magicflow/core';
+import {
+  Operator,
+  OperatorFunction,
+  addNodeNexts,
+  compose,
+  removeNodeNext,
+} from '@magicflow/procedure/operators';
 
 import {Clipboard} from '../@clipboard';
 
-// import {insertNodeBeforeNexts} from './@insert-node-before-nexts';
-// import {insertNodeBetweenNodes} from './@insert-node-between-nodes';
+import {insertNodeBeforeNexts} from './@insert-node-before-nexts';
+import {insertNodeBetweenNodes} from './@insert-node-between-nodes';
 
 export interface PasteNodeOperatorParam {
-  from?: NodeId;
+  from: NodeId;
   to?: NodeId;
-  clipboard: Clipboard<Node>;
+  clipboard: Clipboard<NodeId, NodeId>;
 }
 
-// const pasteNode: (clipboard: Clipboard<Node>) => Node = clipboard =>
-//   clipboard.paste()!;
+const getPasteNode: OperatorFunction<
+  [Clipboard<NodeId, NodeId>, (value: NodeId) => Operator]
+> = (clipboard, callback) => {
+  let pasteTarget = clipboard.paste();
 
-// /**
-//  * 在节点之后粘贴节点
-//  * @param param0
-//  * @returns
-//  */
-// export const pasteNode: OperatorFunction<[PasteNodeOperatorParam]> = ({
-//   from,
-//   clipboard,
-// }) => addNodeNexts(from, [_pasteNode(clipboard).id]);
+  if (!pasteTarget) {
+    // 没有剪切和复制的对象, 视为空操作
+    return compose([]);
+  }
 
-// /**
-//  * 在两个节点间粘贴节点
-//  * @param param0
-//  * @returns
-//  */
-// export const pasteNodeBetweenNodes: OperatorFunction<
-//   [Required<PasteNodeOperatorParam>]
-// > = ({from, to, type}) =>p
-//   out(_pasteNode(type), ({id}) =>
-//     insertNodeBetweenNodes({from, to, target: id}),
-//   );
+  let operators: Operator[] = [];
+  let {type, origin, value} = pasteTarget;
 
-// /**
-//  * 在节点之后粘贴节点并迁移 nexts
-//  * @param param0
-//  * @returns
-//  */
-// export const pasteNodeBeforeNexts: OperatorFunction<
-//   [PasteNodeOperatorParam]
-// > = ({from, type}) =>
-//   out(_pasteNode(type), ({id}) => insertNodeBeforeNexts({from, to: id}));
+  if (type === 'clip' && origin) {
+    operators.push(removeNodeNext(origin, value));
+  }
+
+  operators.push(callback(value));
+
+  return compose(operators);
+};
+
+/**
+ * 在节点之后粘贴节点
+ * @param param0
+ * @returns
+ */
+export const pasteNode: OperatorFunction<[PasteNodeOperatorParam]> = ({
+  from,
+  clipboard,
+}) => getPasteNode(clipboard, node => addNodeNexts(from, [node]));
+
+/**
+ * 在两个节点间粘贴节点
+ * @param param0
+ * @returns
+ */
+export const pasteNodeBetweenNodes: OperatorFunction<
+  [Required<PasteNodeOperatorParam>]
+> = ({from, to, clipboard}) =>
+  getPasteNode(clipboard, insertNodeBetweenNodes({from, to}));
+
+/**
+ * 在节点之后粘贴节点并迁移 nexts
+ * @param param0
+ * @returns
+ */
+export const pasteNodeBeforeNexts: OperatorFunction<
+  [PasteNodeOperatorParam]
+> = ({from, clipboard}) => getPasteNode(clipboard, insertNodeBeforeNexts(from));

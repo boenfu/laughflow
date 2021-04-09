@@ -6,13 +6,8 @@ import {
   replaceNodeNext,
 } from '@magicflow/procedure/operators';
 
-export const insertNodeBetweenNodes: OperatorFunction<
-  [
-    {
-      from: NodeId;
-      to: NodeId;
-      target: NodeId;
-    },
-  ]
-> = ({from, to, target}) =>
+export const insertNodeBetweenNodes: ({}: {
+  from: NodeId;
+  to: NodeId;
+}) => OperatorFunction<[NodeId]> = ({from, to}) => target =>
   compose([replaceNodeNext(from, to, target), addNodeNexts(target, [to])]);

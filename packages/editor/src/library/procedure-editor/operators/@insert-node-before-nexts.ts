@@ -6,12 +6,7 @@ import {
   replaceNodeNexts,
 } from '@magicflow/procedure/operators';
 
-export const insertNodeBeforeNexts: OperatorFunction<
-  [
-    {
-      from: NodeId;
-      to: NodeId;
-    },
-  ]
-> = ({from, to}) =>
-  out(replaceNodeNexts(from, [to]), nexts => addNodeNexts(to, nexts));
+export const insertNodeBeforeNexts: (
+  from: NodeId,
+) => OperatorFunction<[NodeId]> = from => target =>
+  out(replaceNodeNexts(from, [target]), nexts => addNodeNexts(target, nexts));

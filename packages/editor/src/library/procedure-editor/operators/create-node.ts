@@ -1,5 +1,6 @@
-import {Node, NodeId, NodeType} from '@magicflow/core';
+import {NodeId, NodeType} from '@magicflow/core';
 import {
+  Operator,
   OperatorFunction,
   addNode as _addNode,
   addNodeNexts,
@@ -19,8 +20,15 @@ export interface CreateNodeOperatorParam {
   to?: NodeId;
 }
 
-const addNode: OperatorFunction<[NodeType], [Node]> = type =>
-  _addNode(type === 'singleNode' ? createNodeHelper() : createBranchesNode());
+const addNode: OperatorFunction<[NodeType, (value: NodeId) => Operator]> = (
+  type,
+  callback,
+) => {
+  return out(
+    _addNode(type === 'singleNode' ? createNodeHelper() : createBranchesNode()),
+    node => callback(node.id),
+  );
+};
 
 /**
  * 在节点之后新增节点
@@ -30,7 +38,7 @@ const addNode: OperatorFunction<[NodeType], [Node]> = type =>
 export const createNode: OperatorFunction<[CreateNodeOperatorParam]> = ({
   from,
   type,
-}) => out(addNode(type), ({id}) => addNodeNexts(from, [id]));
+}) => addNode(type, id => addNodeNexts(from, [id]));
 
 /**
  * 在两个节点间新增节点
@@ -39,8 +47,7 @@ export const createNode: OperatorFunction<[CreateNodeOperatorParam]> = ({
  */
 export const createNodeBetweenNodes: OperatorFunction<
   [Required<CreateNodeOperatorParam>]
-> = ({from, to, type}) =>
-  out(addNode(type), ({id}) => insertNodeBetweenNodes({from, to, target: id}));
+> = ({from, to, type}) => addNode(type, insertNodeBetweenNodes({from, to}));
 
 /**
  * 在节点之后新增节点并迁移 nexts
@@ -49,5 +56,4 @@ export const createNodeBetweenNodes: OperatorFunction<
  */
 export const createNodeBeforeNexts: OperatorFunction<
   [CreateNodeOperatorParam]
-> = ({from, type}) =>
-  out(addNode(type), ({id}) => insertNodeBeforeNexts({from, to: id}));
+> = ({from, type}) => addNode(type, insertNodeBeforeNexts(from));
