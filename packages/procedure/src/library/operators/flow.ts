@@ -1,5 +1,4 @@
 import {Flow, FlowId, NodeId} from '@magicflow/core';
-import getOrCreate from 'get-or-create';
 import {produce} from 'immer';
 import {cloneDeep} from 'lodash-es';
 
@@ -19,8 +18,8 @@ export function addFlow(branchesNodeId: NodeId, flow: Flow): Operator<[Flow]> {
           'branchesNode',
         );
 
-        getOrCreate(definition).property('flows', []).exec().push(flow);
-        getOrCreate(branchesNode).property('flows', []).exec().push(flow.id);
+        definition.flows.push(flow);
+        branchesNode.flows.push(flow.id);
       }),
       flow,
     ];

@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@magicflow/core": "*",
-    "get-or-create": "^0.1.2",
     "immer": "^8.0.0",
     "lodash-es": "^4.17.20",
     "memorize-decorator": "^0.2.4",

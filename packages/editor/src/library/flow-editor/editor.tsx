@@ -1,27 +1,18 @@
-import {Leaf, LeafId, Ref} from '@magicflow/core';
+import {ProcedureFlow, ProcedureTreeNode} from '@magicflow/procedure';
 import {useCreation, useUpdate} from 'ahooks';
 import classNames from 'classnames';
 import React, {FC, Fragment, ReactNode, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
-import {ConditionPlugin} from '../condition';
+// import {ConditionPlugin} from '../condition';
 import {EditorContext} from '../context';
-import {Editor, ProcedureTreeNode} from '../procedure-editor/procedure-editor';
+import {ProcedureEditor} from '../procedure-editor';
 
-import {Footer} from './@footer';
+// import {Footer} from './@footer';
 import {Navigation} from './@navigation';
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from './connection-line';
-import {EditorProps} from './editor.doc';
-import {Joint} from './joint';
-import {Leaf} from './leaf';
-import {LinkNode, SingleNode} from './node';
-
-const PlaceholderLeafId = 'placeholder' as LeafId;
-
-const PlaceholderLeaf: Leaf = {
-  type: 'done',
-  id: PlaceholderLeafId,
-};
+import {EditorProps as FlowEditorProps} from './editor.doc';
+import {LinkNode, Node} from './node';
 
 declare global {
   namespace Magicflow {
@@ -57,17 +48,14 @@ const Row = styled.div`
   }
 `;
 
-export const FlowEditor: FC<EditorProps> = ({
+export const FlowEditor: FC<FlowEditorProps> = ({
   definition,
-  plugins,
+  // plugins,
   onConfig,
 }) => {
   // eslint-disable-next-line no-null/no-null
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const editor = useCreation(
-    () => new Editor(definition, [...(plugins || []), new ConditionPlugin()]),
-    [],
-  );
+  const editor = useCreation(() => new ProcedureEditor(definition), []);
   const reRender = useUpdate();
 
   const onFullScreenToggle = (): void => {
@@ -78,16 +66,15 @@ export const FlowEditor: FC<EditorProps> = ({
     }
   };
 
-  const onContentClick = (): void => {
-    if (editor.activeTrunk) {
-      editor.setActiveTrunk(undefined);
-    }
-  };
+  // const onContentClick = (): void => {
+  //   if (editor.activeTrunk) {
+  //     editor.setActiveTrunk(undefined);
+  //   }
+  // };
 
   useEffect(() => {
     editor.on('update', () => {
       reRender();
-      console.info(editor.procedure);
     });
 
     if (onConfig) {
@@ -97,45 +84,26 @@ export const FlowEditor: FC<EditorProps> = ({
   }, []);
 
   function renderNode(node: ProcedureTreeNode): ReactNode {
-    if (isTypeTreeNode(node, 'leaf')) {
-      return <Leaf prev={node.prev!.ref} leaf={node.metadata} />;
-    }
-
     let nexts = node.nexts;
 
-    if (nexts === false) {
-      if (isTypeTreeNode(node, 'node')) {
-        return <LinkNode prev={node.prev!.ref} node={node.metadata} />;
-      }
-
-      if (isTypeTreeNode(node, 'joint')) {
-        return <Joint prev={node.prev!.ref} joint={node.metadata} />;
-      }
-
-      return <></>;
-    } else if (!nexts.length) {
-      // placeholder leaf
-      nexts = [
-        {
-          prev: node,
-          ref: {
-            type: 'leaf',
-            id: PlaceholderLeafId,
-          },
-          metadata: PlaceholderLeaf,
-          nexts: false,
-        },
-      ];
+    if (node.left) {
+      return (
+        <LinkNode
+          key={`${node.prev?.id}-${node.id}`}
+          prev={node.prev?.id}
+          node={node.definition}
+        />
+      );
     }
 
     let children = (
       <Row className={classNames({multi: nexts.length > 1})}>
         {nexts.map((next, index, array) => {
           return (
-            <Fragment key={`node:${node.ref.id}-${next.ref.id}`}>
+            <Fragment key={`${node.id}-${next.id}-${index}`}>
               <ConnectionLine
-                node={node.ref}
-                next={next.ref}
+                node={node.id}
+                next={next.id}
                 first={index === 0 && array.length > 1}
                 last={index === array.length - 1 && array.length > 1}
               />
@@ -147,17 +115,17 @@ export const FlowEditor: FC<EditorProps> = ({
     );
 
     return (
-      <Fragment>
-        {isTypeTreeNode(node, 'node') ? (
-          <Node prev={node.prev?.ref} node={node.metadata}>
-            {children}
-          </Node>
-        ) : (
-          <Joint prev={node.prev!.ref} joint={node.metadata}>
-            {children}
-          </Joint>
-        )}
-      </Fragment>
+      <Node key={`${node.prev?.id}-${node.id}`} node={node}>
+        {children}
+      </Node>
+    );
+  }
+
+  function renderFlow(flow: ProcedureFlow): ReactNode {
+    return (
+      <div className="flow" key={flow.definition.id}>
+        {flow.starts.map(renderNode)}
+      </div>
     );
   }
 
@@ -165,19 +133,9 @@ export const FlowEditor: FC<EditorProps> = ({
     <Wrapper ref={wrapperRef}>
       <EditorContext.Provider value={{editor}}>
         <Navigation onFullScreenToggle={onFullScreenToggle} />
-        <Content onClick={onContentClick}>
-          {renderNode(editor.procedureTreeNode)}
-        </Content>
-        <Footer />
-        {/* <ConditionModal /> */}
+        <Content>{renderFlow(editor.treeView)}</Content>
+        {/* <Footer /> */}
       </EditorContext.Provider>
     </Wrapper>
   );
 };
-
-function isTypeTreeNode<TType extends Ref['type']>(
-  node: ProcedureTreeNode,
-  type: TType,
-): node is Extract<ProcedureTreeNode, {ref: {type: TType}}> {
-  return node.ref.type === type;
-}

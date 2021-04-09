@@ -1,4 +1,4 @@
-import {SingleNode, TrunkRef} from '@magicflow/core';
+import {Node, NodeId} from '@magicflow/core';
 import {Trash} from '@magicflow/icons';
 import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
@@ -7,8 +7,8 @@ import {TooltipActions} from '../../components';
 import {EditorContext} from '../../context';
 
 export interface LinkNodeProps {
-  prev: TrunkRef;
-  node: SingleNode;
+  prev: NodeId | undefined;
+  node: Node;
   className?: string;
   readOnly?: boolean;
   style?: CSSProperties;
@@ -40,11 +40,11 @@ const Content = styled.div`
 export const LinkNode: FC<LinkNodeProps> = ({className, style, node, prev}) => {
   const {editor} = useContext(EditorContext);
 
-  const onDisconnectNode = (): void =>
-    void editor.procedure.disconnectNode(prev, {
-      type: 'node',
-      id: node.id,
-    });
+  const onDisconnectNode = (): void => {};
+  // void editor.procedure.disconnectNode(prev, {
+  //   type: 'node',
+  //   id: node.id,
+  // });
 
   return (
     <TooltipActions
@@ -58,7 +58,9 @@ export const LinkNode: FC<LinkNodeProps> = ({className, style, node, prev}) => {
       ]}
     >
       <Container style={style}>
-        <Content className={className}>{node?.displayName || '-'}</Content>
+        <Content className={className}>
+          {node.type === 'singleNode' ? node.displayName || '-' : 'branch'}
+        </Content>
       </Container>
     </TooltipActions>
   );

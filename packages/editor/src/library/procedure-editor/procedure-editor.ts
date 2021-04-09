@@ -1,4 +1,5 @@
-import {NodeId, Procedure} from '@magicflow/core';
+import {NodeId, Procedure as ProcedureDefinition} from '@magicflow/core';
+import {Procedure, ProcedureFlow} from '@magicflow/procedure';
 import {Operator} from '@magicflow/procedure/operators';
 import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
@@ -14,22 +15,37 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
 
   private clipboard = new Clipboard<NodeId, NodeId>();
 
-  get procedure(): Procedure {
-    return this._procedure;
+  nodeRenderDescriptor: {
+    before?: any;
+    after?: any;
+    headLeft?: any;
+    headRight?: any;
+    footer?: any;
+    body?: any;
+  } = {};
+
+  get definition(): ProcedureDefinition {
+    return this._definition;
   }
 
-  set procedure(procedure: Procedure) {
-    this._procedure = procedure;
+  set definition(definition: ProcedureDefinition) {
+    this._definition = definition;
     this.emit('update');
   }
 
-  constructor(private _procedure: Procedure = createEmptyProcedure()) {
+  get treeView(): ProcedureFlow {
+    return new Procedure(this.definition).treeView;
+  }
+
+  constructor(
+    private _definition: ProcedureDefinition = createEmptyProcedure(),
+  ) {
     super();
   }
 
   edit(operator: Operator): void {
-    this.procedure = produce(
-      this.procedure,
+    this.definition = produce(
+      this.definition,
       operator,
       (patches, inversePatches) =>
         this.undoStack.update(patches, inversePatches),
@@ -37,10 +53,10 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   }
 
   undo(): void {
-    this.procedure = this.undoStack.undo(this.procedure);
+    this.definition = this.undoStack.undo(this.definition);
   }
 
   redo(): void {
-    this.procedure = this.undoStack.redo(this.procedure);
+    this.definition = this.undoStack.redo(this.definition);
   }
 }
