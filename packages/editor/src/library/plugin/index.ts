@@ -1,10 +1,10 @@
-import {Flow, Leaf, SingleNode} from '@magicflow/core';
+import {Procedure, SingleNode} from '@magicflow/core';
 import {ComponentType, ReactNode} from 'react';
 
-import {Editor} from '../procedure-editor/procedure-editor';
+import {ProcedureEditor} from '../procedure-editor';
 
 export interface IPluginEvent {
-  definition: Flow;
+  definition: Procedure;
 
   stopPropagation(): void;
   preventDefault(): void;
@@ -19,15 +19,9 @@ export type PluginNodeEventHandler = (
   event: PluginNodeEvent,
 ) => Promise<void> | void;
 
-export interface LeafPluginComponentProps {
-  leaf: Leaf;
-}
-
-export type LeafPluginComponent = ComponentType<LeafPluginComponentProps>;
-
 export interface NodePluginComponentProps {
   node: SingleNode;
-  editor: Editor;
+  editor: ProcedureEditor;
   prevChildren?: ReactNode;
   onChange?(next: SingleNode): void;
 }
@@ -55,12 +49,8 @@ export interface NodePluginRenderObject<TConfigExtraProps = {}> {
   config?: NodePluginComponent<TConfigExtraProps>;
 }
 
-export interface INodePlugin<TConfigExtraProps = {}> {
-  render: NodePluginRenderObject<TConfigExtraProps>;
-  onUpdate?: PluginNodeEventHandler;
-}
-
 export interface IPlugin<TConfigExtraProps = {}> {
   name: string;
-  node?: INodePlugin<TConfigExtraProps>;
+  render: NodePluginRenderObject<TConfigExtraProps>;
+  onUpdate?: PluginNodeEventHandler;
 }
