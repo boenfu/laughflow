@@ -1,6 +1,6 @@
 import {Patch, applyPatches} from 'immer';
 
-export class Stack {
+export class UndoStack {
   constructor(
     private undoes: Patch[][] = [],
     private redoes: Patch[][] = [],
@@ -15,9 +15,9 @@ export class Stack {
     return !!this.redoes?.[this.cursor];
   }
 
-  undo<TSource>(source: TSource): TSource | undefined {
+  undo<TSource>(source: TSource): TSource {
     if (this.cursor === this.redoes.length - 1) {
-      return undefined;
+      return source;
     }
 
     this.cursor += 1;
@@ -25,9 +25,9 @@ export class Stack {
     return applyPatches(source, this.undoes[this.cursor]);
   }
 
-  redo<TSource>(source: TSource): TSource | undefined {
+  redo<TSource>(source: TSource): TSource {
     if (this.cursor === -1) {
-      return undefined;
+      return source;
     }
 
     this.cursor -= 1;

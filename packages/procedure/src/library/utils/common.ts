@@ -2,7 +2,7 @@ import {Flow, Procedure} from '@magicflow/core';
 import {castArray} from 'lodash-es';
 import {nanoid} from 'nanoid';
 
-import {ProcedureModifier} from '../operators';
+import {ProcedureOperator} from '../operators';
 
 export function createId<TId>(): TId {
   return (nanoid(8) as unknown) as TId;
@@ -23,8 +23,8 @@ export function createEmptyProcedure(): Procedure {
 }
 
 export type ProcedureChain = {
-  [TKey in keyof typeof ProcedureModifier]: (
-    ...args: Parameters<typeof ProcedureModifier[TKey]>
+  [TKey in keyof typeof ProcedureOperator]: (
+    ...args: Parameters<typeof ProcedureOperator[TKey]>
   ) => ProcedureChain;
 } & {
   exec(definition: Procedure): Procedure;
@@ -50,7 +50,7 @@ export function chain(): ProcedureChain {
 
         return (definition: Procedure) => {
           for (let [fnName, params] of target._fns) {
-            let fn = ((ProcedureModifier as unknown) as {
+            let fn = ((ProcedureOperator as unknown) as {
               [key in string]: (...args: any[]) => any;
             })[String(fnName)];
 

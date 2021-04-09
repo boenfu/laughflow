@@ -1,4 +1,4 @@
-import {BranchesNode, NodeId, SingleNode} from '@magicflow/core';
+import {Node, NodeId} from '@magicflow/core';
 import produce from 'immer';
 import {cloneDeep} from 'lodash-es';
 
@@ -6,9 +6,7 @@ import {ProcedureUtil} from '../utils';
 
 import {Operator} from './common';
 
-export function addNode<TNode extends SingleNode | BranchesNode>(
-  node: TNode,
-): Operator<[TNode]> {
+export function addNode<TNode extends Node>(node: TNode): Operator<[TNode]> {
   return definition => {
     node = cloneDeep(node);
 
@@ -19,7 +17,7 @@ export function addNode<TNode extends SingleNode | BranchesNode>(
   };
 }
 
-export function updateNode(node: SingleNode | BranchesNode): Operator {
+export function updateNode(node: Node): Operator {
   return definition => {
     let nextNode = cloneDeep(node);
 
@@ -37,15 +35,13 @@ export function updateNode(node: SingleNode | BranchesNode): Operator {
   };
 }
 
-export function removeNode(
-  nodeId: NodeId,
-): Operator<[SingleNode | BranchesNode]> {
+export function removeNode(nodeId: NodeId): Operator<[Node]> {
   return definition => {
-    let removedNode!: SingleNode | BranchesNode;
+    let removedNode!: Node;
 
     return [
       produce(definition, definition => {
-        let nodes: (SingleNode | BranchesNode)[] = [];
+        let nodes: Node[] = [];
 
         for (let node of definition.nodes) {
           if (node.id === nodeId) {
@@ -64,12 +60,40 @@ export function removeNode(
   };
 }
 
-export function replaceNodeNexts(nodeId: NodeId, nexts: NodeId[]): Operator {
-  return definition =>
+export function replaceNodeNexts(
+  nodeId: NodeId,
+  nexts: NodeId[],
+): Operator<[NodeId[]]> {
+  let oldNexts: NodeId[];
+
+  return definition => [
     produce(definition, definition => {
-      ProcedureUtil.requireNode(definition, nodeId).nexts = nexts.map(
+      let node = ProcedureUtil.requireNode(definition, nodeId);
+      oldNexts = [...node.nexts];
+
+      node.nexts = nexts.map(
         next => ProcedureUtil.requireNode(definition, next).id,
       );
+    }),
+    oldNexts,
+  ];
+}
+
+export function replaceNodeNext(
+  nodeId: NodeId,
+  nextId: NodeId,
+  replaceId: NodeId,
+): Operator {
+  return definition =>
+    produce(definition, definition => {
+      let node = ProcedureUtil.requireNode(definition, nodeId);
+      let nextIndex = node.nexts.findIndex(next => next === nextId);
+
+      if (nextIndex === -1) {
+        throw Error(`Not found node next by id '${nextId}'`);
+      }
+
+      node.nexts.splice(nextIndex, 1, replaceId);
     });
 }
 

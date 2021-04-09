@@ -1,8 +1,8 @@
-import {Procedure, ProcedureModifier, ProcedureUtil} from '../library';
+import {Procedure, ProcedureOperator, ProcedureUtil} from '../library';
 
 test('procedure class', () => {
   let definition = ProcedureUtil.createEmptyProcedure();
-  [definition] = ProcedureModifier.addNode(ProcedureUtil.createNode())(
+  [definition] = ProcedureOperator.addNode(ProcedureUtil.createNode())(
     definition,
   );
 

@@ -12,7 +12,7 @@ import styled from 'styled-components';
 
 import {transition} from '../../components';
 import {EditorContext} from '../../context';
-import {ActiveTrunk} from '../../procedure-editor';
+import {ActiveTrunk} from '../../procedure-editor/procedure-editor';
 
 import {DisplayName} from './@header';
 

@@ -1,6 +1,6 @@
 import {NodeId} from '@magicflow/core';
 
-import {ProcedureModifier, ProcedureUtil} from '../../library';
+import {ProcedureOperator, ProcedureUtil} from '../../library';
 
 test('copy params', () => {
   expect(ProcedureUtil.copyNode(ProcedureUtil.createNode())).toBeTruthy();
@@ -25,7 +25,7 @@ test('requireNode error', () => {
 
   expect(() =>
     ProcedureUtil.requireNode(
-      ProcedureModifier.addNode(ProcedureUtil.createBranchesNode({id: node1}))(
+      ProcedureOperator.addNode(ProcedureUtil.createBranchesNode({id: node1}))(
         ProcedureUtil.createEmptyProcedure(),
       )[0],
       node1,

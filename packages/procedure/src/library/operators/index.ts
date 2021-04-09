@@ -1,1 +1,1 @@
-export * as ProcedureModifier from './namespace';
+export * as ProcedureOperator from './namespace';

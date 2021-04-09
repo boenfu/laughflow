@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import {ConditionPlugin} from '../condition';
 import {EditorContext} from '../context';
-import {Editor, ProcedureTreeNode} from '../procedure-editor';
+import {Editor, ProcedureTreeNode} from '../procedure-editor/procedure-editor';
 
 import {Footer} from './@footer';
 import {Navigation} from './@navigation';

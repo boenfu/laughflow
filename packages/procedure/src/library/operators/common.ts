@@ -5,7 +5,7 @@ export type Operator<TRet = void> = (
   definition: Procedure,
 ) => TRet extends any[] ? [Procedure, ...TRet] : Procedure;
 
-export type OperatorFunction<TParams extends [], TRet = undefined> = (
+export type OperatorFunction<TParams extends any[], TRet = void> = (
   ...args: TParams
 ) => Operator<TRet>;
 

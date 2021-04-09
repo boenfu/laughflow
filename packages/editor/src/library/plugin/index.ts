@@ -1,7 +1,7 @@
 import {Flow, Leaf, SingleNode} from '@magicflow/core';
 import {ComponentType, ReactNode} from 'react';
 
-import {Editor} from '../procedure-editor';
+import {Editor} from '../procedure-editor/procedure-editor';
 
 export interface IPluginEvent {
   definition: Flow;
