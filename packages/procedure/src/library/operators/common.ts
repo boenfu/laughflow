@@ -36,54 +36,61 @@ export function out<TRet>(
   };
 }
 
-type VariableContext = {
-  [TKey in string]: any;
-} & {
-  out: (operator: Operator<any>) => Operator<any>;
-  outs: (operator: Operator<any>) => Operator<any>;
-};
+export type VariableContext<TContext> = {
+  out: <TKey extends keyof TContext>(
+    operator: Operator<[TContext[TKey]]>,
+    key: TKey,
+  ) => Operator<any>;
+  outs: <TKey extends keyof TContext>(
+    operator: Operator<TContext[TKey]>,
+    key: TKey,
+  ) => Operator<any>;
+} & TContext;
 
 /**
  *
- * variables(({out, $0}) => [
- *  out(addNode(createNode())),
- *  addNodeNexts($0.id, []),
- *  addNodeNexts($0.id, []),
+ * variables<{nodeA: SingleNode; nodeB: BranchesNode}>([
+ *   $ => $.out(addNode(createNode()), 'nodeA'),
+ *   $ => $.out(addNode(createBranchesNode()), 'nodeB'),
+ *   $ =>
+ *     compose([
+ *       addNodeNexts($.nodeA.id, [$.nodeB.id]),
+ *       addNodeNexts($.nodeB.id, [$.nodeA.id]),
+ *     ]),
  * ]);
  *
- * @param callback
+ * $.out 与 $.outs 无法嵌套在其他 operator 中，
+ * 只能处于表达式最外层，否则无法捕获返回值
+ * @param expressions
  * @returns
  */
-export function variables(
-  callback: ($: VariableContext) => Operator<any>[],
+export function variables<TContext>(
+  expressions: (($: VariableContext<TContext>) => Operator<any>)[],
 ): Operator {
   return definition => {
-    let operatorIndexMap = new Map<
-      Operator<any>,
-      [number, keyof VariableContext]
-    >();
+    let outedOperatorMap = new Map<Operator<any>, [string, 'out' | 'outs']>();
 
-    let index = 0;
-    let variable: VariableContext = {
-      out(operator: Operator<any>): Operator<any> {
-        operatorIndexMap.set(operator, [index, 'out']);
-        index += 1;
+    let variable = {
+      out(operator: Operator<any>, name: string): Operator<any> {
+        outedOperatorMap.set(operator, [name, 'out']);
         return operator;
       },
-      outs(operator: Operator<any>): Operator<any> {
-        operatorIndexMap.set(operator, [index, 'outs']);
-        index += 1;
+      outs(operator: Operator<any>, name: string): Operator<any> {
+        outedOperatorMap.set(operator, [name, 'outs']);
         return operator;
       },
-    };
+    } as VariableContext<TContext>;
 
-    for (let operator of callback(variable)) {
+    for (let expression of expressions) {
+      let operator = expression(variable);
       let ret = castArray(operator(definition)) as [Procedure, ...any[]];
 
-      if (operatorIndexMap.has(operator)) {
-        let [index, type] = operatorIndexMap.get(operator)!;
-        variable[`$${index}`] = type === 'out' ? ret[1] : ret.slice(1);
-        operatorIndexMap.delete(operator);
+      if (outedOperatorMap.has(operator)) {
+        let [name, type] = outedOperatorMap.get(operator)!;
+
+        variable[name as keyof TContext] =
+          type === 'out' ? ret[1] : ret.slice(1);
+        outedOperatorMap.delete(operator);
       }
 
       definition = ret[0];

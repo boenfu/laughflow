@@ -50,8 +50,8 @@ test('removeNode', () => {
 
 test('replaceNodeNexts', () => {
   expect(
-    replaceNodeNexts(headNodeId, [headNodeId, headNodeId])(procedure).nodes[0]
-      .nexts.length,
+    replaceNodeNexts(headNodeId, [headNodeId, headNodeId])(procedure)[0]
+      .nodes[0].nexts.length,
   ).toBe(2);
 });
 
