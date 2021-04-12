@@ -9,6 +9,7 @@ import {
   removeNode,
   removeNodeNext,
   removeNodeNexts,
+  replaceNodeNext,
   replaceNodeNexts,
   updateNode,
 } from '../../library/operators/namespace';
@@ -53,6 +54,21 @@ test('replaceNodeNexts', () => {
     replaceNodeNexts(headNodeId, [headNodeId, headNodeId])(procedure)[0]
       .nodes[0].nexts.length,
   ).toBe(2);
+});
+
+test('replaceNodeNext', () => {
+  expect(
+    compose([
+      addNodeNexts(headNodeId, [headNodeId]),
+      replaceNodeNext(headNodeId, headNodeId, headNodeId),
+    ])(procedure).nodes[0].nexts.length,
+  ).toBe(1);
+});
+
+test('replaceNodeNext error', () => {
+  expect(() =>
+    replaceNodeNext(headNodeId, headNodeId, headNodeId)(procedure),
+  ).toThrow(`Not found node definition by id '${headNodeId}'`);
 });
 
 test('addNodeNexts', () => {
