@@ -1,4 +1,4 @@
-import {NodeId, NodeType} from '@magicflow/core';
+import {FlowId, NodeId, NodeType} from '@magicflow/core';
 import {
   Operator,
   OperatorFunction,
@@ -11,6 +11,7 @@ import {
   createNode as createNodeHelper,
 } from '@magicflow/procedure/utils';
 
+import {insertNodeAsFlowStart} from './@insert-node-as-flow-start';
 import {insertNodeBeforeNexts} from './@insert-node-before-nexts';
 import {insertNodeBetweenNodes} from './@insert-node-between-nodes';
 
@@ -57,3 +58,19 @@ export const createNodeBetweenNodes: OperatorFunction<
 export const createNodeBeforeNexts: OperatorFunction<
   [CreateNodeOperatorParam]
 > = ({from, type}) => addNode(type, insertNodeBeforeNexts(from));
+
+/**
+ * 新增节点并作为 flow start
+ * @param param0
+ * @returns
+ */
+export const createNodeAsFlowStart: OperatorFunction<
+  [
+    {
+      flow: FlowId;
+      type: NodeType;
+      originStart?: NodeId;
+    },
+  ]
+> = ({flow, type, originStart}) =>
+  addNode(type, insertNodeAsFlowStart({flow, originStart}));

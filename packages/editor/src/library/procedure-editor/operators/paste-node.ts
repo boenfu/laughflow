@@ -1,4 +1,4 @@
-import {NodeId} from '@magicflow/core';
+import {FlowId, NodeId} from '@magicflow/core';
 import {
   Operator,
   OperatorFunction,
@@ -9,6 +9,7 @@ import {
 
 import {Clipboard} from '../@clipboard';
 
+import {insertNodeAsFlowStart} from './@insert-node-as-flow-start';
 import {insertNodeBeforeNexts} from './@insert-node-before-nexts';
 import {insertNodeBetweenNodes} from './@insert-node-between-nodes';
 
@@ -68,3 +69,19 @@ export const pasteNodeBetweenNodes: OperatorFunction<
 export const pasteNodeBeforeNexts: OperatorFunction<
   [PasteNodeOperatorParam]
 > = ({from, clipboard}) => getPasteNode(clipboard, insertNodeBeforeNexts(from));
+
+/**
+ * 粘贴节点并作为 flow start
+ * @param param0
+ * @returns
+ */
+export const pasteNodeAsFlowStart: OperatorFunction<
+  [
+    {
+      clipboard: Clipboard<NodeId, NodeId>;
+      flow: FlowId;
+      originStart?: NodeId;
+    },
+  ]
+> = ({flow, clipboard, originStart}) =>
+  getPasteNode(clipboard, insertNodeAsFlowStart({flow, originStart}));

@@ -54,8 +54,8 @@ export const Node: FC<NodeProps> = ({style, node}) => {
             <Fragment key={`${next.id}-${index}`}>
               <ConnectionLine
                 startNode={['parent', 'previousSibling']}
-                node={node.id}
-                next={next.id}
+                start={node}
+                next={next}
                 first={index === 0 && array.length > 1}
                 last={index === array.length - 1 && array.length > 1}
               />

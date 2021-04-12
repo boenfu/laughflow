@@ -1,4 +1,4 @@
-import {NodeId} from '@magicflow/core';
+import {ProcedureFlow, ProcedureTreeNode} from '@magicflow/procedure';
 import {Bezier, BezierProps, BezierStroke} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
@@ -21,8 +21,8 @@ const Wrapper = styled(Bezier)`
 `;
 
 export interface ConnectionLineProps extends BezierProps {
-  node: NodeId;
-  next: NodeId;
+  start: ProcedureFlow | ProcedureTreeNode;
+  next: ProcedureTreeNode;
   /**
    * 边际的两个元素会绘制向下的圆弧
    */
@@ -31,7 +31,7 @@ export interface ConnectionLineProps extends BezierProps {
 }
 
 export const ConnectionLine: FC<ConnectionLineProps> = ({
-  node,
+  start,
   next,
   first,
   last,
@@ -39,7 +39,7 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
   endNode,
   placement,
 }) => {
-  const [Mark] = useMark(node, next);
+  const [Mark] = useMark(start, next);
 
   return (
     <Wrapper

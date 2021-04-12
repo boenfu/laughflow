@@ -63,6 +63,7 @@ export interface ProcedureBranchesTreeNode
 }
 
 export interface ProcedureFlow {
+  type: 'flow';
   id: FlowId;
   parent: ProcedureBranchesTreeNode | undefined;
   starts: ProcedureTreeNode[];
@@ -90,6 +91,7 @@ function buildProcedureFlow(definition: ProcedureDefinition): ProcedureFlow {
     parent: ProcedureBranchesTreeNode | undefined,
   ): ProcedureFlow {
     return {
+      type: 'flow',
       id: flow.id,
       parent,
       starts: compact(

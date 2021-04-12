@@ -38,8 +38,8 @@ export const Flow: FC<FlowProps> = ({flow}) => {
                 placement={{
                   start: 'top',
                 }}
-                node={node.id}
-                next={node.id}
+                start={flow}
+                next={node}
                 first={index === 0 && array.length > 1}
                 last={index === array.length - 1 && array.length > 1}
               />
@@ -54,7 +54,7 @@ export const Flow: FC<FlowProps> = ({flow}) => {
             placement={{
               start: 'top',
             }}
-            node={1 as any}
+            start={1 as any}
             next={1 as any}
           />
           <div />

@@ -3,12 +3,14 @@ import {Procedure, ProcedureFlow} from '@magicflow/procedure';
 import {Operator} from '@magicflow/procedure/operators';
 import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
-import {produce} from 'immer';
+import {enableAllPlugins, produce} from 'immer';
 
 import {Clipboard} from './@clipboard';
 import {UndoStack} from './@undo-stack';
 
 type ProcedureEventType = 'update' | 'config';
+
+enableAllPlugins();
 
 export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   readonly undoStack = new UndoStack();
