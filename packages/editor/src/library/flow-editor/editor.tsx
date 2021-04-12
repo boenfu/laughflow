@@ -1,7 +1,6 @@
-import {ProcedureFlow, ProcedureTreeNode} from '@magicflow/procedure';
+import {ProcedureFlow} from '@magicflow/procedure';
 import {useCreation, useUpdate} from 'ahooks';
-import classNames from 'classnames';
-import React, {FC, Fragment, ReactNode, useEffect, useRef} from 'react';
+import React, {FC, ReactNode, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
 // import {ConditionPlugin} from '../condition';
@@ -10,9 +9,10 @@ import {ProcedureEditor} from '../procedure-editor';
 
 // import {Footer} from './@footer';
 import {Navigation} from './@navigation';
-import {ConnectionLine, LINE_HEIGHT_DEFAULT} from './connection-line';
+import {LINE_HEIGHT_DEFAULT} from './connection-line';
 import {EditorProps as FlowEditorProps} from './editor.doc';
-import {LinkNode, Node} from './node';
+import {Flow} from './flow';
+import {Node} from './node';
 
 declare global {
   namespace Magicflow {
@@ -37,15 +37,6 @@ const Content = styled.div`
   text-align: center;
   overflow: auto;
   background-color: #e5e7eb;
-`;
-
-const Row = styled.div`
-  padding-top: ${LINE_HEIGHT_DEFAULT}px;
-  text-align: center;
-
-  &.multi {
-    padding-top: ${LINE_HEIGHT_DEFAULT * 2}px;
-  }
 `;
 
 export const FlowEditor: FC<FlowEditorProps> = ({
@@ -83,57 +74,13 @@ export const FlowEditor: FC<FlowEditorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function renderNode(node: ProcedureTreeNode): ReactNode {
-    let nexts = node.nexts;
-
-    if (node.left) {
-      return (
-        <LinkNode
-          key={`${node.prev?.id}-${node.id}`}
-          prev={node.prev?.id}
-          node={node.definition}
-        />
-      );
-    }
-
-    let children = (
-      <Row className={classNames({multi: nexts.length > 1})}>
-        {nexts.map((next, index, array) => {
-          return (
-            <Fragment key={`${node.id}-${next.id}-${index}`}>
-              <ConnectionLine
-                node={node.id}
-                next={next.id}
-                first={index === 0 && array.length > 1}
-                last={index === array.length - 1 && array.length > 1}
-              />
-              {renderNode(next)}
-            </Fragment>
-          );
-        })}
-      </Row>
-    );
-
-    return (
-      <Node key={`${node.prev?.id}-${node.id}`} node={node}>
-        {children}
-      </Node>
-    );
-  }
-
-  function renderFlow(flow: ProcedureFlow): ReactNode {
-    return (
-      <div className="flow" key={flow.definition.id}>
-        {flow.starts.map(renderNode)}
-      </div>
-    );
-  }
-
   return (
     <Wrapper ref={wrapperRef}>
       <EditorContext.Provider value={{editor}}>
         <Navigation onFullScreenToggle={onFullScreenToggle} />
-        <Content>{renderFlow(editor.treeView)}</Content>
+        <Content>
+          <Flow flow={editor.treeView} />
+        </Content>
         {/* <Footer /> */}
       </EditorContext.Provider>
     </Wrapper>

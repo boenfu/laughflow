@@ -1,11 +1,12 @@
-import {Node as NodeDefinition, NodeId} from '@magicflow/core';
 import {ProcedureTreeNode} from '@magicflow/procedure';
-import React, {CSSProperties, FC, useContext} from 'react';
+import classNames from 'classnames';
+import React, {CSSProperties, FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {EditorContext} from '../../context';
+import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../connection-line';
 
 import {BranchesNode} from './@branches';
+import {LinkNode} from './@link';
 import {SingleNode} from './@single';
 
 export interface NodeProps {
@@ -22,8 +23,22 @@ const Container = styled.div`
   vertical-align: top;
 `;
 
-export const Node: FC<NodeProps> = ({style, node, children}) => {
+const Row = styled.div`
+  padding-top: ${LINE_HEIGHT_DEFAULT}px;
+  text-align: center;
+
+  &.multi {
+    padding-top: ${LINE_HEIGHT_DEFAULT * 2}px;
+  }
+`;
+
+export const Node: FC<NodeProps> = ({style, node}) => {
+  if (node.left) {
+    return <LinkNode node={node} />;
+  }
+
   // const {editor} = useContext(EditorContext);
+  let nexts = node.nexts;
 
   return (
     <Container style={style}>
@@ -32,7 +47,23 @@ export const Node: FC<NodeProps> = ({style, node, children}) => {
       ) : (
         <BranchesNode node={node} />
       )}
-      {children}
+
+      <Row className={classNames({multi: nexts.length > 1})}>
+        {nexts.map((next, index, array) => {
+          return (
+            <Fragment key={`${next.id}-${index}`}>
+              <ConnectionLine
+                startNode={['parent', 'previousSibling']}
+                node={node.id}
+                next={next.id}
+                first={index === 0 && array.length > 1}
+                last={index === array.length - 1 && array.length > 1}
+              />
+              <Node node={next} />
+            </Fragment>
+          );
+        })}
+      </Row>
     </Container>
   );
 };

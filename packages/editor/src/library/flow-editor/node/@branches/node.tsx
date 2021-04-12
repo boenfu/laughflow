@@ -5,16 +5,10 @@ import styled from 'styled-components';
 import {Flow} from '../../flow';
 
 const Wrapper = styled.div`
-  position: relative;
-  margin: 0 17px;
-  width: 220px;
-  min-height: 83px;
   display: inline-block;
-  vertical-align: top;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  background-color: #ccc;
-  cursor: pointer;
+  border: 1px solid #c8cdd8;
+  border-radius: 8px;
+  padding-bottom: 16px;
 `;
 
 export interface BranchesNodeProps {

@@ -1,5 +1,5 @@
-import {Ref, TrunkRef} from '@magicflow/core';
-import {Bezier, BezierStroke} from 'rc-bezier';
+import {NodeId} from '@magicflow/core';
+import {Bezier, BezierProps, BezierStroke} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
@@ -20,14 +20,14 @@ const Wrapper = styled(Bezier)`
   }
 `;
 
-export interface ConnectionLineProps {
-  node: TrunkRef;
-  next: Ref;
+export interface ConnectionLineProps extends BezierProps {
+  node: NodeId;
+  next: NodeId;
   /**
    * 边际的两个元素会绘制向下的圆弧
    */
-  first: boolean;
-  last: boolean;
+  first?: boolean;
+  last?: boolean;
 }
 
 export const ConnectionLine: FC<ConnectionLineProps> = ({
@@ -35,6 +35,9 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
   next,
   first,
   last,
+  startNode,
+  endNode,
+  placement,
 }) => {
   const [Mark] = useMark(node, next);
 
@@ -42,7 +45,9 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
     <Wrapper
       className="connection-line"
       stroke={STROKE_DEFAULT}
-      startNode={['parent', 'previousSibling']}
+      startNode={startNode}
+      endNode={endNode}
+      placement={placement}
       marks={[Mark]}
       generatePath={points => {
         let start = points[0];

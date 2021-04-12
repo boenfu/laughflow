@@ -14,7 +14,7 @@ function SvgAddSolid(props: React.SVGProps<SVGSVGElement>) {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M8 16A8 8 0 108 0a8 8 0 000 16zm.648-11.7a.65.65 0 00-1.3 0v3.047H4.3a.65.65 0 000 1.3h3.048V11.7a.65.65 0 101.3 0V8.647H11.7a.65.65 0 100-1.3H8.648V4.3z"
-        fill="#9BA0AB"
+        fill="currentColor"
       />
     </svg>
   );

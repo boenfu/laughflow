@@ -1,6 +1,7 @@
 import {FlattenSimpleInterpolation, css} from 'styled-components';
 
 type AllowedTransition =
+  | 'border-color'
   | 'background-color'
   | 'color'
   | 'filter'
