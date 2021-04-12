@@ -20,7 +20,7 @@
     "immer": "8.0.0",
     "lodash-es": "^4.17.20",
     "nanoid": "^3.1.20",
-    "rc-bezier": "^0.2.4",
+    "rc-bezier": "^0.2.5",
     "rc-dialog": "^8.5.2",
     "rc-dropdown": "^3.2.0",
     "rc-menu": "^8.10.6",
