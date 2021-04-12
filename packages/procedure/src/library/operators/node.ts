@@ -1,6 +1,5 @@
 import {Node, NodeId} from '@magicflow/core';
 import produce from 'immer';
-import {cloneDeep} from 'lodash-es';
 
 import {ProcedureUtil} from '../utils';
 
@@ -8,7 +7,7 @@ import {Operator} from './common';
 
 export function addNode<TNode extends Node>(node: TNode): Operator<[TNode]> {
   return definition => {
-    node = cloneDeep(node);
+    node = ProcedureUtil.cloneDeep(node);
 
     return [
       produce(definition, definition => void definition.nodes.push(node)),
@@ -19,7 +18,7 @@ export function addNode<TNode extends Node>(node: TNode): Operator<[TNode]> {
 
 export function updateNode(node: Node): Operator {
   return definition => {
-    let nextNode = cloneDeep(node);
+    let nextNode = ProcedureUtil.cloneDeep(node);
 
     return produce(definition, definition => {
       let nodeIndex = definition.nodes.findIndex(
@@ -45,7 +44,7 @@ export function removeNode(nodeId: NodeId): Operator<[Node]> {
 
         for (let node of definition.nodes) {
           if (node.id === nodeId) {
-            removedNode = cloneDeep(node);
+            removedNode = ProcedureUtil.cloneDeep(node);
           } else {
             nodes.push(node);
           }

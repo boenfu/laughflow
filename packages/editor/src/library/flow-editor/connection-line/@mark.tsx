@@ -1,37 +1,26 @@
 import {NodeType} from '@magicflow/core';
 import {AddSolid as _AddSolid, CombineSolid} from '@magicflow/icons';
 import {ProcedureFlow, ProcedureTreeNode} from '@magicflow/procedure';
-import {Bezier as _Bezier, Mark} from 'rc-bezier';
+import classNames from 'classnames';
+import {Bezier as _Bezier} from 'rc-bezier';
 import React, {FC, useContext} from 'react';
-import styled, {css} from 'styled-components';
+import styled from 'styled-components';
 
-import {transition} from '../../components';
 import {EditorContext} from '../../context';
 import {
   createNodeAsFlowStart,
   createNodeBetweenNodes,
 } from '../../procedure-editor';
-
-const Icon = css`
-  opacity: 1;
-  border-radius: 50%;
-  background-color: #fff;
-  color: #296dff;
-  margin: 6px;
-
-  &:hover {
-    opacity: 0.8;
-  }
-
-  ${transition(['opacity'])}
-`;
+import {Icon} from '../common';
 
 const SingleNode = styled(_AddSolid)`
   ${Icon};
+  margin: 6px;
 `;
 
 const BranchesNode = styled(CombineSolid)`
   ${Icon};
+  margin: 6px;
 
   display: none;
 `;
@@ -40,12 +29,11 @@ const MarkWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  font-size: 16px;
-  cursor: pointer;
   border-radius: 8px;
   border: 1px solid transparent;
 
-  &:hover {
+  &:hover,
+  &.active {
     border-color: #c8cdd8;
 
     ${SingleNode} {
@@ -68,13 +56,16 @@ const MarkWrapper = styled.div`
     }
   }
 
-  animation: mark-transform 0.2s 0.2s linear both;
+  animation: mark-transform 0.2s linear both;
 `;
 
-const Mark: FC<{
+interface MarkProps {
   start: ProcedureFlow | ProcedureTreeNode;
-  next: ProcedureTreeNode;
-}> = ({start, next}) => {
+  next?: ProcedureTreeNode;
+  active?: boolean;
+}
+
+export const Mark: FC<MarkProps> = ({start, next, active}) => {
   const {editor} = useContext(EditorContext);
 
   const onCreateNode = (type: NodeType): void => {
@@ -83,10 +74,14 @@ const Mark: FC<{
         createNodeAsFlowStart({
           type,
           flow: start.id,
-          originStart: next.id,
+          originStart: next?.id,
         }),
       );
     } else {
+      if (!next) {
+        return;
+      }
+
       editor.edit(
         createNodeBetweenNodes({
           type,
@@ -99,27 +94,14 @@ const Mark: FC<{
 
   const onCreateSingleNode = (): void => onCreateNode('singleNode');
 
-  const onCreateBranchesNode = (): void => onCreateNode('singleNode');
+  const onCreateBranchesNode = (): void => onCreateNode('branchesNode');
 
   let title = '插入节点';
 
   return (
-    <MarkWrapper title={title}>
+    <MarkWrapper title={title} className={classNames({active})}>
       <SingleNode onClick={onCreateSingleNode} />
       <BranchesNode onClick={onCreateBranchesNode} />
     </MarkWrapper>
   );
 };
-
-export function useMark(
-  start: ProcedureFlow | ProcedureTreeNode,
-  next: ProcedureTreeNode,
-): [Mark] {
-  return [
-    {
-      key: 'mark',
-      position: 0.5,
-      render: <Mark start={start} next={next} />,
-    },
-  ];
-}

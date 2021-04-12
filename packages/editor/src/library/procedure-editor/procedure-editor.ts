@@ -1,5 +1,5 @@
 import {NodeId, Procedure as ProcedureDefinition} from '@magicflow/core';
-import {Procedure, ProcedureFlow} from '@magicflow/procedure';
+import {Procedure, ProcedureFlow, ProcedureUtil} from '@magicflow/procedure';
 import {Operator} from '@magicflow/procedure/operators';
 import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
@@ -15,7 +15,7 @@ enableAllPlugins();
 export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   readonly undoStack = new UndoStack();
 
-  private clipboard = new Clipboard<NodeId, NodeId>();
+  clipboard = new Clipboard<NodeId, NodeId>();
 
   nodeRenderDescriptor: {
     before?: any;
@@ -31,7 +31,7 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   }
 
   set definition(definition: ProcedureDefinition) {
-    this._definition = definition;
+    this._definition = ProcedureUtil.cloneDeep(definition);
     this.emit('update');
   }
 
@@ -49,9 +49,12 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
     this.definition = produce(
       this.definition,
       operator,
-      (patches, inversePatches) =>
-        this.undoStack.update(patches, inversePatches),
+      (patches, inversePatches) => {
+        this.undoStack.update(patches, inversePatches);
+      },
     );
+
+    console.log(this.definition, '2');
   }
 
   undo(): void {

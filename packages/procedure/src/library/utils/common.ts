@@ -63,3 +63,6 @@ export function chain(): ProcedureChain {
     },
   );
 }
+
+export const cloneDeep = <TData>(data: TData): TData =>
+  JSON.parse(JSON.stringify(data));

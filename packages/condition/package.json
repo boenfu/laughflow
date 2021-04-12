@@ -4,7 +4,6 @@
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/library/index.js",
-  "module": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
   "dependencies": {
     "@magicflow/core": "*",

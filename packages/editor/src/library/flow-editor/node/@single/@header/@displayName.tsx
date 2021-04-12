@@ -55,13 +55,17 @@ const DisplayNameInput = styled.div`
   }
 `;
 
-export interface HeaderProps {
+export interface DisplayNameProps {
   node: SingleNode;
   readOnly?: boolean;
   onChange?(node: SingleNode): void;
 }
 
-export const DisplayName: FC<HeaderProps> = ({node, readOnly, onChange}) => {
+export const DisplayName: FC<DisplayNameProps> = ({
+  node,
+  readOnly,
+  onChange,
+}) => {
   // eslint-disable-next-line no-null/no-null
   const inputRef = useRef<HTMLDivElement>(null);
 

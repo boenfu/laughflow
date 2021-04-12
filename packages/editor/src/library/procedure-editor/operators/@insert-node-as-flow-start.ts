@@ -4,7 +4,7 @@ import {
   addFlowStart,
   addNodeNexts,
   compose,
-  removeFlowStart,
+  replaceFlowStart,
 } from '@magicflow/procedure/operators';
 
 export const insertNodeAsFlowStart: ({}: {
@@ -12,11 +12,10 @@ export const insertNodeAsFlowStart: ({}: {
   originStart?: NodeId;
 }) => OperatorFunction<[NodeId]> = ({flow, originStart}) => target =>
   compose([
-    addFlowStart(flow, target),
     ...(originStart
       ? [
-          removeFlowStart(flow, originStart),
+          replaceFlowStart(flow, originStart, target),
           addNodeNexts(target, [originStart]),
         ]
-      : []),
+      : [addFlowStart(flow, target)]),
   ]);

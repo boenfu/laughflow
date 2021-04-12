@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import React, {CSSProperties, FC, Fragment} from 'react';
 import styled from 'styled-components';
 
+import {RESOURCE_WIDTH} from '../common';
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../connection-line';
 import {Node} from '../node';
 
@@ -10,6 +11,7 @@ const Wrapper = styled.div`
   display: inline-block;
   vertical-align: top;
 
+  min-width: ${RESOURCE_WIDTH}px;
   padding-top: ${LINE_HEIGHT_DEFAULT}px;
 
   &.multi {
@@ -48,17 +50,13 @@ export const Flow: FC<FlowProps> = ({flow}) => {
           </Fragment>
         ))
       ) : (
-        <>
-          <ConnectionLine
-            startNode="parent"
-            placement={{
-              start: 'top',
-            }}
-            start={1 as any}
-            next={1 as any}
-          />
-          <div />
-        </>
+        <ConnectionLine
+          startNode="parent"
+          placement={{
+            start: 'top',
+          }}
+          start={flow}
+        />
       )}
     </Wrapper>
   );

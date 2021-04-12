@@ -1,18 +1,12 @@
-import {ProcedureFlow} from '@magicflow/procedure';
 import {useCreation, useUpdate} from 'ahooks';
-import React, {FC, ReactNode, useEffect, useRef} from 'react';
+import React, {FC, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
-// import {ConditionPlugin} from '../condition';
 import {EditorContext} from '../context';
 import {ProcedureEditor} from '../procedure-editor';
 
-// import {Footer} from './@footer';
-import {Navigation} from './@navigation';
-import {LINE_HEIGHT_DEFAULT} from './connection-line';
 import {EditorProps as FlowEditorProps} from './editor.doc';
 import {Flow} from './flow';
-import {Node} from './node';
 
 declare global {
   namespace Magicflow {
@@ -49,13 +43,12 @@ export const FlowEditor: FC<FlowEditorProps> = ({
   const editor = useCreation(() => new ProcedureEditor(definition), []);
   const reRender = useUpdate();
 
-  const onFullScreenToggle = (): void => {
-    if (document.fullscreenElement) {
-      void document.exitFullscreen();
-    } else {
-      void wrapperRef.current?.requestFullscreen();
-    }
-  };
+  // const onFullScreenToggle = (): void => {
+  //   if (document.fullscreenElement) {
+  //     void document.exitFullscreen();
+  //   } else {
+  //     void wrapperRef.current?.requestFullscreen();
+  //   }
 
   // const onContentClick = (): void => {
   //   if (editor.activeTrunk) {
@@ -77,11 +70,9 @@ export const FlowEditor: FC<FlowEditorProps> = ({
   return (
     <Wrapper ref={wrapperRef}>
       <EditorContext.Provider value={{editor}}>
-        <Navigation onFullScreenToggle={onFullScreenToggle} />
         <Content>
           <Flow flow={editor.treeView} />
         </Content>
-        {/* <Footer /> */}
       </EditorContext.Provider>
     </Wrapper>
   );

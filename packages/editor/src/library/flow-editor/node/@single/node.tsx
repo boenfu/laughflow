@@ -1,12 +1,14 @@
-import {NodeId, SingleNode as SingleNodeDefinition} from '@magicflow/core';
+// import {NodeId, SingleNode as SingleNodeDefinition} from '@magicflow/core';
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
 // import {Connect, Copy, Cut, Jump} from '@magicflow/icons';
 import classnames from 'classnames';
-import React, {CSSProperties, FC, useContext} from 'react';
+import React, {FC, useContext} from 'react';
 import styled from 'styled-components';
 
-import {transition} from '../../../components';
 import {EditorContext} from '../../../context';
+import {RESOURCE_WIDTH} from '../../common';
+
+import {Header} from './@header';
 
 // import {DisplayName} from './@header';
 
@@ -16,36 +18,16 @@ const BeforeWrapper = styled.div`
   justify-content: center;
 `;
 
-const AfterWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const Header = styled.div`
-  display: flex;
-  height: 42px;
-  box-sizing: border-box;
-  padding: 0 16px;
-  align-items: center;
-  font-size: 14px;
-  color: #333333;
-  background-color: #f7f7f7;
-  border-bottom: 1px solid rgba(16, 42, 100, 0.08);
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-
-  ${transition(['background-color', 'color'])}
-`;
-
-const HeaderExtra = styled.div`
-  flex: none;
-`;
+// const AfterWrapper = styled.div`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+// `;
 
 const Wrapper = styled.div`
   position: relative;
   margin: 0 17px;
-  width: 220px;
+  width: ${RESOURCE_WIDTH}px;
   min-height: 83px;
   display: inline-block;
   vertical-align: top;
@@ -55,7 +37,7 @@ const Wrapper = styled.div`
   cursor: pointer;
 
   &:hover {
-    ${Header} {
+    .header {
       color: #ffffff;
       background-color: #5b6e95;
     }
@@ -64,7 +46,7 @@ const Wrapper = styled.div`
   &.active {
     box-shadow: 0 6px 12px rgba(58, 69, 92, 0.16);
 
-    ${Header} {
+    .header {
       color: #ffffff;
       background-color: #296dff;
     }
@@ -113,26 +95,26 @@ const Footer = styled.div`
   display: flex;
 `;
 
-const EditingIconWrapper = styled.div`
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+// const EditingIconWrapper = styled.div`
+//   position: absolute;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
 
-  width: 32px;
-  height: 32px;
+//   width: 32px;
+//   height: 32px;
 
-  top: 100%;
-  left: 50%;
-  transform: translate(-50%, -4px);
+//   top: 100%;
+//   left: 50%;
+//   transform: translate(-50%, -4px);
 
-  background: #296dff;
-  color: #fff;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
-  border-radius: 28px;
+//   background: #296dff;
+//   color: #fff;
+//   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
+//   border-radius: 28px;
 
-  z-index: 3;
-`;
+//   z-index: 3;
+// `;
 
 // const STATE_ICON_DICT: Partial<
 //   {[key in ActiveTrunk['state']]: React.ElementType}
@@ -161,15 +143,9 @@ export interface SingleNodeProps {
   node: ProcedureSingleTreeNode;
   className?: string;
   readOnly?: boolean;
-  style?: CSSProperties;
 }
 
-export const SingleNode: FC<SingleNodeProps> = ({
-  className,
-  style,
-  node,
-  children,
-}) => {
+export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
   const {editor} = useContext(EditorContext);
 
   // let nodeRef: NodeRef = {type: 'singleNode', id: node.id};
@@ -210,11 +186,10 @@ export const SingleNode: FC<SingleNodeProps> = ({
 
   let {
     before = [],
-    after = [],
-    headLeft = [],
-    headRight = [],
-    footer = [],
-    body = [],
+    // after = [],
+
+    // footer = [],
+    // body = [],
   } = editor.nodeRenderDescriptor;
 
   return (
@@ -239,38 +214,7 @@ export const SingleNode: FC<SingleNodeProps> = ({
         ])}
         // onClick={onContainerClick}
       >
-        <Header>
-          {headLeft.length ? (
-            <HeaderExtra>
-              {/* {headLeft.reduce(
-              (reactNode, component) =>
-                createElement(component, {
-                  node,
-                  editor,
-                  prevChildren: reactNode,
-                }),
-              <></>,
-            )} */}
-            </HeaderExtra>
-          ) : undefined}
-          <></>
-
-          {/* <DisplayName node={node} onChange={onNodeChange} /> */}
-          {headRight.length ? (
-            <HeaderExtra>
-              {/* {headRight.reduce(
-              (reactNode, component) =>
-                createElement(component, {
-                  node,
-                  editor,
-                  prevChildren: reactNode,
-                }),
-              <></>,
-            )} */}
-            </HeaderExtra>
-          ) : undefined}
-        </Header>
-
+        <Header node={node} />
         <Body>
           {/* {body.reduce(
           (reactNode, component) =>

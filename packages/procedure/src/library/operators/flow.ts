@@ -1,6 +1,5 @@
 import {Flow, FlowId, NodeId} from '@magicflow/core';
 import {produce} from 'immer';
-import {cloneDeep} from 'lodash-es';
 
 import {ProcedureUtil} from '../utils';
 
@@ -8,7 +7,7 @@ import {Operator} from './common';
 
 export function addFlow(branchesNodeId: NodeId, flow: Flow): Operator<[Flow]> {
   return definition => {
-    flow = cloneDeep(flow);
+    flow = ProcedureUtil.cloneDeep(flow);
 
     return [
       produce(definition, definition => {
@@ -35,7 +34,7 @@ export function updateFlow(flow: Flow): Operator {
         throw Error(`Not found flow definition by id '${flow.id}'`);
       }
 
-      definition.flows.splice(flowIndex, 1, cloneDeep(flow));
+      definition.flows.splice(flowIndex, 1, ProcedureUtil.cloneDeep(flow));
     });
 }
 
@@ -76,7 +75,9 @@ export function removeFlow(
         }
 
         branchesNode.flows.splice(flowIndex, 1);
-        flow = cloneDeep(definition.flows.splice(flowDefinitionIndex, 1))[0];
+        flow = ProcedureUtil.cloneDeep(
+          definition.flows.splice(flowDefinitionIndex, 1),
+        )[0];
       }),
       flow,
     ];
@@ -88,6 +89,24 @@ export function addFlowStart(flowId: FlowId, nodeId: NodeId): Operator {
     produce(definition, definition => {
       ProcedureUtil.requireNode(definition, nodeId);
       ProcedureUtil.requireFlow(definition, flowId).starts.push(nodeId);
+    });
+}
+
+export function replaceFlowStart(
+  flowId: FlowId,
+  startId: NodeId,
+  replaceId: NodeId,
+): Operator {
+  return definition =>
+    produce(definition, definition => {
+      let flow = ProcedureUtil.requireFlow(definition, flowId);
+      let startIndex = flow.starts.findIndex(next => next === startId);
+
+      if (startIndex === -1) {
+        throw Error(`Not found flow start by id '${startId}'`);
+      }
+
+      flow.starts.splice(startIndex, 1, replaceId);
     });
 }
 

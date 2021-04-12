@@ -7,7 +7,7 @@ import {
   Procedure as ProcedureDefinition,
   SingleNode,
 } from '@magicflow/core';
-import {cloneDeep, compact} from 'lodash-es';
+import {compact} from 'lodash-es';
 
 export interface IProcedure {
   definition: ProcedureDefinition;
@@ -29,7 +29,7 @@ export class Procedure implements IProcedure {
   }
 
   constructor(definition: ProcedureDefinition) {
-    this.definition = cloneDeep(definition);
+    this.definition = definition;
   }
 }
 

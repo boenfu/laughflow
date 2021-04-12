@@ -1,18 +1,9 @@
-import {Leaf, TrunkRef} from '@magicflow/core';
-import {Trash} from '@magicflow/icons';
-import React, {FC, createElement, useContext} from 'react';
+import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {TooltipActions, transition} from '../../components';
-import {EditorContext} from '../../context';
+import {transition} from '../../components';
 
-import {DoneLeaf} from './@done';
-import {TerminateLeaf} from './@terminate';
-
-export interface LeafProps {
-  prev: TrunkRef;
-  leaf: Leaf;
-}
+export interface LeafProps {}
 
 const Wrapper = styled.div`
   margin: 0 16px;
@@ -28,29 +19,20 @@ const Wrapper = styled.div`
   ${transition(['opacity'])}
 `;
 
-const LeafContent = styled.div`
-  display: inline-flex;
-`;
+export const Leaf: FC<LeafProps> = ({}) => {
+  // const {editor} = useContext(EditorContext);
 
-const LeafTypeToRender = {
-  done: DoneLeaf,
-  terminate: TerminateLeaf,
-};
+  // let Component = LeafTypeToRender[leaf.type];
 
-export const Leaf: FC<LeafProps> = ({prev, leaf}) => {
-  const {editor} = useContext(EditorContext);
+  // if (!Component) {
+  //   return <></>;
+  // }
 
-  let Component = LeafTypeToRender[leaf.type];
-
-  if (!Component) {
-    return <></>;
-  }
-
-  const onDelete = (): void => void editor.procedure.deleteLeaf(prev, leaf.id);
+  // const onDelete = (): void => void editor.procedure.deleteLeaf(prev, leaf.id);
 
   return (
     <Wrapper>
-      <TooltipActions
+      {/* <TooltipActions
         actions={[
           {
             name: 'delete',
@@ -61,7 +43,7 @@ export const Leaf: FC<LeafProps> = ({prev, leaf}) => {
         ]}
       >
         <LeafContent>{createElement(Component, {leaf})}</LeafContent>
-      </TooltipActions>
+      </TooltipActions> */}
     </Wrapper>
   );
 };

@@ -3,7 +3,7 @@ import {Bezier, BezierProps, BezierStroke} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {useMark} from './@mark';
+import {Mark} from './@mark';
 
 export const LINE_HEIGHT_DEFAULT = 48;
 
@@ -20,9 +20,14 @@ const Wrapper = styled(Bezier)`
   }
 `;
 
+const EndWrapper = styled.div`
+  display: inline-block;
+  text-align: center;
+`;
+
 export interface ConnectionLineProps extends BezierProps {
   start: ProcedureFlow | ProcedureTreeNode;
-  next: ProcedureTreeNode;
+  next?: ProcedureTreeNode;
   /**
    * 边际的两个元素会绘制向下的圆弧
    */
@@ -39,52 +44,71 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
   endNode,
   placement,
 }) => {
-  const [Mark] = useMark(start, next);
+  let actionRendering = <Mark {...{start, next, active: !next}} />;
 
   return (
-    <Wrapper
-      className="connection-line"
-      stroke={STROKE_DEFAULT}
-      startNode={startNode}
-      endNode={endNode}
-      placement={placement}
-      marks={[Mark]}
-      generatePath={points => {
-        let start = points[0];
-        let end = points[points.length - 1];
-
-        if (start.x === end.x) {
-          return `M ${start.x},${start.y} V ${end.y}`;
+    <>
+      <Wrapper
+        className="connection-line"
+        stroke={STROKE_DEFAULT}
+        startNode={startNode}
+        endNode={endNode}
+        placement={placement}
+        marks={
+          next
+            ? [
+                {
+                  key: 'mark',
+                  position: 0.5,
+                  render: actionRendering,
+                },
+              ]
+            : []
         }
+        observer={{
+          attributes: true,
+          subtree: true,
+        }}
+        generatePath={points => {
+          let start = points[0];
+          let end = points[points.length - 1];
 
-        let radius = ARC_RADIUS_DEFAULT;
-        let direction = end.x > start.x ? 1 : -1;
-        let midline = start.y + LINE_HEIGHT_DEFAULT;
+          if (start.x === end.x) {
+            return `M ${start.x},${start.y} V ${end.y}`;
+          }
 
-        if (first) {
-          return `M ${start.x},${start.y} V ${
-            midline - radius
-          } A ${radius},${radius},0,0,${direction === 1 ? '0' : '1'},${
-            start.x + radius * direction
-          },${midline} H ${
-            end.x - radius * direction
-          } A ${radius},${radius},0,0,${direction === 1 ? '1' : '0'},${end.x},${
-            midline + radius
-          } V ${end.y}`;
-        }
+          let radius = ARC_RADIUS_DEFAULT;
+          let direction = end.x > start.x ? 1 : -1;
+          let midline = start.y + LINE_HEIGHT_DEFAULT;
 
-        if (last) {
-          return `M ${start.x},${midline - radius} A ${radius},${radius},0,0,${
-            direction === 1 ? '0' : '1'
-          },${start.x + radius * direction},${midline} H ${
-            end.x - radius * direction
-          } A ${radius},${radius},0,0,${direction === 1 ? '1' : '0'},${end.x},${
-            midline + radius
-          } V ${end.y}`;
-        }
+          if (first) {
+            return `M ${start.x},${start.y} V ${
+              midline - radius
+            } A ${radius},${radius},0,0,${direction === 1 ? '0' : '1'},${
+              start.x + radius * direction
+            },${midline} H ${
+              end.x - radius * direction
+            } A ${radius},${radius},0,0,${direction === 1 ? '1' : '0'},${
+              end.x
+            },${midline + radius} V ${end.y}`;
+          }
 
-        return `M ${end.x},${midline} V ${end.y}`;
-      }}
-    />
+          if (last) {
+            return `M ${start.x},${
+              midline - radius
+            } A ${radius},${radius},0,0,${direction === 1 ? '0' : '1'},${
+              start.x + radius * direction
+            },${midline} H ${
+              end.x - radius * direction
+            } A ${radius},${radius},0,0,${direction === 1 ? '1' : '0'},${
+              end.x
+            },${midline + radius} V ${end.y}`;
+          }
+
+          return `M ${end.x},${midline} V ${end.y}`;
+        }}
+      />
+      {!next ? <EndWrapper>{actionRendering}</EndWrapper> : undefined}
+    </>
   );
 };
