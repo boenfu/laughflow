@@ -3,7 +3,8 @@ import {Procedure, ProcedureFlow, ProcedureUtil} from '@magicflow/procedure';
 import {Operator} from '@magicflow/procedure/operators';
 import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
-import {enableAllPlugins, produce} from 'immer';
+import {enableAllPlugins, isDraft, original, produce} from 'immer';
+import {merge} from 'lodash-es';
 
 import {Clipboard} from './@clipboard';
 import {UndoStack} from './@undo-stack';
@@ -46,15 +47,15 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   }
 
   edit(operator: Operator): void {
+    let definition = operator(this.definition);
+    definition = isDraft(definition) ? original(definition)! : definition;
+
     this.definition = produce(
       this.definition,
-      operator,
-      (patches, inversePatches) => {
-        this.undoStack.update(patches, inversePatches);
-      },
+      originDefinition => merge(originDefinition, definition),
+      (patches, inversePatches) =>
+        this.undoStack.update(patches, inversePatches),
     );
-
-    console.log(this.definition, '2');
   }
 
   undo(): void {

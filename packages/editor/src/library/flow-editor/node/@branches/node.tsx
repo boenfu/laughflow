@@ -13,14 +13,16 @@ const AddFlow = styled(AddSolid)`
 `;
 
 const Wrapper = styled.div`
+  box-sizing: border-box;
   position: relative;
+  display: inline-block;
   min-width: ${RESOURCE_WIDTH}px;
   min-height: 83px;
 
-  display: inline-block;
   border: 1px solid #c8cdd8;
   border-radius: 8px;
   padding-bottom: 16px;
+  margin: 0 17px;
 
   ${AddFlow} {
     position: absolute;
