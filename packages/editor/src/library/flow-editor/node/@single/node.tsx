@@ -1,16 +1,14 @@
-// import {NodeId, SingleNode as SingleNodeDefinition} from '@magicflow/core';
+import {Copy, Cut, Jump} from '@magicflow/icons';
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
-// import {Connect, Copy, Cut, Jump} from '@magicflow/icons';
 import classnames from 'classnames';
 import React, {FC, useContext} from 'react';
 import styled from 'styled-components';
 
 import {EditorContext} from '../../../context';
+import {ActiveState} from '../../../procedure-editor';
 import {RESOURCE_WIDTH} from '../../common';
 
 import {Header} from './@header';
-
-// import {DisplayName} from './@header';
 
 const BeforeWrapper = styled.div`
   display: flex;
@@ -57,8 +55,8 @@ const Wrapper = styled.div`
       opacity: 0;
       margin: 0px;
       height: 100%;
-      transform: translate(-12px, -12px);
-      padding: 12px;
+      transform: translate(-12px, -16px);
+      padding: 16px 12px;
       position: absolute;
       top: 0px;
       left: 0px;
@@ -95,49 +93,46 @@ const Footer = styled.div`
   display: flex;
 `;
 
-// const EditingIconWrapper = styled.div`
-//   position: absolute;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
+const EditingIconWrapper = styled.div`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-//   width: 32px;
-//   height: 32px;
+  width: 32px;
+  height: 32px;
 
-//   top: 100%;
-//   left: 50%;
-//   transform: translate(-50%, -4px);
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 4px);
 
-//   background: #296dff;
-//   color: #fff;
-//   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
-//   border-radius: 28px;
+  background: #296dff;
+  color: #fff;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
+  border-radius: 28px;
 
-//   z-index: 3;
-// `;
+  z-index: 3;
+`;
 
-// const STATE_ICON_DICT: Partial<
-//   {[key in ActiveTrunk['state']]: React.ElementType}
-// > = {
-//   joining: Connect,
-//   cutting: Cut,
-//   copying: Copy,
-//   connecting: Jump,
-// };
+const STATE_ICON_DICT: Partial<{[key in ActiveState]: React.ElementType}> = {
+  cut: Cut,
+  copy: Copy,
+  connect: Jump,
+};
 
-// const EditingIcon: FC<{state: ActiveTrunk['state']}> = ({state}) => {
-//   let Component = STATE_ICON_DICT[state];
+const EditingIcon: FC<{state: ActiveState}> = ({state}) => {
+  let Component = STATE_ICON_DICT[state];
 
-//   if (!Component) {
-//     return <></>;
-//   }
+  if (!Component) {
+    return <></>;
+  }
 
-//   return (
-//     <EditingIconWrapper>
-//       <Component />
-//     </EditingIconWrapper>
-//   );
-// };
+  return (
+    <EditingIconWrapper>
+      <Component />
+    </EditingIconWrapper>
+  );
+};
 
 export interface SingleNodeProps {
   node: ProcedureSingleTreeNode;
@@ -180,8 +175,10 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
   //   });
   // };
 
-  // let editing = activeTrunk && activeTrunk?.state !== 'none';
-  // let active = activeTrunk?.ref?.id === node.id;
+  let activeIdentity = editor.activeIdentity;
+  let active = editor.isActive(node);
+
+  let editing = active ? activeIdentity?.state : undefined;
   // let selected = activeTrunk?.relationTrunks?.some(ref => ref.id === node.id);
 
   let {
@@ -208,10 +205,13 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
           className,
           {
             // editing,
-            // active,
+            active,
+            editing: !!editing,
             // selected,
           },
+          editing,
         ])}
+        data-scope={`${node.type}:${node.id}:${node.prev?.id ?? ''}`}
         // onClick={onContainerClick}
       >
         <Header node={node} />
@@ -231,9 +231,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
         )} */}
         </Footer>
 
-        {/* {editing && active ? (
-        <EditingIcon state={activeTrunk!.state} />
-      ) : undefined} */}
+        {editing ? <EditingIcon state={editing} /> : undefined}
       </Wrapper>
       {/* {after.length ? (
       <AfterWrapper>

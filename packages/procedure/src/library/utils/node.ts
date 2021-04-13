@@ -1,5 +1,6 @@
 import {
   BranchesNode,
+  Node,
   NodeId,
   NodeType,
   Procedure,
@@ -56,7 +57,7 @@ export function createBranchesNode({
   };
 }
 
-export function copyNode(node: SingleNode): SingleNode {
+export function copyNode<TNode extends Node>(node: TNode): TNode {
   return {
     ...node,
     id: createId(),

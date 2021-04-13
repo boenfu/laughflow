@@ -1,22 +1,38 @@
-import {NodeId, Procedure as ProcedureDefinition} from '@magicflow/core';
-import {Procedure, ProcedureFlow, ProcedureUtil} from '@magicflow/procedure';
+import {Procedure as ProcedureDefinition} from '@magicflow/core';
+import {
+  Procedure,
+  ProcedureFlow,
+  ProcedureTreeNode,
+  ProcedureUtil,
+} from '@magicflow/procedure';
 import {Operator} from '@magicflow/procedure/operators';
 import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
 import {enableAllPlugins, isDraft, original, produce} from 'immer';
 import {merge} from 'lodash-es';
 
-import {Clipboard} from './@clipboard';
 import {UndoStack} from './@undo-stack';
 
 type ProcedureEventType = 'update' | 'config';
 
 enableAllPlugins();
 
+export type ActiveState = 'connect' | 'cut' | 'copy';
+
+export interface ActiveIdentity {
+  type: string;
+  id: string;
+  /**
+   * 激活项的前一项
+   */
+  origin?: string;
+  state?: ActiveState;
+}
+
 export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   readonly undoStack = new UndoStack();
 
-  clipboard = new Clipboard<NodeId, NodeId>();
+  activeIdentity: ActiveIdentity | undefined;
 
   nodeRenderDescriptor: {
     before?: any;
@@ -44,6 +60,23 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
     private _definition: ProcedureDefinition = createEmptyProcedure(),
   ) {
     super();
+  }
+
+  isActive(resource: ProcedureTreeNode | ProcedureFlow): boolean {
+    let activeIdentity = this.activeIdentity;
+
+    if (!activeIdentity) {
+      return false;
+    }
+
+    return (
+      resource.type === activeIdentity.type && resource.id === activeIdentity.id
+    );
+  }
+
+  active(identity?: ActiveIdentity): void {
+    this.activeIdentity = identity;
+    this.emit('update');
   }
 
   edit(operator: Operator): void {

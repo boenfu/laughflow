@@ -11,8 +11,17 @@ import {
   createNode,
   createNodeAsFlowStart,
   createNodeBetweenNodes,
+  pasteNode,
+  pasteNodeAsFlowStart,
+  pasteNodeBetweenNodes,
 } from '../../procedure-editor';
 import {Icon} from '../common';
+
+const PasteNode = styled(_AddSolid)`
+  ${Icon};
+  margin: 6px;
+  color: red;
+`;
 
 const SingleNode = styled(_AddSolid)`
   ${Icon};
@@ -69,6 +78,36 @@ interface MarkProps {
 export const Mark: FC<MarkProps> = ({start, next, active}) => {
   const {editor} = useContext(EditorContext);
 
+  const onPasteSingleNode = (): void => {
+    let activeIdentity = editor.activeIdentity;
+
+    if (!activeIdentity) {
+      return;
+    }
+
+    if (start.type === 'flow') {
+      editor.edit(
+        pasteNodeAsFlowStart({
+          activeIdentity,
+          flow: start.id,
+          originStart: next?.id,
+        }),
+      );
+    } else {
+      let from = start.id;
+
+      editor.edit(
+        next
+          ? pasteNodeBetweenNodes({
+              activeIdentity,
+              from,
+              to: next.id,
+            })
+          : pasteNode({activeIdentity, from}),
+      );
+    }
+  };
+
   const onCreateNode = (type: NodeType): void => {
     if (start.type === 'flow') {
       editor.edit(
@@ -97,12 +136,22 @@ export const Mark: FC<MarkProps> = ({start, next, active}) => {
 
   const onCreateBranchesNode = (): void => onCreateNode('branchesNode');
 
-  let title = '插入节点';
+  let state = editor.activeIdentity?.state;
+
+  if (state === 'connect') {
+    return <></>;
+  }
 
   return (
-    <MarkWrapper title={title} className={classNames({active})}>
-      <SingleNode onClick={onCreateSingleNode} />
-      <BranchesNode onClick={onCreateBranchesNode} />
+    <MarkWrapper className={classNames({active})}>
+      {state ? (
+        <PasteNode onClick={onPasteSingleNode} />
+      ) : (
+        <>
+          <SingleNode onClick={onCreateSingleNode} />
+          <BranchesNode onClick={onCreateBranchesNode} />
+        </>
+      )}
     </MarkWrapper>
   );
 };

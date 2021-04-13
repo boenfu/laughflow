@@ -1,10 +1,11 @@
 import {useCreation, useUpdate} from 'ahooks';
-import React, {FC, useEffect, useRef} from 'react';
+import React, {FC, MouseEvent, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
 import {EditorContext} from '../context';
 import {ProcedureEditor} from '../procedure-editor';
 
+import {Navigation} from './@navigation';
 import {EditorProps as FlowEditorProps} from './editor.doc';
 import {Flow} from './flow';
 
@@ -43,23 +44,33 @@ export const FlowEditor: FC<FlowEditorProps> = ({
   const editor = useCreation(() => new ProcedureEditor(definition), []);
   const reRender = useUpdate();
 
-  // const onFullScreenToggle = (): void => {
-  //   if (document.fullscreenElement) {
-  //     void document.exitFullscreen();
-  //   } else {
-  //     void wrapperRef.current?.requestFullscreen();
-  //   }
+  const onFullScreenToggle = (): void => {
+    if (document.fullscreenElement) {
+      void document.exitFullscreen();
+    } else {
+      void wrapperRef.current?.requestFullscreen();
+    }
+  };
 
-  // const onContentClick = (): void => {
-  //   if (editor.activeTrunk) {
-  //     editor.setActiveTrunk(undefined);
-  //   }
-  // };
+  const onContentClick = (event: MouseEvent): void => {
+    let ele = event.target as HTMLElement;
+
+    while (ele && !ele.dataset?.['scope']) {
+      ele = ele.parentNode as HTMLElement;
+    }
+
+    if (!ele) {
+      editor.active();
+      return;
+    }
+
+    let [type, id, origin] = String(ele.dataset['scope']).split(':');
+
+    editor.active({type, id, origin});
+  };
 
   useEffect(() => {
-    editor.on('update', () => {
-      reRender();
-    });
+    editor.on('update', () => reRender());
 
     if (onConfig) {
       editor.on('config', onConfig);
@@ -70,7 +81,8 @@ export const FlowEditor: FC<FlowEditorProps> = ({
   return (
     <Wrapper ref={wrapperRef}>
       <EditorContext.Provider value={{editor}}>
-        <Content>
+        <Navigation onFullScreenToggle={onFullScreenToggle} />
+        <Content onClick={onContentClick}>
           <Flow flow={editor.treeView} start />
         </Content>
       </EditorContext.Provider>

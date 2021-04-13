@@ -12,6 +12,8 @@ const AddFlow = styled(AddSolid)`
   ${Icon};
 `;
 
+const AddFlowWrapper = styled.div``;
+
 const Wrapper = styled.div`
   position: relative;
   display: inline-block;
@@ -22,7 +24,7 @@ const Wrapper = styled.div`
   border-radius: 8px;
   margin: 0 17px;
 
-  ${AddFlow} {
+  ${AddFlowWrapper} {
     position: absolute;
     right: 0;
     top: 50%;
@@ -45,11 +47,13 @@ export const BranchesNode: FC<BranchesNodeProps> = ({node}) => {
   };
 
   return (
-    <Wrapper>
+    <Wrapper data-scope={`${node.type}:${node.id}:${node.prev?.id ?? ''}`}>
       {node.flows.map(flow => (
         <Flow key={flow.id} flow={flow} />
       ))}
-      <AddFlow onClick={onCreateFlow} />
+      <AddFlowWrapper>
+        <AddFlow onClick={onCreateFlow} />
+      </AddFlowWrapper>
     </Wrapper>
   );
 };

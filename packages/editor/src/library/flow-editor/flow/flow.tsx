@@ -34,7 +34,10 @@ export const Flow: FC<FlowProps> = ({flow, start}) => {
   let startNodes = flow.starts;
 
   return (
-    <Wrapper className={classNames({multi: startNodes.length > 1, start})}>
+    <Wrapper
+      className={classNames({multi: startNodes.length > 1, start})}
+      data-scope={`${flow.type}:${flow.id}:${flow.parent?.id}`}
+    >
       {startNodes.length ? (
         startNodes.map((node, index, array) => (
           <Fragment key={`${node.id}-${index}`}>
