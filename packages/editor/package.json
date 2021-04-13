@@ -24,7 +24,6 @@
     "rc-dialog": "^8.5.2",
     "rc-dropdown": "^3.2.0",
     "rc-menu": "^8.10.6",
-    "rc-tooltip": "^5.0.1",
     "react-select": "^4.3.0",
     "styled-components": "^5.2.1",
     "tslang": "^0.1.23",

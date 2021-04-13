@@ -88,7 +88,7 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   }
 
   isActive(resource: ProcedureTreeNode | ProcedureFlow): boolean {
-    return this.activeInfo?.value === resource;
+    return this.activeInfo?.value.id === resource.id;
   }
 
   active(identityOrState?: ActiveIdentity | ActiveState): void {

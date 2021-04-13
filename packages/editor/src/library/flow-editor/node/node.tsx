@@ -38,7 +38,6 @@ export const Node: FC<NodeProps> = ({style, node}) => {
     return <LinkNode node={node} />;
   }
 
-  // const {editor} = useContext(EditorContext);
   let nexts = node.nexts;
 
   return (

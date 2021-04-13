@@ -14,7 +14,6 @@ import styled from 'styled-components';
 import {IconButton} from '../components';
 import {EditorContext} from '../context';
 import {createNode, deleteNode} from '../procedure-editor';
-// import {createNode} from '../procedure-editor';
 
 export interface NavigationProps {
   onFullScreenToggle(): void;
