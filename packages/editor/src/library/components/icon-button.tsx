@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 export interface IconButtonProps extends React.HTMLAttributes<HTMLDivElement> {
   tooltip?: string | string[];
+  tooltipPlacement?: 'top' | 'bottom';
   disable?: boolean | boolean[];
 }
 
@@ -30,6 +31,26 @@ const Button = styled.div`
   }
 
   &:hover {
+    &.bottom {
+      &::before {
+        top: calc(100% + 10px);
+      }
+
+      &::after {
+        top: calc(100% + 7px);
+      }
+    }
+
+    &.top {
+      &::before {
+        bottom: calc(100% + 10px);
+      }
+
+      &::after {
+        bottom: calc(100% + 7px);
+      }
+    }
+
     &::before {
       content: attr(title);
       position: absolute;
@@ -37,7 +58,6 @@ const Button = styled.div`
       white-space: nowrap;
       box-sizing: border-box;
       padding: 0 8px;
-      top: calc(100% + 10px);
       height: 28px;
       line-height: 28px;
       font-size: 12px;
@@ -50,7 +70,6 @@ const Button = styled.div`
     &::after {
       content: '';
       position: absolute;
-      top: calc(100% + 7px);
       left: 50%;
       width: 6.4px;
       height: 6.4px;
@@ -81,7 +100,7 @@ const ButtonWrapper = styled.div`
 `;
 
 export const IconButton: FC<IconButtonProps> = React.memo(
-  ({children, tooltip, disable, ...props}) => {
+  ({children, tooltip, tooltipPlacement = 'bottom', disable, ...props}) => {
     let tooltips = castArray(tooltip);
     let disables = castArray(disable);
 
@@ -95,7 +114,10 @@ export const IconButton: FC<IconButtonProps> = React.memo(
               <Button
                 key={`button:${index}`}
                 title={tooltips[index]}
-                className={classNames({disable: disables[index] ?? disable})}
+                className={classNames({
+                  disable: disables[index] ?? disable,
+                  [tooltipPlacement]: true,
+                })}
                 onClick={onClick}
               >
                 {{...child, props: restProps}}

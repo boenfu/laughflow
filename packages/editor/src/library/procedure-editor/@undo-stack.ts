@@ -38,6 +38,10 @@ export class UndoStack {
   }
 
   update(patches: Patch[], inversePatches: Patch[]): void {
+    if (!patches.length) {
+      return;
+    }
+
     let size = this.cursor + 1;
 
     this.undoes.splice(0, size, inversePatches);

@@ -10,6 +10,12 @@ import {RESOURCE_WIDTH} from '../../common';
 
 import {Header} from './@header';
 
+const Container = styled.div`
+  * {
+    pointer-events: all !important;
+  }
+`;
+
 const BeforeWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -55,8 +61,8 @@ const Wrapper = styled.div`
       opacity: 0;
       margin: 0px;
       height: 100%;
-      transform: translate(-12px, -16px);
-      padding: 16px 12px;
+      transform: translate(-12px, -12px);
+      padding: 12px;
       position: absolute;
       top: 0px;
       left: 0px;
@@ -104,7 +110,7 @@ const EditingIconWrapper = styled.div`
 
   top: 100%;
   left: 50%;
-  transform: translate(-50%, 4px);
+  transform: translate(-50%, 2px);
 
   background: #296dff;
   color: #fff;
@@ -190,7 +196,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
   } = editor.nodeRenderDescriptor;
 
   return (
-    <>
+    <Container>
       {before.length ? (
         <BeforeWrapper>
           {/* {before.reduce(
@@ -243,6 +249,6 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
         )}
       </AfterWrapper>
     ) : undefined} */}
-    </>
+    </Container>
   );
 };

@@ -12,6 +12,7 @@ const Wrapper = styled.div`
   text-align: center;
   vertical-align: top;
   cursor: pointer;
+  pointer-events: all !important;
 
   &:hover {
     opacity: 0.8;

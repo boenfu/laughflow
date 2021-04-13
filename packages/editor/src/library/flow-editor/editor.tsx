@@ -35,6 +35,10 @@ const Content = styled.div`
   text-align: center;
   overflow: auto;
   background-color: #e5e7eb;
+
+  * {
+    pointer-events: none;
+  }
 `;
 
 export const FlowEditor: FC<FlowEditorProps> = ({

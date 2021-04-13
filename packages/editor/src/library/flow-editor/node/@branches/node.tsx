@@ -12,6 +12,8 @@ import {Flow} from '../../flow';
 
 const AddFlow = styled(AddSolid)`
   ${Icon};
+
+  pointer-events: all !important;
 `;
 
 const AddFlowWrapper = styled.div``;
@@ -25,6 +27,9 @@ const Wrapper = styled.div`
   border: 1px solid #c8cdd8;
   border-radius: 8px;
   margin: 0 17px;
+  cursor: pointer;
+
+  pointer-events: all !important;
 
   &.active {
     border-color: #296dff;

@@ -18,6 +18,10 @@ const Wrapper = styled(Bezier)`
     height: 0px !important;
     cursor: pointer;
   }
+
+  * {
+    pointer-events: all !important;
+  }
 `;
 
 const EndWrapper = styled.div`

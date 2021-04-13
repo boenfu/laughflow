@@ -36,6 +36,7 @@ export const Footer: FC<FooterProps> = React.memo(() => {
       <History>
         <IconButton
           tooltip={['撤销', '重做']}
+          tooltipPlacement="top"
           disable={[!editor.undoStack.undoAble, !editor.undoStack.redoAble]}
         >
           <Undo onClick={onUndo} />
