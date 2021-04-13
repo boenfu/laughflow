@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@magicflow/core": "*",
-    "immer": "^8.0.0",
     "lodash-es": "^4.17.20",
     "memorize-decorator": "^0.2.4",
     "nanoid": "^3.1.20",

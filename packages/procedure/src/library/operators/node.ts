@@ -1,5 +1,4 @@
 import {Node, NodeId} from '@magicflow/core';
-import produce from 'immer';
 
 import {ProcedureUtil} from '../utils';
 
@@ -8,29 +7,24 @@ import {Operator} from './common';
 export function addNode<TNode extends Node>(node: TNode): Operator<[TNode]> {
   return definition => {
     node = ProcedureUtil.cloneDeep(node);
+    definition.nodes.push(node);
 
-    return [
-      produce(definition, definition => void definition.nodes.push(node)),
-      node,
-    ];
+    return [definition, node];
   };
 }
 
 export function updateNode(node: Node): Operator {
   return definition => {
     let nextNode = ProcedureUtil.cloneDeep(node);
+    let nodeIndex = definition.nodes.findIndex(node => node.id === nextNode.id);
 
-    return produce(definition, definition => {
-      let nodeIndex = definition.nodes.findIndex(
-        node => node.id === nextNode.id,
-      );
+    if (nodeIndex === -1) {
+      throw Error(`Not found node definition by id '${node.id}'`);
+    }
 
-      if (nodeIndex === -1) {
-        throw Error(`Not found node definition by id '${node.id}'`);
-      }
+    definition.nodes.splice(nodeIndex, 1, nextNode);
 
-      definition.nodes.splice(nodeIndex, 1, nextNode);
-    });
+    return definition;
   };
 }
 
@@ -38,24 +32,27 @@ export function removeNode(nodeId: NodeId): Operator<[Node]> {
   return definition => {
     let removedNode!: Node;
 
-    return [
-      produce(definition, definition => {
-        let nodes: Node[] = [];
+    let nodes: Node[] = [];
 
-        for (let node of definition.nodes) {
-          if (node.id === nodeId) {
-            removedNode = ProcedureUtil.cloneDeep(node);
-          } else {
-            nodes.push(node);
-          }
+    for (let node of definition.nodes) {
+      if (node.id === nodeId) {
+        removedNode = ProcedureUtil.cloneDeep(node);
+      } else {
+        nodes.push(node);
+      }
 
-          node.nexts = node.nexts.filter(next => next !== nodeId);
-        }
+      node.nexts = node.nexts.filter(next => next !== nodeId);
+    }
 
-        definition.nodes = nodes;
-      }),
-      removedNode,
-    ];
+    definition.nodes = nodes;
+
+    definition.flows = definition.flows.map(flow => {
+      flow.starts = flow.starts.filter(start => start !== nodeId);
+
+      return flow;
+    });
+
+    return [definition, removedNode];
   };
 }
 
@@ -63,19 +60,16 @@ export function replaceNodeNexts(
   nodeId: NodeId,
   nexts: NodeId[],
 ): Operator<[NodeId[]]> {
-  let oldNexts: NodeId[];
+  return definition => {
+    let node = ProcedureUtil.requireNode(definition, nodeId);
+    let oldNexts = [...node.nexts];
 
-  return definition => [
-    produce(definition, definition => {
-      let node = ProcedureUtil.requireNode(definition, nodeId);
-      oldNexts = [...node.nexts];
+    node.nexts = nexts.map(
+      next => ProcedureUtil.requireNode(definition, next).id,
+    );
 
-      node.nexts = nexts.map(
-        next => ProcedureUtil.requireNode(definition, next).id,
-      );
-    }),
-    oldNexts,
-  ];
+    return [definition, oldNexts];
+  };
 }
 
 export function replaceNodeNext(
@@ -83,54 +77,51 @@ export function replaceNodeNext(
   nextId: NodeId,
   replaceId: NodeId,
 ): Operator {
-  return definition =>
-    produce(definition, definition => {
-      let node = ProcedureUtil.requireNode(definition, nodeId);
-      let nextIndex = node.nexts.findIndex(next => next === nextId);
+  return definition => {
+    let node = ProcedureUtil.requireNode(definition, nodeId);
+    let nextIndex = node.nexts.findIndex(next => next === nextId);
 
-      if (nextIndex === -1) {
-        throw Error(`Not found node next by id '${nextId}'`);
-      }
+    if (nextIndex === -1) {
+      throw Error(`Not found node next by id '${nextId}'`);
+    }
 
-      node.nexts.splice(nextIndex, 1, replaceId);
-    });
+    node.nexts.splice(nextIndex, 1, replaceId);
+    return definition;
+  };
 }
 
 export function addNodeNexts(nodeId: NodeId, nexts: NodeId[]): Operator {
-  return definition =>
-    produce(definition, definition => {
-      ProcedureUtil.requireNode(definition, nodeId).nexts.push(
-        ...nexts.map(next => ProcedureUtil.requireNode(definition, next).id),
-      );
-    });
+  return definition => {
+    ProcedureUtil.requireNode(definition, nodeId).nexts.push(
+      ...nexts.map(next => ProcedureUtil.requireNode(definition, next).id),
+    );
+
+    return definition;
+  };
 }
 
 export function removeNodeNext(nodeId: NodeId, next: NodeId): Operator {
-  return definition =>
-    produce(definition, definition => {
-      let node = ProcedureUtil.requireNode(definition, nodeId);
+  return definition => {
+    let node = ProcedureUtil.requireNode(definition, nodeId);
 
-      let nextIndex = node.nexts.findIndex(id => id === next);
+    let nextIndex = node.nexts.findIndex(id => id === next);
 
-      if (nextIndex === -1) {
-        throw Error(`Not found node next by id '${next}'`);
-      }
+    if (nextIndex === -1) {
+      throw Error(`Not found node next by id '${next}'`);
+    }
 
-      node.nexts.splice(nextIndex, 1);
-    });
+    node.nexts.splice(nextIndex, 1);
+
+    return definition;
+  };
 }
 
 export function removeNodeNexts(nodeId: NodeId): Operator<[NodeId[]]> {
   return definition => {
-    let nexts!: NodeId[];
+    let node = ProcedureUtil.requireNode(definition, nodeId);
+    let nexts = [...node.nexts];
+    node.nexts = [];
 
-    return [
-      produce(definition, definition => {
-        let node = ProcedureUtil.requireNode(definition, nodeId);
-        nexts = [...node.nexts];
-        node.nexts = [];
-      }),
-      nexts,
-    ];
+    return [definition, nexts];
   };
 }
