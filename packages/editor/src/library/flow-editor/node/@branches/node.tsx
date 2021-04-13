@@ -1,8 +1,10 @@
 import {AddSolid} from '@magicflow/icons';
 import {ProcedureBranchesTreeNode} from '@magicflow/procedure';
+import classNames from 'classnames';
 import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
 
+import {transition} from '../../../components';
 import {EditorContext} from '../../../context';
 import {createFlow} from '../../../procedure-editor';
 import {Icon, RESOURCE_WIDTH} from '../../common';
@@ -23,6 +25,12 @@ const Wrapper = styled.div`
   border: 1px solid #c8cdd8;
   border-radius: 8px;
   margin: 0 17px;
+
+  &.active {
+    border-color: #296dff;
+  }
+
+  ${transition(['border-color'])}
 
   ${AddFlowWrapper} {
     position: absolute;
@@ -47,7 +55,11 @@ export const BranchesNode: FC<BranchesNodeProps> = ({node}) => {
   };
 
   return (
-    <Wrapper data-id={node.id} data-prev={node.prev.id}>
+    <Wrapper
+      className={classNames({active: editor.isActive(node)})}
+      data-id={node.id}
+      data-prev={node.prev.id}
+    >
       {node.flows.map(flow => (
         <Flow key={flow.id} flow={flow} />
       ))}

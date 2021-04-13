@@ -13,6 +13,7 @@ import styled from 'styled-components';
 
 import {IconButton} from '../components';
 import {EditorContext} from '../context';
+import {createNode, deleteNode} from '../procedure-editor';
 // import {createNode} from '../procedure-editor';
 
 export interface NavigationProps {
@@ -45,12 +46,12 @@ const Right = styled.div`
 
 const NODE_ACTIONS = [
   {
-    type: 'addSingle',
+    type: 'singleNode',
     icon: Add,
     title: '添加普通节点',
   },
   {
-    type: 'addBranches',
+    type: 'branchesNode',
     icon: Add,
     title: '添加分支节点',
   },
@@ -93,7 +94,7 @@ export const Navigation: FC<NavigationProps> = React.memo(
     let activeInfo = editor.activeInfo;
 
     const onNodeActionClick = (event: MouseEvent<HTMLDivElement>): void => {
-      if (!activeInfo) {
+      if (!activeInfo || activeInfo.value.type === 'flow') {
         return;
       }
 
@@ -103,13 +104,12 @@ export const Navigation: FC<NavigationProps> = React.memo(
         .type as typeof NODE_ACTIONS[number]['type'];
 
       switch (type) {
-        case 'addSingle':
-        case 'addBranches':
-          // createNode({type})
-          // void editor.procedure.createNode(activeInfo.ref);
+        case 'singleNode':
+        case 'branchesNode':
+          editor.edit(createNode({type, from: activeInfo.value.id}));
           break;
         case 'done':
-          // void editor.procedure.createLeaf(activeInfo.ref, type);
+          // TODO
           break;
         case 'connect':
         case 'cut':
@@ -117,12 +117,7 @@ export const Navigation: FC<NavigationProps> = React.memo(
           editor.active(type);
           break;
         case 'trash':
-          // if (activeIdentity.ref.type === 'node') {
-          //   void editor.procedure.deleteNode(
-          //     activeIdentity.ref.id,
-          //     activeIdentity.prev,
-          //   );
-          // }
+          editor.edit(deleteNode(activeInfo.value));
 
           break;
         case 'more':

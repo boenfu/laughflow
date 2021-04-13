@@ -10,10 +10,11 @@ import {
   ProcedureTreeView,
   ProcedureUtil,
 } from '@magicflow/procedure';
-import {Operator} from '@magicflow/procedure/operators';
+import {Operator, compose} from '@magicflow/procedure/operators';
 import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
 import {enableAllPlugins, produce} from 'immer';
+import {isEqual} from 'lodash-es';
 
 import {UndoStack} from './@undo-stack';
 
@@ -46,6 +47,8 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
 
   readonly undoStack = new UndoStack();
 
+  activeInfo: ActiveInfo | undefined;
+
   nodeRenderDescriptor: {
     before?: any;
     after?: any;
@@ -54,6 +57,15 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
     footer?: any;
     body?: any;
   } = {};
+
+  private get activeIdentity(): ActiveIdentity | undefined {
+    return this._activeIdentity;
+  }
+
+  private set activeIdentity(activeIdentity: ActiveIdentity | undefined) {
+    this._activeIdentity = activeIdentity;
+    this.updateActiveInfo(activeIdentity);
+  }
 
   get definition(): ProcedureDefinition {
     return this._definition;
@@ -69,32 +81,6 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
     return this._treeView.root;
   }
 
-  get activeInfo(): ActiveInfo | undefined {
-    let activeIdentity = this._activeIdentity;
-
-    if (!activeIdentity) {
-      return undefined;
-    }
-
-    let treeView = this._treeView;
-
-    let value =
-      'flow' in activeIdentity
-        ? treeView.flowsMap.get(activeIdentity.flow)
-        : treeView.nodesMapMap
-            .get(activeIdentity.node)
-            ?.get(activeIdentity.prev);
-
-    if (!value) {
-      return undefined;
-    }
-
-    return {
-      value,
-      state: this._activeIdentity?.state,
-    };
-  }
-
   constructor(definition: ProcedureDefinition = createEmptyProcedure()) {
     super();
 
@@ -107,22 +93,20 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
 
   active(identityOrState?: ActiveIdentity | ActiveState): void {
     if (typeof identityOrState === 'string') {
-      if (!this._activeIdentity) {
+      if (!this.activeIdentity) {
         return;
       }
 
-      this._activeIdentity.state = identityOrState;
+      this.activeIdentity = {...this.activeIdentity, state: identityOrState};
     } else {
-      this._activeIdentity = identityOrState;
+      this.activeIdentity = identityOrState;
     }
-
-    this.emit('update');
   }
 
   edit(operator: Operator): void {
     this.definition = produce(
       this.definition,
-      operator,
+      compose([operator]),
       (patches, inversePatches) =>
         this.undoStack.update(patches, inversePatches),
     );
@@ -134,5 +118,39 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
 
   redo(): void {
     this.definition = this.undoStack.redo(this.definition);
+  }
+
+  private updateActiveInfo(activeIdentity: ActiveIdentity | undefined): void {
+    let activeInfo: ActiveInfo | undefined;
+
+    if (!activeIdentity) {
+      activeInfo = undefined;
+    } else {
+      let treeView = this._treeView;
+
+      let value =
+        'flow' in activeIdentity
+          ? treeView.flowsMap.get(activeIdentity.flow)
+          : treeView.nodesMapMap
+              .get(activeIdentity.node)
+              ?.get(activeIdentity.prev);
+
+      activeInfo = value
+        ? {
+            value,
+            state: activeIdentity?.state,
+          }
+        : undefined;
+    }
+
+    let activeInfoChanged = !isEqual(activeInfo, this.activeInfo);
+
+    if (!activeInfoChanged) {
+      return;
+    }
+
+    this.activeInfo = activeInfo;
+
+    this.emit('update');
   }
 }

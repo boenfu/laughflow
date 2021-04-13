@@ -1,3 +1,5 @@
+import {FlowId, NodeId} from '@magicflow/core';
+import {addFlowStart, addNodeNexts} from '@magicflow/procedure/operators';
 import {useCreation, useUpdate} from 'ahooks';
 import React, {FC, MouseEvent, useEffect, useRef} from 'react';
 import styled from 'styled-components';
@@ -5,6 +7,7 @@ import styled from 'styled-components';
 import {EditorContext} from '../context';
 import {ActiveIdentity, ProcedureEditor} from '../procedure-editor';
 
+import {Footer} from './@footer';
 import {Navigation} from './@navigation';
 import {EditorProps as FlowEditorProps} from './editor.doc';
 import {Flow} from './flow';
@@ -53,19 +56,31 @@ export const FlowEditor: FC<FlowEditorProps> = ({
   };
 
   const onContentClick = (event: MouseEvent): void => {
-    let ele = event.target as HTMLElement;
+    let elem = event.target as HTMLElement;
 
-    while (ele && !ele.dataset?.['id']) {
-      ele = ele.parentNode as HTMLElement;
+    while (elem && !elem.dataset?.['id']) {
+      elem = elem.parentNode as HTMLElement;
     }
 
-    if (!ele) {
+    if (!elem) {
       editor.active();
       return;
     }
 
-    let id = String(ele.dataset['id']);
-    let prev = String(ele.dataset['prev']);
+    let id = String(elem.dataset['id']);
+    let prev = String(elem.dataset['prev']);
+
+    let activeInfo = editor.activeInfo;
+
+    if (activeInfo?.value.type !== 'flow' && activeInfo?.state === 'connect') {
+      editor.edit(
+        prev
+          ? addNodeNexts(id as NodeId, [activeInfo.value.id])
+          : addFlowStart(id as FlowId, activeInfo.value.id),
+      );
+      editor.active();
+      return;
+    }
 
     editor.active((prev ? {prev, node: id} : {flow: id}) as ActiveIdentity);
   };
@@ -86,6 +101,7 @@ export const FlowEditor: FC<FlowEditorProps> = ({
         <Content onClick={onContentClick}>
           <Flow flow={editor.rootFlow} start />
         </Content>
+        <Footer />
       </EditorContext.Provider>
     </Wrapper>
   );

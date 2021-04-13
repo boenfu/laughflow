@@ -2,12 +2,14 @@ import {FlowId, NodeId} from '@magicflow/core';
 import {
   Operator,
   OperatorFunction,
+  addFlowStart,
   addNode,
   addNodeNexts,
   compose,
   out,
   removeFlowStart,
   removeNodeNext,
+  removeNodeNexts,
 } from '@magicflow/procedure/operators';
 import {copyNode} from '@magicflow/procedure/utils';
 
@@ -26,8 +28,6 @@ export interface PasteNodeOperatorParam {
 const getPasteNode: OperatorFunction<
   [ActiveInfo, (value: NodeId) => Operator]
 > = ({value, state}, callback) => {
-  let operators: Operator[] = [];
-
   if (value.type !== 'singleNode' || state === 'connect') {
     return compose([]);
   }
@@ -35,25 +35,27 @@ const getPasteNode: OperatorFunction<
   let nodeId = value.id;
 
   if (state === 'cut') {
-    operators.push(
-      value.prev.type !== 'flow'
-        ? removeNodeNext(value.prev.id, nodeId)
-        : removeFlowStart(value.prev.id, nodeId),
-    );
-  } else {
-    operators.push(
-      out(
-        definition => addNode(copyNode(value.definition))(definition),
-        node => {
-          nodeId = node.id;
-        },
-      ),
-    );
+    return compose([
+      out(removeNodeNexts(nodeId), nexts => {
+        let prev = value.prev;
+
+        if (prev.type === 'flow') {
+          return [
+            removeFlowStart(prev.id, nodeId),
+            ...nexts.map(next => addFlowStart(prev.id as FlowId, next)),
+          ];
+        }
+
+        return [removeNodeNext(prev.id, nodeId), addNodeNexts(prev.id, nexts)];
+      }),
+      callback(nodeId),
+    ]);
   }
 
-  operators.push(callback(nodeId));
-
-  return compose(operators);
+  return out(
+    definition => addNode(copyNode(value.definition))(definition),
+    node => callback(node.id),
+  );
 };
 
 /**

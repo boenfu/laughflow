@@ -46,6 +46,7 @@ export interface IProcedureTreeNode<TNode extends Node> {
    * 首次引用的 left 为 undefined
    */
   left: Extract<ProcedureTreeNode, {type: TNode['type']}> | undefined;
+  right: Extract<ProcedureTreeNode, {type: TNode['type']}> | undefined;
   nexts: ProcedureTreeNode[];
   definition: TNode;
 }
@@ -148,6 +149,7 @@ function buildProcedureTreeView(
         definition: node,
         prev,
         left: left as ProcedureSingleTreeNode,
+        right: undefined,
         nexts,
       };
     } else {
@@ -159,6 +161,7 @@ function buildProcedureTreeView(
         definition: node,
         prev,
         left: left as ProcedureBranchesTreeNode,
+        right: undefined,
         flows,
         nexts,
       };
@@ -176,7 +179,13 @@ function buildProcedureTreeView(
 
     leftNodesMap.set(nodeId, procedureTreeNode);
 
-    if (!left) {
+    if (left) {
+      // 双向关联
+
+      left.right = procedureTreeNode;
+    } else {
+      // 首次使用才生成 nexts
+
       for (let next of node.nexts) {
         let nextNode = buildProcedureTreeNode(next, procedureTreeNode);
 

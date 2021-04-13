@@ -1,9 +1,10 @@
 import {ProcedureFlow} from '@magicflow/procedure';
 import classNames from 'classnames';
-import React, {FC, Fragment} from 'react';
+import React, {FC, Fragment, useContext} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../../components';
+import {EditorContext} from '../../context';
 import {RESOURCE_WIDTH} from '../common';
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../connection-line';
 import {Node} from '../node';
@@ -20,6 +21,10 @@ const Wrapper = styled.div`
     padding-top: ${LINE_HEIGHT_DEFAULT * 2}px;
   }
 
+  &.active {
+    background-color: #ccc;
+  }
+
   ${transition(['border-color'])}
 `;
 
@@ -31,11 +36,16 @@ export interface FlowProps {
 }
 
 export const Flow: FC<FlowProps> = ({flow, start}) => {
+  const {editor} = useContext(EditorContext);
   let startNodes = flow.starts;
 
   return (
     <Wrapper
-      className={classNames({multi: startNodes.length > 1, start})}
+      className={classNames({
+        multi: startNodes.length > 1,
+        start,
+        active: editor.isActive(flow),
+      })}
       data-id={flow.id}
     >
       {startNodes.length ? (

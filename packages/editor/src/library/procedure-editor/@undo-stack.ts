@@ -30,9 +30,11 @@ export class UndoStack {
       return source;
     }
 
+    let nextSource = applyPatches(source, this.redoes[this.cursor]);
+
     this.cursor -= 1;
 
-    return applyPatches(source, this.redoes[this.cursor]);
+    return nextSource;
   }
 
   update(patches: Patch[], inversePatches: Patch[]): void {
