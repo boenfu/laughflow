@@ -1,15 +1,19 @@
-import {Procedure as ProcedureDefinition} from '@magicflow/core';
+import {
+  FlowId,
+  NodeId,
+  Procedure as ProcedureDefinition,
+} from '@magicflow/core';
 import {
   Procedure,
   ProcedureFlow,
   ProcedureTreeNode,
+  ProcedureTreeView,
   ProcedureUtil,
 } from '@magicflow/procedure';
 import {Operator} from '@magicflow/procedure/operators';
 import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
-import {enableAllPlugins, isDraft, original, produce} from 'immer';
-import {merge} from 'lodash-es';
+import {enableAllPlugins, produce} from 'immer';
 
 import {UndoStack} from './@undo-stack';
 
@@ -19,20 +23,28 @@ enableAllPlugins();
 
 export type ActiveState = 'connect' | 'cut' | 'copy';
 
-export interface ActiveIdentity {
-  type: string;
-  id: string;
-  /**
-   * 激活项的前一项
-   */
-  origin?: string;
+export type ActiveIdentity = (
+  | {
+      flow: FlowId;
+    }
+  | {prev: NodeId | FlowId; node: NodeId}
+) & {
+  state?: ActiveState;
+};
+
+export interface ActiveInfo {
+  value: ProcedureTreeNode | ProcedureFlow;
   state?: ActiveState;
 }
 
 export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
-  readonly undoStack = new UndoStack();
+  private _definition!: ProcedureDefinition;
 
-  activeIdentity: ActiveIdentity | undefined;
+  private _treeView!: ProcedureTreeView;
+
+  private _activeIdentity: ActiveIdentity | undefined;
+
+  readonly undoStack = new UndoStack();
 
   nodeRenderDescriptor: {
     before?: any;
@@ -49,43 +61,68 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
 
   set definition(definition: ProcedureDefinition) {
     this._definition = ProcedureUtil.cloneDeep(definition);
+    this._treeView = new Procedure(definition).treeView;
     this.emit('update');
   }
 
-  get treeView(): ProcedureFlow {
-    return new Procedure(this.definition).treeView;
+  get rootFlow(): ProcedureFlow {
+    return this._treeView.root;
   }
 
-  constructor(
-    private _definition: ProcedureDefinition = createEmptyProcedure(),
-  ) {
+  get activeInfo(): ActiveInfo | undefined {
+    let activeIdentity = this._activeIdentity;
+
+    if (!activeIdentity) {
+      return undefined;
+    }
+
+    let treeView = this._treeView;
+
+    let value =
+      'flow' in activeIdentity
+        ? treeView.flowsMap.get(activeIdentity.flow)
+        : treeView.nodesMapMap
+            .get(activeIdentity.node)
+            ?.get(activeIdentity.prev);
+
+    if (!value) {
+      return undefined;
+    }
+
+    return {
+      value,
+      state: this._activeIdentity?.state,
+    };
+  }
+
+  constructor(definition: ProcedureDefinition = createEmptyProcedure()) {
     super();
+
+    this.definition = definition;
   }
 
   isActive(resource: ProcedureTreeNode | ProcedureFlow): boolean {
-    let activeIdentity = this.activeIdentity;
-
-    if (!activeIdentity) {
-      return false;
-    }
-
-    return (
-      resource.type === activeIdentity.type && resource.id === activeIdentity.id
-    );
+    return this.activeInfo?.value === resource;
   }
 
-  active(identity?: ActiveIdentity): void {
-    this.activeIdentity = identity;
+  active(identityOrState?: ActiveIdentity | ActiveState): void {
+    if (typeof identityOrState === 'string') {
+      if (!this._activeIdentity) {
+        return;
+      }
+
+      this._activeIdentity.state = identityOrState;
+    } else {
+      this._activeIdentity = identityOrState;
+    }
+
     this.emit('update');
   }
 
   edit(operator: Operator): void {
-    let definition = operator(this.definition);
-    definition = isDraft(definition) ? original(definition)! : definition;
-
     this.definition = produce(
       this.definition,
-      originDefinition => merge(originDefinition, definition),
+      operator,
       (patches, inversePatches) =>
         this.undoStack.update(patches, inversePatches),
     );

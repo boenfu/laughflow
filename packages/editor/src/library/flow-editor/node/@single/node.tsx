@@ -175,10 +175,10 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
   //   });
   // };
 
-  let activeIdentity = editor.activeIdentity;
+  let activeInfo = editor.activeInfo;
   let active = editor.isActive(node);
 
-  let editing = active ? activeIdentity?.state : undefined;
+  let editing = active ? activeInfo?.state : undefined;
   // let selected = activeTrunk?.relationTrunks?.some(ref => ref.id === node.id);
 
   let {
@@ -211,7 +211,8 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
           },
           editing,
         ])}
-        data-scope={`${node.type}:${node.id}:${node.prev?.id ?? ''}`}
+        data-id={node.id}
+        data-prev={node.prev.id}
         // onClick={onContainerClick}
       >
         <Header node={node} />

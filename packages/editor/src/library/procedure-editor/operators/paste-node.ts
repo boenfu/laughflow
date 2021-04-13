@@ -1,5 +1,4 @@
 import {FlowId, NodeId} from '@magicflow/core';
-import {ProcedureUtil} from '@magicflow/procedure';
 import {
   Operator,
   OperatorFunction,
@@ -12,7 +11,7 @@ import {
 } from '@magicflow/procedure/operators';
 import {copyNode} from '@magicflow/procedure/utils';
 
-import {ActiveIdentity} from '../procedure-editor';
+import {ActiveInfo} from '../procedure-editor';
 
 import {insertNodeAsFlowStart} from './@insert-node-as-flow-start';
 import {insertNodeBeforeNexts} from './@insert-node-before-nexts';
@@ -21,33 +20,30 @@ import {insertNodeBetweenNodes} from './@insert-node-between-nodes';
 export interface PasteNodeOperatorParam {
   from: NodeId;
   to?: NodeId;
-  activeIdentity: ActiveIdentity;
+  activeInfo: ActiveInfo;
 }
 
 const getPasteNode: OperatorFunction<
-  [ActiveIdentity, (value: NodeId) => Operator]
-> = ({type, id, origin, state}, callback) => {
+  [ActiveInfo, (value: NodeId) => Operator]
+> = ({value, state}, callback) => {
   let operators: Operator[] = [];
 
-  if (type !== 'singleNode' || state === 'connect') {
+  if (value.type !== 'singleNode' || state === 'connect') {
     return compose([]);
   }
 
-  let nodeId = id as NodeId;
+  let nodeId = value.id;
 
   if (state === 'cut') {
     operators.push(
-      origin
-        ? removeNodeNext(origin as NodeId, nodeId)
-        : removeFlowStart(origin as FlowId, nodeId),
+      value.prev.type !== 'flow'
+        ? removeNodeNext(value.prev.id, nodeId)
+        : removeFlowStart(value.prev.id, nodeId),
     );
   } else {
     operators.push(
       out(
-        definition =>
-          addNode(
-            copyNode(ProcedureUtil.requireNode(definition, nodeId, type)),
-          )(definition),
+        definition => addNode(copyNode(value.definition))(definition),
         node => {
           nodeId = node.id;
         },
@@ -67,8 +63,8 @@ const getPasteNode: OperatorFunction<
  */
 export const pasteNode: OperatorFunction<[PasteNodeOperatorParam]> = ({
   from,
-  activeIdentity,
-}) => getPasteNode(activeIdentity, node => addNodeNexts(from, [node]));
+  activeInfo,
+}) => getPasteNode(activeInfo, node => addNodeNexts(from, [node]));
 
 /**
  * 在两个节点间粘贴节点
@@ -77,8 +73,8 @@ export const pasteNode: OperatorFunction<[PasteNodeOperatorParam]> = ({
  */
 export const pasteNodeBetweenNodes: OperatorFunction<
   [Required<PasteNodeOperatorParam>]
-> = ({from, to, activeIdentity}) =>
-  getPasteNode(activeIdentity, insertNodeBetweenNodes({from, to}));
+> = ({from, to, activeInfo}) =>
+  getPasteNode(activeInfo, insertNodeBetweenNodes({from, to}));
 
 /**
  * 在节点之后粘贴节点并迁移 nexts
@@ -87,8 +83,8 @@ export const pasteNodeBetweenNodes: OperatorFunction<
  */
 export const pasteNodeBeforeNexts: OperatorFunction<
   [PasteNodeOperatorParam]
-> = ({from, activeIdentity}) =>
-  getPasteNode(activeIdentity, insertNodeBeforeNexts(from));
+> = ({from, activeInfo}) =>
+  getPasteNode(activeInfo, insertNodeBeforeNexts(from));
 
 /**
  * 粘贴节点并作为 flow start
@@ -98,10 +94,10 @@ export const pasteNodeBeforeNexts: OperatorFunction<
 export const pasteNodeAsFlowStart: OperatorFunction<
   [
     {
-      activeIdentity: ActiveIdentity;
+      activeInfo: ActiveInfo;
       flow: FlowId;
       originStart?: NodeId;
     },
   ]
-> = ({flow, activeIdentity, originStart}) =>
-  getPasteNode(activeIdentity, insertNodeAsFlowStart({flow, originStart}));
+> = ({flow, activeInfo, originStart}) =>
+  getPasteNode(activeInfo, insertNodeAsFlowStart({flow, originStart}));

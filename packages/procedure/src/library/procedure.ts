@@ -24,8 +24,8 @@ export class Procedure implements IProcedure {
     return new Map(this.definition.nodes.map(node => [node.id, node]));
   }
 
-  get treeView(): ProcedureFlow {
-    return buildProcedureFlow(this.definition);
+  get treeView(): ProcedureTreeView {
+    return buildProcedureTreeView(this.definition);
   }
 
   constructor(definition: ProcedureDefinition) {
@@ -39,7 +39,7 @@ export interface IProcedureTreeNode<TNode extends Node> {
   /**
    * 前驱节点
    */
-  prev: ProcedureTreeNode | undefined;
+  prev: ProcedureTreeNode | ProcedureFlow;
   /**
    * 同一个节点定义在多处使用时
    * left 即对应前一次使用的引用
@@ -70,42 +70,67 @@ export interface ProcedureFlow {
   definition: Flow;
 }
 
-function buildProcedureFlow(definition: ProcedureDefinition): ProcedureFlow {
+export type ProcedureEdge = `${FlowId | NodeId}-${NodeId}`;
+
+export interface ProcedureTreeView {
+  definition: ProcedureDefinition;
+  root: ProcedureFlow;
+  nodesMapMap: Map<NodeId, Map<NodeId | FlowId, ProcedureTreeNode>>;
+  flowsMap: Map<FlowId, ProcedureFlow>;
+}
+
+function buildProcedureTreeView(
+  definition: ProcedureDefinition,
+): ProcedureTreeView {
   let {start, nodes, flows} = definition;
 
-  let nodesMap = new Map(nodes.map(node => [node.id, node]));
-  let flowsMap = new Map(flows.map(flow => [flow.id, flow]));
+  let nodesMapMap = new Map<NodeId, Map<NodeId | FlowId, ProcedureTreeNode>>();
+  let flowsMap = new Map<FlowId, ProcedureFlow>();
+
+  let nodeDefinitionsMap = new Map(nodes.map(node => [node.id, node]));
+  let flowDefinitionsMap = new Map(flows.map(flow => [flow.id, flow]));
 
   let leftNodesMap = new Map<NodeId, ProcedureTreeNode>();
 
-  let startFlow = flowsMap.get(start);
+  let startFlow = flowDefinitionsMap.get(start);
 
   if (!startFlow) {
     throw Error('todo');
   }
 
-  return buildProcedureFlow(startFlow, undefined);
+  return {
+    root: buildProcedureFlow(startFlow, undefined),
+    definition,
+    nodesMapMap,
+    flowsMap,
+  };
 
   function buildProcedureFlow(
     flow: Flow,
     parent: ProcedureBranchesTreeNode | undefined,
   ): ProcedureFlow {
-    return {
+    let procedureFlow: ProcedureFlow = {
       type: 'flow',
       id: flow.id,
       parent,
-      starts: compact(
-        flow.starts.map(node => buildProcedureTreeNode(node, undefined)),
-      ),
+      starts: [],
       definition: flow,
     };
+
+    procedureFlow.starts = compact(
+      flow.starts.map(node => buildProcedureTreeNode(node, procedureFlow)),
+    );
+
+    flowsMap.set(flow.id, procedureFlow);
+
+    return procedureFlow;
   }
 
   function buildProcedureTreeNode(
     nodeId: NodeId,
-    prev: ProcedureTreeNode | undefined,
+    prev: ProcedureTreeNode | ProcedureFlow,
   ): ProcedureTreeNode | undefined {
-    let node = nodesMap.get(nodeId);
+    let node = nodeDefinitionsMap.get(nodeId);
 
     if (!node) {
       return;
@@ -139,7 +164,7 @@ function buildProcedureFlow(definition: ProcedureDefinition): ProcedureFlow {
       };
 
       for (let flowId of node.flows) {
-        let flow = flowsMap.get(flowId);
+        let flow = flowDefinitionsMap.get(flowId);
 
         if (!flow) {
           continue;
@@ -162,6 +187,14 @@ function buildProcedureFlow(definition: ProcedureDefinition): ProcedureFlow {
         nexts.push(nextNode);
       }
     }
+
+    nodesMapMap.set(
+      procedureTreeNode.id,
+      (nodesMapMap.get(procedureTreeNode.id) || new Map()).set(
+        procedureTreeNode.prev.id,
+        procedureTreeNode,
+      ),
+    );
 
     return procedureTreeNode;
   }

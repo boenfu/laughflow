@@ -47,7 +47,7 @@ export const BranchesNode: FC<BranchesNodeProps> = ({node}) => {
   };
 
   return (
-    <Wrapper data-scope={`${node.type}:${node.id}:${node.prev?.id ?? ''}`}>
+    <Wrapper data-id={node.id} data-prev={node.prev.id}>
       {node.flows.map(flow => (
         <Flow key={flow.id} flow={flow} />
       ))}

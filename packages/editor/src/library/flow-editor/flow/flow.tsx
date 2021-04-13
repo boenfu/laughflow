@@ -36,7 +36,7 @@ export const Flow: FC<FlowProps> = ({flow, start}) => {
   return (
     <Wrapper
       className={classNames({multi: startNodes.length > 1, start})}
-      data-scope={`${flow.type}:${flow.id}:${flow.parent?.id}`}
+      data-id={flow.id}
     >
       {startNodes.length ? (
         startNodes.map((node, index, array) => (

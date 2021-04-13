@@ -79,16 +79,16 @@ export const Mark: FC<MarkProps> = ({start, next, active}) => {
   const {editor} = useContext(EditorContext);
 
   const onPasteSingleNode = (): void => {
-    let activeIdentity = editor.activeIdentity;
+    let activeInfo = editor.activeInfo;
 
-    if (!activeIdentity) {
+    if (!activeInfo) {
       return;
     }
 
     if (start.type === 'flow') {
       editor.edit(
         pasteNodeAsFlowStart({
-          activeIdentity,
+          activeInfo,
           flow: start.id,
           originStart: next?.id,
         }),
@@ -99,11 +99,11 @@ export const Mark: FC<MarkProps> = ({start, next, active}) => {
       editor.edit(
         next
           ? pasteNodeBetweenNodes({
-              activeIdentity,
+              activeInfo,
               from,
               to: next.id,
             })
-          : pasteNode({activeIdentity, from}),
+          : pasteNode({activeInfo, from}),
       );
     }
   };
@@ -136,7 +136,7 @@ export const Mark: FC<MarkProps> = ({start, next, active}) => {
 
   const onCreateBranchesNode = (): void => onCreateNode('branchesNode');
 
-  let state = editor.activeIdentity?.state;
+  let state = editor.activeInfo?.state;
 
   if (state === 'connect') {
     return <></>;

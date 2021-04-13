@@ -3,7 +3,7 @@ import React, {FC, MouseEvent, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
 import {EditorContext} from '../context';
-import {ProcedureEditor} from '../procedure-editor';
+import {ActiveIdentity, ProcedureEditor} from '../procedure-editor';
 
 import {Navigation} from './@navigation';
 import {EditorProps as FlowEditorProps} from './editor.doc';
@@ -55,7 +55,7 @@ export const FlowEditor: FC<FlowEditorProps> = ({
   const onContentClick = (event: MouseEvent): void => {
     let ele = event.target as HTMLElement;
 
-    while (ele && !ele.dataset?.['scope']) {
+    while (ele && !ele.dataset?.['id']) {
       ele = ele.parentNode as HTMLElement;
     }
 
@@ -64,9 +64,10 @@ export const FlowEditor: FC<FlowEditorProps> = ({
       return;
     }
 
-    let [type, id, origin] = String(ele.dataset['scope']).split(':');
+    let id = String(ele.dataset['id']);
+    let prev = String(ele.dataset['prev']);
 
-    editor.active({type, id, origin});
+    editor.active((prev ? {prev, node: id} : {flow: id}) as ActiveIdentity);
   };
 
   useEffect(() => {
@@ -83,7 +84,7 @@ export const FlowEditor: FC<FlowEditorProps> = ({
       <EditorContext.Provider value={{editor}}>
         <Navigation onFullScreenToggle={onFullScreenToggle} />
         <Content onClick={onContentClick}>
-          <Flow flow={editor.treeView} start />
+          <Flow flow={editor.rootFlow} start />
         </Content>
       </EditorContext.Provider>
     </Wrapper>

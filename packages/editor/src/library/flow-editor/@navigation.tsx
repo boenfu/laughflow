@@ -90,10 +90,10 @@ export const Navigation: FC<NavigationProps> = React.memo(
   ({onFullScreenToggle}) => {
     const {editor} = useContext(EditorContext);
 
-    let activeIdentity = editor.activeIdentity;
+    let activeInfo = editor.activeInfo;
 
     const onNodeActionClick = (event: MouseEvent<HTMLDivElement>): void => {
-      if (!activeIdentity) {
+      if (!activeInfo) {
         return;
       }
 
@@ -106,15 +106,15 @@ export const Navigation: FC<NavigationProps> = React.memo(
         case 'addSingle':
         case 'addBranches':
           // createNode({type})
-          // void editor.procedure.createNode(activeIdentity.ref);
+          // void editor.procedure.createNode(activeInfo.ref);
           break;
         case 'done':
-          // void editor.procedure.createLeaf(activeIdentity.ref, type);
+          // void editor.procedure.createLeaf(activeInfo.ref, type);
           break;
         case 'connect':
         case 'cut':
         case 'copy':
-          editor.active({...activeIdentity, state: type});
+          editor.active(type);
           break;
         case 'trash':
           // if (activeIdentity.ref.type === 'node') {
@@ -139,7 +139,7 @@ export const Navigation: FC<NavigationProps> = React.memo(
         <Left />
         <Mid />
         <Right>
-          {activeIdentity
+          {activeInfo
             ? NODE_ACTIONS.map(({type, icon: Icon, title}) => (
                 <IconButton
                   key={type}
