@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import {EditorContext} from '../../context';
 import {
+  createNode,
   createNodeAsFlowStart,
   createNodeBetweenNodes,
 } from '../../procedure-editor';
@@ -78,16 +79,16 @@ export const Mark: FC<MarkProps> = ({start, next, active}) => {
         }),
       );
     } else {
-      if (!next) {
-        return;
-      }
+      let from = start.id;
 
       editor.edit(
-        createNodeBetweenNodes({
-          type,
-          from: start.id,
-          to: next.id,
-        }),
+        next
+          ? createNodeBetweenNodes({
+              type,
+              from,
+              to: next.id,
+            })
+          : createNode({type, from}),
       );
     }
   };

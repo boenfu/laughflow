@@ -1,3 +1,4 @@
+import {Check} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
@@ -19,31 +20,26 @@ const Wrapper = styled.div`
   ${transition(['opacity'])}
 `;
 
+const Content = styled.div`
+  font-size: 12px;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  background-color: #81cb5f;
+`;
+
 export const Leaf: FC<LeafProps> = ({}) => {
-  // const {editor} = useContext(EditorContext);
-
-  // let Component = LeafTypeToRender[leaf.type];
-
-  // if (!Component) {
-  //   return <></>;
-  // }
-
-  // const onDelete = (): void => void editor.procedure.deleteLeaf(prev, leaf.id);
-
   return (
     <Wrapper>
-      {/* <TooltipActions
-        actions={[
-          {
-            name: 'delete',
-            icon: <Trash />,
-            content: '删除',
-            onAction: onDelete,
-          },
-        ]}
-      >
-        <LeafContent>{createElement(Component, {leaf})}</LeafContent>
-      </TooltipActions> */}
+      <Content>
+        <Check />
+      </Content>
     </Wrapper>
   );
 };

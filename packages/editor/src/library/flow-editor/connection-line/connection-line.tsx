@@ -27,7 +27,10 @@ const EndWrapper = styled.div`
 
 export interface ConnectionLineProps extends BezierProps {
   start: ProcedureFlow | ProcedureTreeNode;
-  next?: ProcedureTreeNode;
+  /**
+   * false: 设置 mark 为 结束元素
+   */
+  next?: ProcedureTreeNode | false;
   /**
    * 边际的两个元素会绘制向下的圆弧
    */
@@ -44,7 +47,11 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
   endNode,
   placement,
 }) => {
-  let actionRendering = <Mark {...{start, next, active: !next}} />;
+  let markAsNext = next === false;
+
+  let markRendering = (
+    <Mark {...{start, next: next || undefined, active: markAsNext}} />
+  );
 
   return (
     <>
@@ -55,12 +62,12 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
         endNode={endNode}
         placement={placement}
         marks={
-          next
+          next !== false
             ? [
                 {
                   key: 'mark',
                   position: 0.5,
-                  render: actionRendering,
+                  render: markRendering,
                 },
               ]
             : []
@@ -108,7 +115,7 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
           return `M ${end.x},${midline} V ${end.y}`;
         }}
       />
-      {!next ? <EndWrapper>{actionRendering}</EndWrapper> : undefined}
+      {markAsNext ? <EndWrapper>{markRendering}</EndWrapper> : undefined}
     </>
   );
 };

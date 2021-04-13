@@ -71,7 +71,7 @@ export const FlowEditor: FC<FlowEditorProps> = ({
     <Wrapper ref={wrapperRef}>
       <EditorContext.Provider value={{editor}}>
         <Content>
-          <Flow flow={editor.treeView} />
+          <Flow flow={editor.treeView} start />
         </Content>
       </EditorContext.Provider>
     </Wrapper>
