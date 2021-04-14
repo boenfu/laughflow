@@ -8,6 +8,7 @@
     "@magicflow/core": "*",
     "@magicflow/icons": "*",
     "@magicflow/procedure": "*",
+    "@magicflow/task": "*",
     "tslib": "^2.2.0"
   }
 }

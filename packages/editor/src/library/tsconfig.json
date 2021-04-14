@@ -15,6 +15,9 @@
       "path": "../../../procedure/src/library"
     },
     {
+      "path": "../../../task/src/library"
+    },
+    {
       "path": "../../../icons/src/library"
     }
   ]
