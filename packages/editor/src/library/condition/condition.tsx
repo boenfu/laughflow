@@ -168,4 +168,8 @@ export class ConditionPlugin implements IConditionPlugin {
       );
     },
   };
+
+  task: IPlugin['task'] = {
+    context: {},
+  };
 }

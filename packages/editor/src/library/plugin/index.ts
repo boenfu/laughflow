@@ -1,5 +1,6 @@
 import {Node, NodeType} from '@magicflow/core';
 import {ProcedureTreeNode} from '@magicflow/procedure';
+import {TaskContext} from '@magicflow/task';
 import {ComponentType, ReactNode} from 'react';
 
 import {ProcedureEditor} from '../procedure-editor';
@@ -47,5 +48,9 @@ export interface IPlugin<TConfigExtraProps = {}> {
     before?: PluginComponent<'branchesNode'>;
     after?: PluginComponent<'branchesNode'>;
     config?: PluginConfigComponent<'branchesNode', TConfigExtraProps>;
+  };
+
+  task: {
+    context: TaskContext;
   };
 }

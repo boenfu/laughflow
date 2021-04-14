@@ -12,10 +12,13 @@ import {createId} from '@magicflow/procedure/utils';
 import {Dict} from 'tslang';
 
 import {
-  ITaskContext,
   TaskBranchesNodeMetadata,
+  TaskContext,
+  TaskFlowId,
   TaskFlowMetadata,
+  TaskId,
   TaskMetadata,
+  TaskNodeId,
   TaskNodeMetadata,
   TaskSingleNodeMetadata,
   TaskStage,
@@ -24,6 +27,10 @@ import {
 export type TaskNode = TaskSingleNode | TaskBranchesNode;
 
 export class Task {
+  get id(): TaskId {
+    return this.metadata.id;
+  }
+
   get stage(): TaskStage {
     return this.startFlow.stage;
   }
@@ -62,14 +69,22 @@ export class Task {
     };
   }
 
+  get flattenNodes(): TaskSingleNode[] {
+    return flatFlow(this.startFlow);
+  }
+
   constructor(
     readonly procedure: Procedure,
     readonly metadata: TaskMetadata,
-    readonly context: ITaskContext = {},
+    readonly context: TaskContext = {},
   ) {}
 }
 
 export class TaskSingleNode {
+  get id(): TaskNodeId {
+    return this.metadata.id;
+  }
+
   get stage(): TaskStage {
     let stage = this.metadata.stage;
 
@@ -199,6 +214,10 @@ export class TaskSingleNode {
 }
 
 export class TaskBranchesNode {
+  get id(): TaskNodeId {
+    return this.metadata.id;
+  }
+
   get stage(): TaskStage {
     if (this.blocked) {
       return 'none';
@@ -300,6 +319,7 @@ export class TaskBranchesNode {
       );
 
       inputs = taskFlow.outputs;
+      taskFlows.push(taskFlow);
     }
 
     return taskFlows;
@@ -315,6 +335,10 @@ export class TaskBranchesNode {
 }
 
 export class TaskFlow {
+  get id(): TaskFlowId {
+    return this.metadata.id;
+  }
+
   get stage(): TaskStage {
     if (this.blocked) {
       return 'none';
@@ -639,4 +663,19 @@ function getBranchesDefinition(
 ): BranchesNode | undefined {
   let node = task.procedure.nodesMap.get(id);
   return node?.type === 'branchesNode' ? node : undefined;
+}
+
+function flatFlow(flow: TaskFlow): TaskSingleNode[] {
+  return flow.startNodes.flatMap(flatNode);
+}
+
+function flatNode(node: TaskSingleNode | TaskBranchesNode): TaskSingleNode[] {
+  return [
+    ...(node instanceof TaskSingleNode ? [node] : flatBranchesNode(node)),
+    ...node.nextNodes.flatMap(flatNode),
+  ];
+}
+
+function flatBranchesNode(branchesNode: TaskBranchesNode): TaskSingleNode[] {
+  return branchesNode.flows.flatMap(flatFlow);
 }
