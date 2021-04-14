@@ -8,11 +8,17 @@ export interface PluginComponentProps {
   editor: ProcedureEditor;
   node: ProcedureTreeNode;
   prevChildren?: ReactNode;
-  onChange?(node: Node): void;
 }
 
 export type PluginComponent<TProps = {}> = ComponentType<
   PluginComponentProps & TProps
+>;
+
+export type PluginConfigComponent<TProps = {}> = PluginComponent<
+  TProps & {
+    value: Node;
+    onChange(node: Node): void;
+  }
 >;
 
 export interface IPlugin<TConfigExtraProps = {}> {
@@ -30,11 +36,11 @@ export interface IPlugin<TConfigExtraProps = {}> {
      * default `flex-direction: row`
      */
     footer?: PluginComponent;
-    config?: PluginComponent<TConfigExtraProps>;
+    config?: PluginConfigComponent<TConfigExtraProps>;
   };
   branchesNode?: {
     before?: PluginComponent;
     after?: PluginComponent;
-    config?: PluginComponent<TConfigExtraProps>;
+    config?: PluginConfigComponent<TConfigExtraProps>;
   };
 }

@@ -16,7 +16,7 @@ import Eventemitter from 'eventemitter3';
 import {enableAllPlugins, produce} from 'immer';
 import {compact, fromPairs, isEqual} from 'lodash-es';
 
-import {IPlugin, PluginComponentProps} from '../plugin';
+import {IPlugin} from '../plugin';
 
 import {UndoStack} from './@undo-stack';
 
@@ -149,7 +149,7 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
       {
         editor: this,
         node,
-      } as PluginComponentProps,
+      },
       payload,
     );
   }
@@ -188,7 +188,7 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
           if (component) {
             nodeRenderDescriptor['singleNode'][
               name as keyof NodeRenderDescriptor['singleNode']
-            ]!.push(component);
+            ]!.push(component as any);
           }
         }
       }
@@ -198,7 +198,7 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
           if (component) {
             nodeRenderDescriptor['branchesNode'][
               name as keyof NodeRenderDescriptor['branchesNode']
-            ]!.push(component);
+            ]!.push(component as any);
           }
         }
       }

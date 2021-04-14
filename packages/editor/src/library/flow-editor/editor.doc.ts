@@ -1,9 +1,9 @@
 import {Procedure} from '@magicflow/core';
 
-import {IPlugin, PluginComponent, PluginComponentProps} from '../plugin';
+import {IPlugin, PluginComponentProps, PluginConfigComponent} from '../plugin';
 
 export interface EditorConfigObject {
-  [TPluginName: string]: PluginComponent;
+  [TPluginName: string]: PluginConfigComponent;
 }
 
 export interface EditorProps {

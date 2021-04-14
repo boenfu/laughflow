@@ -152,11 +152,7 @@ export class ConditionPlugin implements IConditionPlugin {
         </>
       );
     },
-    config: ({node, onChange, mode}) => {
-      let definition = node.definition;
-
-      console.log(node.definition);
-
+    config: ({value: definition, onChange, mode}) => {
       let conditionField: keyof typeof definition =
         mode === 'enter' ? 'visibleConditions' : 'enterConditions';
 
@@ -172,34 +168,4 @@ export class ConditionPlugin implements IConditionPlugin {
       );
     },
   };
-
-  // onUpdate({nextNode: node}): void {
-  //   const conditionFields = ['visibleConditions', 'enterConditions'] as const;
-
-  //   for (let key of conditionFields) {
-  //     if (!node[key]) {
-  //       continue;
-  //     }
-
-  //     let conditions: ConditionOrGroup = [];
-
-  //     for (let group of node[key] || []) {
-  //       group = group.filter(
-  //         condition =>
-  //           !!(condition.left && condition.operator && condition.right),
-  //       );
-
-  //       if (group.length) {
-  //         conditions.push(group);
-  //       }
-  //     }
-
-  //     if (!conditions.length) {
-  //       node[key] = undefined;
-  //       continue;
-  //     }
-
-  //     node[key] = conditions;
-  //   }
-  // }
 }
