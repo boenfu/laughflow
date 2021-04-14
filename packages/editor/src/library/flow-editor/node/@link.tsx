@@ -1,6 +1,11 @@
+import {Trash} from '@magicflow/icons';
 import {ProcedureTreeNode} from '@magicflow/procedure';
-import React, {CSSProperties, FC} from 'react';
+import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
+
+import {transition} from '../../components';
+import {EditorContext} from '../../context';
+import {deleteLinkNode} from '../../procedure-editor';
 
 export interface LinkNodeProps {
   node: ProcedureTreeNode;
@@ -15,10 +20,33 @@ const Container = styled.div`
   white-space: nowrap;
   vertical-align: top;
   margin: 0 16px;
-  pointer-events: all !important;
+
+  &,
+  * {
+    pointer-events: all !important;
+  }
+`;
+
+const TrashWrapper = styled.div`
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #296dff;
+  font-size: 16px;
+  color: #fff;
+  cursor: pointer;
+
+  ${transition(['opacity'])}
 `;
 
 const Content = styled.div`
+  position: relative;
   width: 64px;
   height: 32px;
   font-size: 12px;
@@ -31,15 +59,26 @@ const Content = styled.div`
   overflow: hidden;
   color: #333333;
   background-color: #fff;
+
+  &:hover {
+    ${TrashWrapper} {
+      opacity: 1;
+    }
+  }
 `;
 
 export const LinkNode: FC<LinkNodeProps> = ({className, style, node}) => {
+  const {editor} = useContext(EditorContext);
+
+  const onDelete = (): void => editor.edit(deleteLinkNode(node));
+
   return (
     <Container style={style}>
       <Content className={className}>
-        {node.type === 'singleNode'
-          ? node.definition.displayName || '-'
-          : 'branch'}
+        {(node.type === 'singleNode' && node.definition.displayName) || '-'}
+        <TrashWrapper onClick={onDelete}>
+          <Trash />
+        </TrashWrapper>
       </Content>
     </Container>
   );
