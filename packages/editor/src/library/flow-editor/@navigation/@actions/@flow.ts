@@ -1,14 +1,24 @@
-import {More, Trash} from '@magicflow/icons';
+import {Add, More, Trash} from '@magicflow/icons';
+import {removeBranchesNodeFlow} from '@magicflow/procedure/operators';
 
 import {
   ProcedureEditor,
-  createNode,
-  deleteNode,
+  createNodeAsFlowStart,
 } from '../../../procedure-editor';
 
 import {ActionDefinition} from './actions';
 
 const ACTIONS = [
+  {
+    type: 'singleNode',
+    icon: Add,
+    title: '添加普通节点',
+  },
+  {
+    type: 'branchesNode',
+    icon: Add,
+    title: '添加分支节点',
+  },
   {
     type: 'trash',
     icon: Trash,
@@ -27,31 +37,32 @@ const handler = (
 ): void => {
   let activeInfo = editor.activeInfo;
 
-  if (!activeInfo || activeInfo.value.type === 'flow') {
+  if (!activeInfo || activeInfo.value.type !== 'flow') {
     return;
   }
 
   switch (type) {
     case 'singleNode':
     case 'branchesNode':
-      editor.edit(createNode({type, from: activeInfo.value.id}));
+      editor.edit(
+        createNodeAsFlowStart({type, flow: activeInfo.value.id}),
+        true,
+      );
       break;
-    case 'done':
-      // TODO
-      break;
-    case 'connect':
-    case 'cut':
-    case 'copy':
-      editor.active(type);
-      break;
-    case 'trash':
-      editor.edit(deleteNode(activeInfo.value));
+    case 'trash': {
+      if (!activeInfo.value.parent) {
+        break;
+      }
+
+      editor.edit(
+        removeBranchesNodeFlow(activeInfo.value.parent.id, activeInfo.value.id),
+      );
 
       break;
+    }
     case 'more':
       // editor.emitConfig(activeIdentity.ref);
       break;
-
     default:
       break;
   }

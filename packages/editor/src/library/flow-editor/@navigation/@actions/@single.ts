@@ -1,4 +1,4 @@
-import {Add, Check, Copy, Cut, Jump, More, Trash} from '@magicflow/icons';
+import {Add, Copy, Cut, Jump, More, Trash} from '@magicflow/icons';
 
 import {
   ProcedureEditor,
@@ -18,11 +18,6 @@ const ACTIONS = [
     type: 'branchesNode',
     icon: Add,
     title: '添加分支节点',
-  },
-  {
-    type: 'done',
-    icon: Check,
-    title: '展示完成情况',
   },
   {
     type: 'connect',
@@ -64,10 +59,7 @@ const handler = (
   switch (type) {
     case 'singleNode':
     case 'branchesNode':
-      editor.edit(createNode({type, from: activeInfo.value.id}));
-      break;
-    case 'done':
-      // TODO
+      editor.edit(createNode({type, from: activeInfo.value.id}), true);
       break;
     case 'connect':
     case 'cut':
@@ -76,7 +68,6 @@ const handler = (
       break;
     case 'trash':
       editor.edit(deleteNode(activeInfo.value));
-
       break;
     case 'more':
       // editor.emitConfig(activeIdentity.ref);

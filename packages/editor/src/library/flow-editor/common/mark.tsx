@@ -15,7 +15,8 @@ import {
   pasteNodeAsFlowStart,
   pasteNodeBetweenNodes,
 } from '../../procedure-editor';
-import {Icon} from '../common';
+
+import {Icon} from './icon';
 
 const PasteNode = styled(_AddSolid)`
   ${Icon};

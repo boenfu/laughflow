@@ -80,7 +80,6 @@ const Wrapper = styled.div`
       }
     }
 
-    &.selected,
     &.active {
       &::before {
         opacity: 1;
@@ -149,43 +148,13 @@ export interface SingleNodeProps {
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
   const {editor} = useContext(EditorContext);
 
-  // let nodeRef: NodeRef = {type: 'singleNode', id: node.id};
-
-  // let activeTrunk = editor.activeTrunk;
-
   // const onNodeChange = (node: SingleNode): void => {
   // void editor.procedure.updateNode(node);
   // };
 
-  // const onContainerClick = (event: MouseEvent<HTMLDivElement>): void => {
-  //   event.stopPropagation();
-
-  //   if (activeTrunk?.state === 'connecting') {
-  //     void editor.procedure.connectNode(activeTrunk.ref, nodeRef);
-  //     editor.setActiveTrunk(undefined);
-  //     return;
-  //   }
-
-  //   if (activeTrunk?.state === 'joining') {
-  //     editor.setActiveTrunk({
-  //       ...activeTrunk,
-  //       relationTrunks: [...(activeTrunk.relationTrunks || []), nodeRef],
-  //     });
-  //     return;
-  //   }
-
-  //   void editor.setActiveTrunk({
-  //     prev,
-  //     ref: nodeRef,
-  //     state: 'none',
-  //   });
-  // };
-
   let activeInfo = editor.activeInfo;
   let active = editor.isActive(node);
-
   let editing = active ? activeInfo?.state : undefined;
-  // let selected = activeTrunk?.relationTrunks?.some(ref => ref.id === node.id);
 
   let {
     before = [],
@@ -210,16 +179,13 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
         className={classnames([
           className,
           {
-            // editing,
             active,
             editing: !!editing,
-            // selected,
           },
           editing,
         ])}
         data-id={node.id}
         data-prev={node.prev.id}
-        // onClick={onContainerClick}
       >
         <Header node={node} />
         <Body>

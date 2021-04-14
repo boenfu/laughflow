@@ -103,13 +103,19 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
     }
   }
 
-  edit(operator: Operator): void {
+  edit(operator: Operator, keepActive = false): void {
     this.definition = produce(
       this.definition,
       compose([operator]),
       (patches, inversePatches) =>
         this.undoStack.update(patches, inversePatches),
     );
+
+    if (keepActive) {
+      return;
+    }
+
+    this.active();
   }
 
   undo(): void {

@@ -22,6 +22,7 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   z-index: 2;
+  pointer-events: none;
 `;
 
 const Left = styled.div``;
@@ -33,6 +34,10 @@ const Mid = styled.div`
 const Right = styled.div`
   display: flex;
   align-items: center;
+
+  * {
+    pointer-events: all !important;
+  }
 `;
 
 export const Navigation: FC<NavigationProps> = React.memo(
@@ -46,10 +51,6 @@ export const Navigation: FC<NavigationProps> = React.memo(
       : {};
 
     const onNodeActionClick = (event: MouseEvent<HTMLDivElement>): void => {
-      if (!activeInfo || activeInfo.value.type === 'flow') {
-        return;
-      }
-
       event.stopPropagation();
 
       handler?.(editor, String(event.currentTarget.dataset.type));

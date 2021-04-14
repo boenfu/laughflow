@@ -2,14 +2,10 @@ import {FlowId, NodeId} from '@magicflow/core';
 import {
   Operator,
   OperatorFunction,
-  addFlowStart,
   addNode,
   addNodeNexts,
   compose,
   out,
-  removeFlowStart,
-  removeNodeNext,
-  removeNodeNexts,
 } from '@magicflow/procedure/operators';
 import {copyNode} from '@magicflow/procedure/utils';
 
@@ -18,6 +14,7 @@ import {ActiveInfo} from '../procedure-editor';
 import {insertNodeAsFlowStart} from './@insert-node-as-flow-start';
 import {insertNodeBeforeNexts} from './@insert-node-before-nexts';
 import {insertNodeBetweenNodes} from './@insert-node-between-nodes';
+import {stripNode} from './@strip-node';
 
 export interface PasteNodeOperatorParam {
   from: NodeId;
@@ -36,18 +33,7 @@ const getPasteNode: OperatorFunction<
 
   if (state === 'cut') {
     return compose([
-      out(removeNodeNexts(nodeId), nexts => {
-        let prev = value.prev;
-
-        if (prev.type === 'flow') {
-          return [
-            removeFlowStart(prev.id, nodeId),
-            ...nexts.map(next => addFlowStart(prev.id as FlowId, next)),
-          ];
-        }
-
-        return [removeNodeNext(prev.id, nodeId), addNodeNexts(prev.id, nexts)];
-      }),
+      stripNode({prev: value.prev, node: value.id}),
       callback(nodeId),
     ]);
   }

@@ -1,4 +1,4 @@
-import {Node, NodeId} from '@magicflow/core';
+import {FlowId, Node, NodeId} from '@magicflow/core';
 
 import {ProcedureUtil} from '../utils';
 
@@ -111,6 +111,26 @@ export function removeNodeNext(nodeId: NodeId, next: NodeId): Operator {
     }
 
     node.nexts.splice(nextIndex, 1);
+
+    return definition;
+  };
+}
+
+export function removeBranchesNodeFlow(nodeId: NodeId, flow: FlowId): Operator {
+  return definition => {
+    let branchesNode = ProcedureUtil.requireNode(
+      definition,
+      nodeId,
+      'branchesNode',
+    );
+
+    let flowIndex = branchesNode.flows.findIndex(id => id === flow);
+
+    if (flowIndex === -1) {
+      throw Error(`Not found branchesNode flow by id '${flow}'`);
+    }
+
+    branchesNode.flows.splice(flowIndex, 1);
 
     return definition;
   };

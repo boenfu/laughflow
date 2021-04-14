@@ -72,7 +72,7 @@ export const FlowEditor: FC<FlowEditorProps> = ({
     }
 
     let id = String(elem.dataset['id']);
-    let prev = String(elem.dataset['prev']);
+    let prev = elem.dataset['prev'] && String(elem.dataset['prev']);
 
     let activeInfo = editor.activeInfo;
 

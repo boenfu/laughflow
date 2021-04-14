@@ -1,7 +1,8 @@
-import {Add, Check, More, Trash} from '@magicflow/icons';
+import {Add, More, Trash} from '@magicflow/icons';
 
 import {
   ProcedureEditor,
+  createFlow,
   createNode,
   deleteNode,
 } from '../../../procedure-editor';
@@ -20,19 +21,14 @@ const ACTIONS = [
     title: '添加分支节点',
   },
   {
-    type: 'done',
-    icon: Check,
-    title: '展示完成情况',
-  },
-  {
     type: 'flow',
     icon: Add,
-    title: '添加分支',
+    title: '添加新分支',
   },
   {
     type: 'trash',
     icon: Trash,
-    title: '删除节点',
+    title: '删除分支节点',
   },
   {
     type: 'more',
@@ -56,22 +52,15 @@ const handler = (
     case 'branchesNode':
       editor.edit(createNode({type, from: activeInfo.value.id}));
       break;
-    case 'done':
-      // TODO
-      break;
-    case 'connect':
-    case 'cut':
-    case 'copy':
-      editor.active(type);
+    case 'flow':
+      editor.edit(createFlow({node: activeInfo.value.id}));
       break;
     case 'trash':
       editor.edit(deleteNode(activeInfo.value));
-
       break;
     case 'more':
       // editor.emitConfig(activeIdentity.ref);
       break;
-
     default:
       break;
   }
