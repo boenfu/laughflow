@@ -76,6 +76,10 @@
                 "project": "library"
               },
               {
+                "package": "@magicflow/task",
+                "project": "library"
+              },
+              {
                 "package": "@magicflow/icons",
                 "project": "library"
               }
