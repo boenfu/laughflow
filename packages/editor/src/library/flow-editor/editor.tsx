@@ -45,6 +45,7 @@ const Content = styled.div`
 export const FlowEditor: FC<FlowEditorProps> = ({
   definition,
   plugins = [],
+  onChange,
   onConfig,
 }) => {
   // eslint-disable-next-line no-null/no-null
@@ -99,7 +100,10 @@ export const FlowEditor: FC<FlowEditorProps> = ({
   };
 
   useEffect(() => {
-    editor.on('update', () => reRender());
+    editor.on('update', () => {
+      onChange?.(editor.definition);
+      reRender();
+    });
 
     if (onConfig) {
       editor.on('config', onConfig);

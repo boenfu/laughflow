@@ -140,7 +140,7 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
       fromPairs(
         compact(
           this.plugins.map(plugin =>
-            plugin[node.type]
+            plugin[node.type]?.config
               ? [plugin.name, plugin[node.type]!['config']]
               : undefined,
           ),

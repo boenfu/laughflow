@@ -9,6 +9,7 @@ export interface EditorConfigObject {
 export interface EditorProps {
   definition: Procedure;
   plugins?: IPlugin[];
+  onChange?(definition: Procedure): void;
   onConfig?<TPayload>(
     config: EditorConfigObject,
     props: PluginComponentProps,
