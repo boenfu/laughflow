@@ -1,13 +1,9 @@
 import {Procedure} from '@magicflow/core';
 
-import {
-  IPlugin,
-  NodePluginComponent,
-  NodePluginComponentProps,
-} from '../plugin';
+import {IPlugin, PluginComponent, PluginComponentProps} from '../plugin';
 
 export interface EditorConfigObject {
-  [TPluginName: string]: NodePluginComponent;
+  [TPluginName: string]: PluginComponent;
 }
 
 export interface EditorProps {
@@ -15,7 +11,7 @@ export interface EditorProps {
   plugins?: IPlugin[];
   onConfig?<TPayload>(
     config: EditorConfigObject,
-    props: NodePluginComponentProps,
+    props: PluginComponentProps,
     payload?: TPayload,
   ): void;
 }

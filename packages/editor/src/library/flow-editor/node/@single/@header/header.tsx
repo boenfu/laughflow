@@ -1,7 +1,7 @@
 import {SingleNode} from '@magicflow/core';
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
 import {updateNode} from '@magicflow/procedure/operators';
-import React, {FC, useContext} from 'react';
+import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../../../../components';
@@ -40,37 +40,37 @@ export const Header: FC<HeaderProps> = ({node}) => {
     void editor.edit(updateNode(node));
   };
 
-  let {headLeft = [], headRight = []} = editor.nodeRenderDescriptor;
+  let {headLeft, headRight} = editor.nodeRenderDescriptor['singleNode'];
 
   return (
     <Wrapper className="header">
-      {headLeft.length ? (
+      {headLeft?.length ? (
         <HeaderExtra>
-          {/* {headLeft.reduce(
-      (reactNode, component) =>
-        createElement(component, {
-          node,
-          editor,
-          prevChildren: reactNode,
-        }),
-      <></>,
-    )} */}
+          {headLeft.reduce(
+            (reactNode, component) =>
+              createElement(component, {
+                node,
+                editor,
+                prevChildren: reactNode,
+              }),
+            <></>,
+          )}
         </HeaderExtra>
       ) : undefined}
       <></>
 
       <DisplayName node={node.definition} onChange={onNodeChange} />
-      {headRight.length ? (
+      {headRight?.length ? (
         <HeaderExtra>
-          {/* {headRight.reduce(
-      (reactNode, component) =>
-        createElement(component, {
-          node,
-          editor,
-          prevChildren: reactNode,
-        }),
-      <></>,
-    )} */}
+          {headRight.reduce(
+            (reactNode, component) =>
+              createElement(component, {
+                node,
+                editor,
+                prevChildren: reactNode,
+              }),
+            <></>,
+          )}
         </HeaderExtra>
       ) : undefined}
     </Wrapper>

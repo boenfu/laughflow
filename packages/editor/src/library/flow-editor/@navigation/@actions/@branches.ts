@@ -59,7 +59,7 @@ const handler = (
       editor.edit(deleteNode(activeInfo.value));
       break;
     case 'more':
-      // editor.emitConfig(activeIdentity.ref);
+      editor.emitConfig(activeInfo.value);
       break;
     default:
       break;

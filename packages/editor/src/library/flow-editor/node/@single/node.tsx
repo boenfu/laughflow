@@ -1,7 +1,7 @@
 import {Copy, Cut, Jump} from '@magicflow/icons';
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
 import classnames from 'classnames';
-import React, {FC, useContext} from 'react';
+import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
 import {EditorContext} from '../../../context';
@@ -22,11 +22,11 @@ const BeforeWrapper = styled.div`
   justify-content: center;
 `;
 
-// const AfterWrapper = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-// `;
+const AfterWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const Wrapper = styled.div`
   position: relative;
@@ -148,31 +148,21 @@ export interface SingleNodeProps {
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
   const {editor} = useContext(EditorContext);
 
-  // const onNodeChange = (node: SingleNode): void => {
-  // void editor.procedure.updateNode(node);
-  // };
-
   let activeInfo = editor.activeInfo;
   let active = editor.isActive(node);
   let editing = active ? activeInfo?.state : undefined;
 
-  let {
-    before = [],
-    // after = [],
-
-    // footer = [],
-    // body = [],
-  } = editor.nodeRenderDescriptor;
+  let {before, after, footer, body} = editor.nodeRenderDescriptor['singleNode'];
 
   return (
     <Container>
-      {before.length ? (
+      {before?.length ? (
         <BeforeWrapper>
-          {/* {before.reduce(
-          (reactNode, component) =>
-            createElement(component, {node, editor, prevChildren: reactNode}),
-          <></>,
-        )} */}
+          {before.reduce(
+            (reactNode, component) =>
+              createElement(component, {node, editor, prevChildren: reactNode}),
+            <></>,
+          )}
         </BeforeWrapper>
       ) : undefined}
       <Wrapper
@@ -189,32 +179,32 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
       >
         <Header node={node} />
         <Body>
-          {/* {body.reduce(
-          (reactNode, component) =>
-            createElement(component, {node, editor, prevChildren: reactNode}),
-          <></>,
-        )} */}
+          {body?.reduce(
+            (reactNode, component) =>
+              createElement(component, {node, editor, prevChildren: reactNode}),
+            <></>,
+          )}
         </Body>
 
         <Footer>
-          {/* {footer.reduce(
-          (reactNode, component) =>
-            createElement(component, {node, editor, prevChildren: reactNode}),
-          <></>,
-        )} */}
+          {footer?.reduce(
+            (reactNode, component) =>
+              createElement(component, {node, editor, prevChildren: reactNode}),
+            <></>,
+          )}
         </Footer>
 
         {editing ? <EditingIcon state={editing} /> : undefined}
       </Wrapper>
-      {/* {after.length ? (
-      <AfterWrapper>
-        {after.reduce(
-          (reactNode, component) =>
-            createElement(component, {node, editor, prevChildren: reactNode}),
-          <></>,
-        )}
-      </AfterWrapper>
-    ) : undefined} */}
+      {after?.length ? (
+        <AfterWrapper>
+          {after.reduce(
+            (reactNode, component) =>
+              createElement(component, {node, editor, prevChildren: reactNode}),
+            <></>,
+          )}
+        </AfterWrapper>
+      ) : undefined}
     </Container>
   );
 };

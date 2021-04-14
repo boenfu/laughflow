@@ -14,7 +14,9 @@ import {Operator, compose} from '@magicflow/procedure/operators';
 import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
 import {enableAllPlugins, produce} from 'immer';
-import {isEqual} from 'lodash-es';
+import {compact, fromPairs, isEqual} from 'lodash-es';
+
+import {IPlugin, PluginComponentProps} from '../plugin';
 
 import {UndoStack} from './@undo-stack';
 
@@ -38,6 +40,15 @@ export interface ActiveInfo {
   state?: ActiveState;
 }
 
+export type NodeRenderCollect<TRender extends object> = {
+  [TK in keyof TRender]: NonNullable<TRender[TK]>[];
+};
+
+export interface NodeRenderDescriptor {
+  singleNode: NodeRenderCollect<NonNullable<IPlugin['singleNode']>>;
+  branchesNode: NodeRenderCollect<NonNullable<IPlugin['branchesNode']>>;
+}
+
 export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   private _definition!: ProcedureDefinition;
 
@@ -45,18 +56,16 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
 
   private _activeIdentity: ActiveIdentity | undefined;
 
+  private plugins: IPlugin[] = [];
+
   readonly undoStack = new UndoStack();
 
   activeInfo: ActiveInfo | undefined;
 
-  nodeRenderDescriptor: {
-    before?: any;
-    after?: any;
-    headLeft?: any;
-    headRight?: any;
-    footer?: any;
-    body?: any;
-  } = {};
+  nodeRenderDescriptor: NodeRenderDescriptor = {
+    singleNode: {},
+    branchesNode: {},
+  };
 
   private get activeIdentity(): ActiveIdentity | undefined {
     return this._activeIdentity;
@@ -81,10 +90,14 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
     return this._treeView.root;
   }
 
-  constructor(definition: ProcedureDefinition = createEmptyProcedure()) {
+  constructor(
+    definition: ProcedureDefinition = createEmptyProcedure(),
+    plugins: IPlugin[] = [],
+  ) {
     super();
 
     this.definition = definition;
+    this.setPlugins(plugins);
   }
 
   isActive(resource: ProcedureTreeNode | ProcedureFlow): boolean {
@@ -118,12 +131,80 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
     this.active();
   }
 
+  emitConfig<TPayload extends {}>(
+    node: ProcedureTreeNode,
+    payload?: TPayload,
+  ): void {
+    this.emit(
+      'config',
+      fromPairs(
+        compact(
+          this.plugins.map(plugin =>
+            plugin[node.type]
+              ? [plugin.name, plugin[node.type]!['config']]
+              : undefined,
+          ),
+        ),
+      ),
+      {
+        editor: this,
+        node,
+      } as PluginComponentProps,
+      payload,
+    );
+  }
+
   undo(): void {
     this.definition = this.undoStack.undo(this.definition);
   }
 
   redo(): void {
     this.definition = this.undoStack.redo(this.definition);
+  }
+
+  private setPlugins(plugins: IPlugin[]): void {
+    this.plugins = plugins;
+
+    let nodeRenderDescriptor: NodeRenderDescriptor = {
+      singleNode: {
+        before: [],
+        after: [],
+        headLeft: [],
+        headRight: [],
+        body: [],
+        footer: [],
+        config: [],
+      },
+      branchesNode: {
+        before: [],
+        after: [],
+        config: [],
+      },
+    };
+
+    for (let plugin of plugins) {
+      if (plugin.singleNode) {
+        for (let [name, component] of Object.entries(plugin.singleNode)) {
+          if (component) {
+            nodeRenderDescriptor['singleNode'][
+              name as keyof NodeRenderDescriptor['singleNode']
+            ]!.push(component);
+          }
+        }
+      }
+
+      if (plugin.branchesNode) {
+        for (let [name, component] of Object.entries(plugin.branchesNode)) {
+          if (component) {
+            nodeRenderDescriptor['branchesNode'][
+              name as keyof NodeRenderDescriptor['branchesNode']
+            ]!.push(component);
+          }
+        }
+      }
+    }
+
+    this.nodeRenderDescriptor = nodeRenderDescriptor;
   }
 
   private updateActiveInfo(activeIdentity: ActiveIdentity | undefined): void {

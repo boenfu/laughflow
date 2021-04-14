@@ -1,4 +1,4 @@
-import {Add, More, Trash} from '@magicflow/icons';
+import {Add, Trash} from '@magicflow/icons';
 import {removeBranchesNodeFlow} from '@magicflow/procedure/operators';
 
 import {
@@ -23,11 +23,6 @@ const ACTIONS = [
     type: 'trash',
     icon: Trash,
     title: '删除分支',
-  },
-  {
-    type: 'more',
-    icon: More,
-    title: '更多',
   },
 ];
 
@@ -60,9 +55,6 @@ const handler = (
 
       break;
     }
-    case 'more':
-      // editor.emitConfig(activeIdentity.ref);
-      break;
     default:
       break;
   }

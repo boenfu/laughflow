@@ -4,6 +4,7 @@ import {useCreation, useUpdate} from 'ahooks';
 import React, {FC, MouseEvent, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
+import {ConditionPlugin} from '../condition';
 import {EditorContext} from '../context';
 import {ActiveIdentity, ProcedureEditor} from '../procedure-editor';
 
@@ -43,12 +44,20 @@ const Content = styled.div`
 
 export const FlowEditor: FC<FlowEditorProps> = ({
   definition,
-  // plugins,
+  plugins = [],
   onConfig,
 }) => {
   // eslint-disable-next-line no-null/no-null
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const editor = useCreation(() => new ProcedureEditor(definition), []);
+  const editor = useCreation(
+    () =>
+      new ProcedureEditor(definition, [
+        ...plugins,
+        // default
+        new ConditionPlugin(),
+      ]),
+    [],
+  );
   const reRender = useUpdate();
 
   const onFullScreenToggle = (): void => {
