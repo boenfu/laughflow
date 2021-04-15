@@ -1,14 +1,11 @@
 import {
   BranchesNode,
   Flow,
-  FlowId,
-  NodeId,
   Procedure as ProcedureDefinition,
   SingleNode,
 } from '@magicflow/core';
 import {Procedure} from '@magicflow/procedure';
 import {createId} from '@magicflow/procedure/utils';
-// import {cloneDeep} from 'lodash-es';
 import {Dict} from 'tslang';
 
 import {
@@ -23,6 +20,12 @@ import {
   TaskSingleNodeMetadata,
   TaskStage,
 } from './core';
+import {
+  flatFlow,
+  getBranchesDefinition,
+  getFlowDefinition,
+  getNodeDefinition,
+} from './utils';
 
 export type TaskNode = TaskSingleNode | TaskBranchesNode;
 
@@ -375,14 +378,14 @@ export class TaskFlow {
   }
 
   get startNodes(): TaskNode[] {
-    let {nodes} = this.metadata;
+    let {starts} = this.metadata;
 
     let task = this.task;
     let blocked = this.blocked;
     // 同一个 Flow 的多个开始 inputs 应该一致
     let inputs = this.inputs;
 
-    return nodes.map(node => {
+    return starts.map(node => {
       return node.type === 'singleNode'
         ? new TaskSingleNode(
             task,
@@ -468,7 +471,7 @@ export function initTask({
       id: createId(),
       definition: id,
       stage: 'none',
-      nodes,
+      starts: nodes,
     };
   }
 
@@ -647,35 +650,3 @@ export function initTask({
 //     // });
 //   }
 // }
-
-function getFlowDefinition(task: Task, flow: FlowId): Flow | undefined {
-  return task.procedure.flowsMap.get(flow);
-}
-
-function getNodeDefinition(task: Task, id: NodeId): SingleNode | undefined {
-  let node = task.procedure.nodesMap.get(id);
-  return node?.type === 'singleNode' ? node : undefined;
-}
-
-function getBranchesDefinition(
-  task: Task,
-  id: NodeId,
-): BranchesNode | undefined {
-  let node = task.procedure.nodesMap.get(id);
-  return node?.type === 'branchesNode' ? node : undefined;
-}
-
-function flatFlow(flow: TaskFlow): TaskSingleNode[] {
-  return flow.startNodes.flatMap(flatNode);
-}
-
-function flatNode(node: TaskSingleNode | TaskBranchesNode): TaskSingleNode[] {
-  return [
-    ...(node instanceof TaskSingleNode ? [node] : flatBranchesNode(node)),
-    ...node.nextNodes.flatMap(flatNode),
-  ];
-}
-
-function flatBranchesNode(branchesNode: TaskBranchesNode): TaskSingleNode[] {
-  return branchesNode.flows.flatMap(flatFlow);
-}

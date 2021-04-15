@@ -1,4 +1,5 @@
 import {TaskSingleNode} from '@magicflow/task';
+import classNames from 'classnames';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
@@ -27,6 +28,7 @@ const Wrapper = styled.div`
 // `;
 
 export interface HeaderProps {
+  className?: string;
   node: TaskSingleNode;
 }
 
@@ -34,7 +36,7 @@ export const Header: FC<HeaderProps> = ({node}) => {
   // let {headLeft, headRight} = editor.nodeRenderDescriptor['singleNode'];
 
   return (
-    <Wrapper className="header">
+    <Wrapper className={classNames(['header', node.stage])}>
       {/* {headLeft?.length ? (
         <HeaderExtra>
           {headLeft.reduce(

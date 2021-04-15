@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import {ConditionPlugin} from '../condition';
 
 import {Flow} from './@flow';
-import {TaskContext, ViewerContext} from './@task-context';
+import {TaskContext, ViewerContext} from './task-context';
 import {ViewerProps as FlowEditorProps} from './viewer.doc';
 
 declare global {

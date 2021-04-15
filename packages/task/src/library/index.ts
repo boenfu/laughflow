@@ -1,5 +1,7 @@
 export * from './task';
 export * from './core';
+export * from './operators';
+export * from './utils';
 
 declare global {
   namespace Magicflow {

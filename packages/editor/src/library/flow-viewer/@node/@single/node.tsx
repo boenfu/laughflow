@@ -52,6 +52,27 @@ const Wrapper = styled.div`
       background-color: #296dff;
     }
   }
+
+  &.in-progress {
+    .header {
+      color: #ffffff;
+      background-color: #296dff;
+    }
+  }
+
+  &.done {
+    .header {
+      color: #ffffff;
+      background-color: #81cb5f;
+    }
+  }
+
+  &.terminated {
+    .header {
+      color: #ffffff;
+      background-color: #e55a3a;
+    }
+  }
 `;
 
 const Body = styled.div`
@@ -93,6 +114,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
           {
             active,
           },
+          node.stage,
         ])}
       >
         <Header node={node} />

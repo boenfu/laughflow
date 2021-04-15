@@ -28,7 +28,7 @@ export interface TaskFlowMetadata
   id: TaskFlowId;
   definition: FlowId;
   stage: TaskStage;
-  nodes: TaskNodeMetadata[];
+  starts: TaskNodeMetadata[];
 }
 
 export type TaskNodeMetadata =

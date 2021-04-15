@@ -8,7 +8,7 @@ import {RESOURCE_WIDTH} from '../@common';
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../@connection-line';
 import {Leaf} from '../@leaf';
 import {Node} from '../@node';
-import {ViewerContext} from '../@task-context';
+import {ViewerContext} from '../task-context';
 
 const Container = styled.div`
   display: inline-flex;
