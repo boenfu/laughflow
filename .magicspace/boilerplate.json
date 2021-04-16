@@ -68,15 +68,15 @@
                 "project": "library"
               },
               {
-                "package": "@magicflow/condition",
-                "project": "library"
-              },
-              {
                 "package": "@magicflow/procedure",
                 "project": "library"
               },
               {
                 "package": "@magicflow/task",
+                "project": "library"
+              },
+              {
+                "package": "@magicflow/plugins",
                 "project": "library"
               },
               {
@@ -124,6 +124,14 @@
               },
               {
                 "package": "@magicflow/task",
+                "project": "library"
+              },
+              {
+                "package": "@magicflow/condition",
+                "project": "library"
+              },
+              {
+                "package": "@magicflow/icons",
                 "project": "library"
               }
             ]

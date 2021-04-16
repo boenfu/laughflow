@@ -3,10 +3,9 @@ import classNames from 'classnames';
 import React, {FC, Fragment, useContext} from 'react';
 import styled from 'styled-components';
 
-import {transition} from '../../components';
-import {EditorContext} from '../../context';
-import {RESOURCE_WIDTH} from '../common';
-import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../connection-line';
+import {RESOURCE_WIDTH, transition} from '../@common';
+import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../@connection-line';
+import {EditorContext} from '../context';
 import {Leaf} from '../leaf';
 import {Node} from '../node';
 

@@ -3,6 +3,7 @@ import {
   NodeId,
   Procedure as ProcedureDefinition,
 } from '@magicflow/core';
+import {IPlugin} from '@magicflow/plugins';
 import {
   Procedure,
   ProcedureFlow,
@@ -15,8 +16,6 @@ import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
 import {enableAllPlugins, produce} from 'immer';
 import {compact, fromPairs, isEqual} from 'lodash-es';
-
-import {IPlugin} from '../plugin';
 
 import {UndoStack} from './@undo-stack';
 

@@ -18,6 +18,12 @@
     },
     {
       "path": "../../../task/src/library"
+    },
+    {
+      "path": "../../../condition/src/library"
+    },
+    {
+      "path": "../../../icons/src/library"
     }
   ]
 }

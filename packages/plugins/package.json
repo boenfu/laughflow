@@ -10,9 +10,16 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
+    "@magicflow/condition": "*",
     "@magicflow/core": "*",
+    "@magicflow/icons": "*",
     "@magicflow/procedure": "*",
     "@magicflow/task": "*",
+    "styled-components": "^5.2.3",
+    "tslang": "^0.1.23",
     "tslib": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/styled-components": "^5.1.9"
   }
 }

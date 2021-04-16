@@ -4,8 +4,8 @@ import {updateNode} from '@magicflow/procedure/operators';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {transition} from '../../../../components';
-import {EditorContext} from '../../../../context';
+import {transition} from '../../../@common';
+import {EditorContext} from '../../../context';
 
 import {DisplayName} from './@displayName';
 
@@ -50,7 +50,6 @@ export const Header: FC<HeaderProps> = ({node}) => {
             (reactNode, component) =>
               createElement(component, {
                 node,
-                editor,
                 prevChildren: reactNode,
               }),
             <></>,
@@ -66,7 +65,6 @@ export const Header: FC<HeaderProps> = ({node}) => {
             (reactNode, component) =>
               createElement(component, {
                 node,
-                editor,
                 prevChildren: reactNode,
               }),
             <></>,

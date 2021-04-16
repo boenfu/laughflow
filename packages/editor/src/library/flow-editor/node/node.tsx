@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import React, {CSSProperties, FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../connection-line';
+import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../@connection-line';
 import {Leaf} from '../leaf';
 
 import {BranchesNode} from './@branches';

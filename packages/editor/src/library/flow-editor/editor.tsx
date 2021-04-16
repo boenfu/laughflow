@@ -4,12 +4,11 @@ import {useCreation, useUpdate} from 'ahooks';
 import React, {FC, MouseEvent, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
-import {ConditionPlugin} from '../condition';
-import {EditorContext} from '../context';
 import {ActiveIdentity, ProcedureEditor} from '../procedure-editor';
 
 import {Footer} from './@footer';
 import {Navigation} from './@navigation';
+import {EditorContext} from './context';
 import {EditorProps as FlowEditorProps} from './editor.doc';
 import {Flow} from './flow';
 
@@ -51,12 +50,7 @@ export const FlowEditor: FC<FlowEditorProps> = ({
   // eslint-disable-next-line no-null/no-null
   const wrapperRef = useRef<HTMLDivElement>(null);
   const editor = useCreation(
-    () =>
-      new ProcedureEditor(definition, [
-        ...plugins,
-        // default
-        new ConditionPlugin(),
-      ]),
+    () => new ProcedureEditor(definition, plugins),
     [],
   );
   const reRender = useUpdate();

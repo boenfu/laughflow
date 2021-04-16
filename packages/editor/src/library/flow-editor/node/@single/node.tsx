@@ -4,9 +4,9 @@ import classnames from 'classnames';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {EditorContext} from '../../../context';
 import {ActiveState} from '../../../procedure-editor';
-import {RESOURCE_WIDTH} from '../../common';
+import {RESOURCE_WIDTH} from '../../@common';
+import {EditorContext} from '../../context';
 
 import {Header} from './@header';
 
@@ -160,7 +160,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
         <BeforeWrapper>
           {before.reduce(
             (reactNode, component) =>
-              createElement(component, {node, editor, prevChildren: reactNode}),
+              createElement(component, {node, prevChildren: reactNode}),
             <></>,
           )}
         </BeforeWrapper>
@@ -181,7 +181,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
         <Body>
           {body?.reduce(
             (reactNode, component) =>
-              createElement(component, {node, editor, prevChildren: reactNode}),
+              createElement(component, {node, prevChildren: reactNode}),
             <></>,
           )}
         </Body>
@@ -189,7 +189,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
         <Footer>
           {footer?.reduce(
             (reactNode, component) =>
-              createElement(component, {node, editor, prevChildren: reactNode}),
+              createElement(component, {node, prevChildren: reactNode}),
             <></>,
           )}
         </Footer>
@@ -200,7 +200,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
         <AfterWrapper>
           {after.reduce(
             (reactNode, component) =>
-              createElement(component, {node, editor, prevChildren: reactNode}),
+              createElement(component, {node, prevChildren: reactNode}),
             <></>,
           )}
         </AfterWrapper>

@@ -2,8 +2,8 @@ import {Expand} from '@magicflow/icons';
 import React, {FC, MouseEvent, useContext} from 'react';
 import styled from 'styled-components';
 
-import {IconButton} from '../../components';
-import {EditorContext} from '../../context';
+import {IconButton} from '../@common';
+import {EditorContext} from '../context';
 
 import {ActionDefinition, actionDefinitionDict} from './@actions';
 
