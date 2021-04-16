@@ -1,5 +1,4 @@
-import {Condition} from './condition';
-import {Operant} from './operant';
+import {Condition, Operant} from './condition';
 import {
   commonOperatorDefinitionDict,
   leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap,

@@ -1,36 +1,51 @@
+import {Node, NodeType, Procedure} from '@magicflow/core';
 import {Dict} from 'tslang';
 
-import {TaskMetadata, TaskNodeMetadata, TaskSingleNodeMetadata} from './task';
+import {TaskSingleNode} from '../task';
+
+import {TaskMetadata, TaskNodeMetadata} from './task';
+
+export interface TaskContextFunctionParams {
+  definition: Procedure;
+  metadata: TaskMetadata;
+}
+
+export interface TaskNodeContextFunctionParams<
+  TNodeType extends NodeType = NodeType
+> {
+  definition: Extract<Node, {type: TNodeType}>;
+  metadata: Extract<TaskNodeMetadata, {type: TNodeType}>;
+  inputs: Dict<any>;
+}
 
 export interface TaskContext {
   // reload outputs
   // such as tags
-  preloadTaskExtraOutputs?(taskMetadata: TaskMetadata): Dict<any>;
+  preloadTaskExtraOutputs?(params: TaskContextFunctionParams): Dict<any>;
 
-  getTaskAbleToBeStart?(taskMetadata: TaskMetadata): boolean;
+  preloadTaskNodeExtraOutputs?(
+    params: TaskNodeContextFunctionParams<'singleNode'>,
+  ): Dict<any>;
 
-  getTaskNodeBroken?(
-    nodeMetadata: TaskNodeMetadata,
-    inputs: Dict<any>,
-  ): boolean;
+  getTaskAbleToBeStart?(params: TaskContextFunctionParams): boolean;
 
-  getTaskNodeIgnored?(
-    nodeMetadata: TaskNodeMetadata,
-    inputs: Dict<any>,
-  ): boolean;
+  getTaskNodeBroken?(params: TaskNodeContextFunctionParams): boolean;
+
+  getTaskNodeIgnored?(params: TaskNodeContextFunctionParams): boolean;
 
   getTaskNodeAbleToBeStart?(
-    nodeMetadata: TaskSingleNodeMetadata,
-    inputs: Dict<any>,
+    params: TaskNodeContextFunctionParams<'singleNode'>,
   ): boolean;
 
   getTaskNodeAbleToBeDone?(
-    nodeMetadata: TaskSingleNodeMetadata,
-    inputs: Dict<any>,
+    params: TaskNodeContextFunctionParams<'singleNode'>,
   ): boolean;
 
   getTaskNodeAbleToBeTerminated?(
-    nodeMetadata: TaskSingleNodeMetadata,
-    inputs: Dict<any>,
+    params: TaskNodeContextFunctionParams<'singleNode'>,
   ): boolean;
+
+  next?(task: TaskMetadata): TaskMetadata;
+
+  nextNode?(node: TaskSingleNode): TaskSingleNode;
 }

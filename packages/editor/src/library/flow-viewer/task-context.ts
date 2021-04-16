@@ -1,9 +1,8 @@
 import {
   Task,
   TaskContext as ITaskContext,
-  TaskMetadata,
-  TaskNodeMetadata,
-  TaskSingleNodeMetadata,
+  TaskContextFunctionParams,
+  TaskNodeContextFunctionParams,
 } from '@magicflow/task';
 import {createContext} from 'react';
 import {Dict} from 'tslang';
@@ -13,66 +12,65 @@ import {IPlugin} from '../plugin';
 export class TaskContext implements ITaskContext {
   constructor(private plugins: IPlugin[]) {}
 
-  preloadTaskExtraOutputs = (taskMetadata: TaskMetadata): Dict<any> => {
+  preloadTaskExtraOutputs = (params: TaskContextFunctionParams): Dict<any> => {
     return Object.assign(
-      this.plugins.map(({task: {context: {preloadTaskExtraOutputs}}}) =>
-        preloadTaskExtraOutputs ? preloadTaskExtraOutputs(taskMetadata) : {},
+      {},
+      ...this.plugins.map(({task: {context: {preloadTaskExtraOutputs}}}) =>
+        preloadTaskExtraOutputs ? preloadTaskExtraOutputs(params) : {},
       ),
     );
   };
 
-  getTaskAbleToBeStart = (taskMetadata: TaskMetadata): boolean => {
+  preloadTaskNodeExtraOutputs = (
+    params: TaskNodeContextFunctionParams<'singleNode'>,
+  ): Dict<any> => {
+    return Object.assign(
+      {},
+      ...this.plugins.map(({task: {context: {preloadTaskNodeExtraOutputs}}}) =>
+        preloadTaskNodeExtraOutputs ? preloadTaskNodeExtraOutputs(params) : {},
+      ),
+    );
+  };
+
+  getTaskAbleToBeStart = (params: TaskContextFunctionParams): boolean => {
     return this.plugins.every(({task: {context: {getTaskAbleToBeStart}}}) =>
-      getTaskAbleToBeStart ? getTaskAbleToBeStart(taskMetadata) : true,
+      getTaskAbleToBeStart ? getTaskAbleToBeStart(params) : true,
     );
   };
 
-  getTaskNodeBroken = (
-    nodeMetadata: TaskNodeMetadata,
-    inputs: Dict<any>,
-  ): boolean => {
+  getTaskNodeBroken = (params: TaskNodeContextFunctionParams): boolean => {
     return this.plugins.some(({task: {context}}) =>
-      context.getTaskNodeBroken?.(nodeMetadata, inputs),
+      context.getTaskNodeBroken?.(params),
     );
   };
 
-  getTaskNodeIgnored = (
-    nodeMetadata: TaskNodeMetadata,
-    inputs: Dict<any>,
-  ): boolean => {
+  getTaskNodeIgnored = (params: TaskNodeContextFunctionParams): boolean => {
     return this.plugins.some(({task: {context}}) =>
-      context.getTaskNodeIgnored?.(nodeMetadata, inputs),
+      context.getTaskNodeIgnored?.(params),
     );
   };
 
   getTaskNodeAbleToBeStart = (
-    nodeMetadata: TaskSingleNodeMetadata,
-    inputs: Dict<any>,
+    params: TaskNodeContextFunctionParams<'singleNode'>,
   ): boolean => {
     return this.plugins.every(({task: {context: {getTaskNodeAbleToBeStart}}}) =>
-      getTaskNodeAbleToBeStart
-        ? getTaskNodeAbleToBeStart(nodeMetadata, inputs)
-        : true,
+      getTaskNodeAbleToBeStart ? getTaskNodeAbleToBeStart(params) : true,
     );
   };
 
   getTaskNodeAbleToBeDone = (
-    nodeMetadata: TaskSingleNodeMetadata,
-    inputs: Dict<any>,
+    params: TaskNodeContextFunctionParams<'singleNode'>,
   ): boolean => {
     return this.plugins.every(({task: {context: {getTaskNodeAbleToBeDone}}}) =>
-      getTaskNodeAbleToBeDone
-        ? getTaskNodeAbleToBeDone(nodeMetadata, inputs)
-        : true,
+      getTaskNodeAbleToBeDone ? getTaskNodeAbleToBeDone(params) : true,
     );
   };
 
   getTaskNodeAbleToBeTerminated = (
-    nodeMetadata: TaskSingleNodeMetadata,
-    inputs: Dict<any>,
+    params: TaskNodeContextFunctionParams<'singleNode'>,
   ): boolean => {
     return this.plugins.some(({task: {context}}) =>
-      context.getTaskNodeAbleToBeTerminated?.(nodeMetadata, inputs),
+      context.getTaskNodeAbleToBeTerminated?.(params),
     );
   };
 }

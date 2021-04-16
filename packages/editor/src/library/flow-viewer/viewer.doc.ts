@@ -1,11 +1,6 @@
-import {Procedure} from '@magicflow/core';
-import {TaskMetadata} from '@magicflow/task';
-
-import {IPlugin} from '../plugin';
+import {Task, TaskMetadata} from '@magicflow/task';
 
 export interface ViewerProps {
-  definition: Procedure;
-  metadata: TaskMetadata;
-  plugins?: IPlugin[];
+  task: Task;
   onChange?(metadata: TaskMetadata): void;
 }

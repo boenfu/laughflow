@@ -1,13 +1,8 @@
-import {Procedure} from '@magicflow/procedure';
-import {Task} from '@magicflow/task';
-import {useCreation} from 'ahooks';
 import React, {FC, useRef} from 'react';
 import styled from 'styled-components';
 
-import {ConditionPlugin} from '../condition';
-
 import {Flow} from './@flow';
-import {TaskContext, ViewerContext} from './task-context';
+import {ViewerContext} from './task-context';
 import {ViewerProps as FlowEditorProps} from './viewer.doc';
 
 declare global {
@@ -39,26 +34,9 @@ const Content = styled.div`
   }
 `;
 
-export const FlowViewer: FC<FlowEditorProps> = ({
-  definition,
-  metadata,
-  plugins = [],
-}) => {
+export const FlowViewer: FC<FlowEditorProps> = ({task}) => {
   // eslint-disable-next-line no-null/no-null
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const task = useCreation(
-    () =>
-      new Task(
-        new Procedure(definition),
-        metadata,
-        new TaskContext([
-          ...plugins,
-          // default
-          new ConditionPlugin(),
-        ]),
-      ),
-    [],
-  );
 
   return (
     <Wrapper ref={wrapperRef}>

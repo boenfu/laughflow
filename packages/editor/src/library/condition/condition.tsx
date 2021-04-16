@@ -1,3 +1,4 @@
+import {evaluate} from '@magicflow/condition';
 import {ArrowDown} from '@magicflow/icons';
 import React from 'react';
 import styled from 'styled-components';
@@ -170,6 +171,21 @@ export class ConditionPlugin implements IConditionPlugin {
   };
 
   task: IPlugin['task'] = {
-    context: {},
+    context: {
+      getTaskNodeBroken({definition, inputs}) {
+        if (!definition.enterConditions) {
+          return false;
+        }
+
+        return evaluate(definition.enterConditions, name => inputs[name]);
+      },
+      getTaskNodeIgnored({definition, inputs}) {
+        if (!definition.visibleConditions) {
+          return false;
+        }
+
+        return !evaluate(definition.visibleConditions, name => inputs[name]);
+      },
+    },
   };
 }

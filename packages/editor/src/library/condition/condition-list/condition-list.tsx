@@ -98,7 +98,10 @@ export const ConditionList: FC<ConditionListProps> = ({
                     `${right.type}:${
                       'value' in right ? right.value : right.variable
                     }`,
-                  ) || `变量:${(right as any).variable}`}
+                  ) ||
+                    ('value' in right
+                      ? `值:${right.value}`
+                      : `变量:${right.variable}`)}
                 </DisplayText>
               </ConditionLine>
             );

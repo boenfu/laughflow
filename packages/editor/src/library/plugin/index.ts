@@ -2,6 +2,7 @@ import {Node, NodeType} from '@magicflow/core';
 import {ProcedureTreeNode} from '@magicflow/procedure';
 import {TaskContext} from '@magicflow/task';
 import {ComponentType, ReactNode} from 'react';
+import {Dict} from 'tslang';
 
 import {ProcedureEditor} from '../procedure-editor';
 
@@ -27,7 +28,7 @@ export type PluginConfigComponent<
   }
 >;
 
-export interface IPlugin<TConfigExtraProps = {}> {
+export interface IPlugin<TConfigExtraProps extends Dict<any> = Dict<any>> {
   name: string;
   singleNode?: {
     before?: PluginComponent<'singleNode'>;

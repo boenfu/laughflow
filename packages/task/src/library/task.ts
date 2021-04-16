@@ -45,7 +45,10 @@ export class Task {
       return true;
     }
 
-    return getTaskAbleToBeStart(this.metadata);
+    return getTaskAbleToBeStart({
+      metadata: this.metadata,
+      definition: this.procedure.definition,
+    });
   }
 
   get startFlow(): TaskFlow {
@@ -68,7 +71,10 @@ export class Task {
 
     return {
       ...outputs,
-      ...preloadTaskExtraOutputs?.(this.metadata),
+      ...preloadTaskExtraOutputs?.({
+        metadata: this.metadata,
+        definition: this.procedure.definition,
+      }),
     };
   }
 
@@ -90,6 +96,10 @@ export class TaskSingleNode {
 
   get stage(): TaskStage {
     let stage = this.metadata.stage;
+
+    if (this.blocked) {
+      return 'none';
+    }
 
     if (this.broken) {
       return 'none';
@@ -124,11 +134,11 @@ export class TaskSingleNode {
   }
 
   get broken(): boolean {
-    return !!this.task.context.getTaskNodeBroken?.(this.metadata, this.inputs);
+    return !!this.task.context.getTaskNodeBroken?.(this);
   }
 
   get ignored(): boolean {
-    return !!this.task.context.getTaskNodeIgnored?.(this.metadata, this.inputs);
+    return !!this.task.context.getTaskNodeIgnored?.(this);
   }
 
   get ableToBeStart(): boolean {
@@ -138,7 +148,7 @@ export class TaskSingleNode {
       return true;
     }
 
-    return getTaskNodeAbleToBeStart(this.metadata, this.inputs);
+    return getTaskNodeAbleToBeStart(this);
   }
 
   get ableToBeDone(): boolean {
@@ -148,14 +158,11 @@ export class TaskSingleNode {
       return true;
     }
 
-    return getTaskNodeAbleToBeDone(this.metadata, this.inputs);
+    return getTaskNodeAbleToBeDone(this);
   }
 
   get ableToBeTerminated(): boolean {
-    return !!this.task.context.getTaskNodeAbleToBeTerminated?.(
-      this.metadata,
-      this.inputs,
-    );
+    return !!this.task.context.getTaskNodeAbleToBeTerminated?.(this);
   }
 
   get nextNodes(): TaskNode[] {
@@ -204,6 +211,7 @@ export class TaskSingleNode {
     return {
       ...this.inputs,
       ...outputs,
+      ...this.task.context.preloadTaskNodeExtraOutputs?.(this),
     };
   }
 
@@ -212,7 +220,7 @@ export class TaskSingleNode {
     readonly definition: SingleNode,
     readonly metadata: TaskSingleNodeMetadata,
     readonly blocked: boolean,
-    private readonly inputs: Dict<any>,
+    readonly inputs: Dict<any>,
   ) {}
 }
 
@@ -252,11 +260,11 @@ export class TaskBranchesNode {
   }
 
   get broken(): boolean {
-    return !!this.task.context.getTaskNodeBroken?.(this.metadata, this.inputs);
+    return !!this.task.context.getTaskNodeBroken?.(this);
   }
 
   get ignored(): boolean {
-    return !!this.task.context.getTaskNodeIgnored?.(this.metadata, this.inputs);
+    return !!this.task.context.getTaskNodeIgnored?.(this);
   }
 
   get nextNodes(): TaskNode[] {
@@ -333,7 +341,7 @@ export class TaskBranchesNode {
     readonly definition: BranchesNode,
     readonly metadata: TaskBranchesNodeMetadata,
     readonly blocked: boolean,
-    private readonly inputs: Dict<any>,
+    readonly inputs: Dict<any>,
   ) {}
 }
 
@@ -423,7 +431,7 @@ export class TaskFlow {
     readonly definition: Flow,
     readonly metadata: TaskFlowMetadata,
     readonly blocked: boolean,
-    private readonly inputs: Dict<any>,
+    readonly inputs: Dict<any>,
   ) {}
 }
 
