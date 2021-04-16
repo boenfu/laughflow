@@ -172,14 +172,14 @@ export class ConditionPlugin implements IConditionPlugin {
 
   task: IPlugin['task'] = {
     context: {
-      getTaskNodeBroken({definition, inputs}) {
+      nodeBroken({definition, inputs}) {
         if (!definition.enterConditions) {
           return false;
         }
 
         return evaluate(definition.enterConditions, name => inputs[name]);
       },
-      getTaskNodeIgnored({definition, inputs}) {
+      nodeIgnored({definition, inputs}) {
         if (!definition.visibleConditions) {
           return false;
         }

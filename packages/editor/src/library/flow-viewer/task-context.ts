@@ -1,8 +1,8 @@
 import {
+  ITaskRuntime as ITaskContext,
   Task,
-  TaskContext as ITaskContext,
-  TaskContextFunctionParams,
-  TaskNodeContextFunctionParams,
+  TaskNodeRuntimeMethodParams,
+  TaskRuntimeMethodParams,
 } from '@magicflow/task';
 import {createContext} from 'react';
 import {Dict} from 'tslang';
@@ -12,65 +12,87 @@ import {IPlugin} from '../plugin';
 export class TaskContext implements ITaskContext {
   constructor(private plugins: IPlugin[]) {}
 
-  preloadTaskExtraOutputs = (params: TaskContextFunctionParams): Dict<any> => {
+  preloadOutputs = (params: TaskRuntimeMethodParams): Dict<any> => {
     return Object.assign(
       {},
-      ...this.plugins.map(({task: {context: {preloadTaskExtraOutputs}}}) =>
-        preloadTaskExtraOutputs ? preloadTaskExtraOutputs(params) : {},
+      ...this.plugins.map(
+        ({
+          task: {
+            context: {preloadOutputs: preloadTaskExtraOutputs},
+          },
+        }) => (preloadTaskExtraOutputs ? preloadTaskExtraOutputs(params) : {}),
       ),
     );
   };
 
-  preloadTaskNodeExtraOutputs = (
-    params: TaskNodeContextFunctionParams<'singleNode'>,
+  nodeOutputs = (
+    params: TaskNodeRuntimeMethodParams<'singleNode'>,
   ): Dict<any> => {
     return Object.assign(
       {},
-      ...this.plugins.map(({task: {context: {preloadTaskNodeExtraOutputs}}}) =>
-        preloadTaskNodeExtraOutputs ? preloadTaskNodeExtraOutputs(params) : {},
+      ...this.plugins.map(
+        ({
+          task: {
+            context: {nodeOutputs: preloadTaskNodeExtraOutputs},
+          },
+        }) =>
+          preloadTaskNodeExtraOutputs
+            ? preloadTaskNodeExtraOutputs(params)
+            : {},
       ),
     );
   };
 
-  getTaskAbleToBeStart = (params: TaskContextFunctionParams): boolean => {
-    return this.plugins.every(({task: {context: {getTaskAbleToBeStart}}}) =>
-      getTaskAbleToBeStart ? getTaskAbleToBeStart(params) : true,
+  startAble = (params: TaskRuntimeMethodParams): boolean => {
+    return this.plugins.every(
+      ({
+        task: {
+          context: {startAble: getTaskAbleToBeStart},
+        },
+      }) => (getTaskAbleToBeStart ? getTaskAbleToBeStart(params) : true),
     );
   };
 
-  getTaskNodeBroken = (params: TaskNodeContextFunctionParams): boolean => {
+  nodeBroken = (params: TaskNodeRuntimeMethodParams): boolean => {
     return this.plugins.some(({task: {context}}) =>
-      context.getTaskNodeBroken?.(params),
+      context.nodeBroken?.(params),
     );
   };
 
-  getTaskNodeIgnored = (params: TaskNodeContextFunctionParams): boolean => {
+  nodeIgnored = (params: TaskNodeRuntimeMethodParams): boolean => {
     return this.plugins.some(({task: {context}}) =>
-      context.getTaskNodeIgnored?.(params),
+      context.nodeIgnored?.(params),
     );
   };
 
-  getTaskNodeAbleToBeStart = (
-    params: TaskNodeContextFunctionParams<'singleNode'>,
+  nodeStartAble = (
+    params: TaskNodeRuntimeMethodParams<'singleNode'>,
   ): boolean => {
-    return this.plugins.every(({task: {context: {getTaskNodeAbleToBeStart}}}) =>
-      getTaskNodeAbleToBeStart ? getTaskNodeAbleToBeStart(params) : true,
+    return this.plugins.every(
+      ({
+        task: {
+          context: {nodeStartAble: getTaskNodeAbleToBeStart},
+        },
+      }) =>
+        getTaskNodeAbleToBeStart ? getTaskNodeAbleToBeStart(params) : true,
     );
   };
 
-  getTaskNodeAbleToBeDone = (
-    params: TaskNodeContextFunctionParams<'singleNode'>,
-  ): boolean => {
-    return this.plugins.every(({task: {context: {getTaskNodeAbleToBeDone}}}) =>
-      getTaskNodeAbleToBeDone ? getTaskNodeAbleToBeDone(params) : true,
+  nodeDone = (params: TaskNodeRuntimeMethodParams<'singleNode'>): boolean => {
+    return this.plugins.every(
+      ({
+        task: {
+          context: {nodeDone: getTaskNodeAbleToBeDone},
+        },
+      }) => (getTaskNodeAbleToBeDone ? getTaskNodeAbleToBeDone(params) : true),
     );
   };
 
-  getTaskNodeAbleToBeTerminated = (
-    params: TaskNodeContextFunctionParams<'singleNode'>,
+  nodeTerminated = (
+    params: TaskNodeRuntimeMethodParams<'singleNode'>,
   ): boolean => {
     return this.plugins.some(({task: {context}}) =>
-      context.getTaskNodeAbleToBeTerminated?.(params),
+      context.nodeTerminated?.(params),
     );
   };
 }

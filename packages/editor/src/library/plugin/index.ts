@@ -1,6 +1,6 @@
 import {Node, NodeType} from '@magicflow/core';
 import {ProcedureTreeNode} from '@magicflow/procedure';
-import {TaskContext} from '@magicflow/task';
+import {ITaskRuntime} from '@magicflow/task';
 import {ComponentType, ReactNode} from 'react';
 import {Dict} from 'tslang';
 
@@ -52,6 +52,6 @@ export interface IPlugin<TConfigExtraProps extends Dict<any> = Dict<any>> {
   };
 
   task: {
-    context: TaskContext;
+    context: ITaskRuntime;
   };
 }
