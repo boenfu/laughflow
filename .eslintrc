@@ -15,10 +15,6 @@
       }
     },
     {
-      "files": ["packages/core/src/test/**/*.{ts,tsx}"],
-      "extends": ["plugin:@mufan/override-dev"]
-    },
-    {
       "files": ["packages/procedure/src/test/**/*.{ts,tsx}"],
       "extends": ["plugin:@mufan/override-dev"]
     },

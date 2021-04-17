@@ -11,9 +11,6 @@
   },
   "references": [
     {
-      "path": "../../../core/src/library"
-    },
-    {
       "path": "../../../procedure/src/library"
     },
     {

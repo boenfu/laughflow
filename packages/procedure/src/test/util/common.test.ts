@@ -1,6 +1,4 @@
-import {FlowId, NodeId} from '@magicflow/core';
-
-import {ProcedureUtil} from '../../library';
+import {FlowId, NodeId, ProcedureUtil} from '../../library';
 
 const procedure = ProcedureUtil.createEmptyProcedure();
 

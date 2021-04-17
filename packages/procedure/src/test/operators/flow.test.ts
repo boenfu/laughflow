@@ -1,6 +1,5 @@
 /* eslint-disable @mufan/import-path-shallowest */
-import {FlowId, NodeId} from '@magicflow/core';
-
+import {FlowId, NodeId} from '../../library';
 import {
   addFlow,
   addFlowStart,

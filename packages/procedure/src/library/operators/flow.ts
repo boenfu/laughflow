@@ -1,5 +1,4 @@
-import {Flow, FlowId, NodeId} from '@magicflow/core';
-
+import {Flow, FlowId, NodeId} from '../core';
 import {ProcedureUtil} from '../utils';
 
 import {Operator} from './common';

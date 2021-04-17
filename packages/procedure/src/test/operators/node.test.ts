@@ -1,6 +1,5 @@
 /* eslint-disable @mufan/import-path-shallowest */
-import {NodeId} from '@magicflow/core';
-
+import {NodeId} from '../../library';
 import {
   addNode,
   addNodeNexts,

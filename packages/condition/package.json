@@ -6,7 +6,6 @@
   "main": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
   "dependencies": {
-    "@magicflow/core": "*",
     "lodash-es": "^4.17.20",
     "tslib": "^2.2.0"
   },

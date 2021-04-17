@@ -1,5 +1,4 @@
-import {Node, NodeType} from '@magicflow/core';
-import {ProcedureTreeNode} from '@magicflow/procedure';
+import {Node, NodeType, ProcedureTreeNode} from '@magicflow/procedure';
 import {ITaskRuntime} from '@magicflow/task';
 import {ComponentType, ReactNode} from 'react';
 import {Dict} from 'tslang';

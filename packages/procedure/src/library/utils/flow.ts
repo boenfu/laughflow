@@ -1,8 +1,11 @@
-import {Flow, FlowId, Procedure} from '@magicflow/core';
+import {Flow, FlowId, ProcedureDefinition} from '../core';
 
 import {createId} from './common';
 
-export function requireFlow(definition: Procedure, flowId: FlowId): Flow {
+export function requireFlow(
+  definition: ProcedureDefinition,
+  flowId: FlowId,
+): Flow {
   let flow = definition.flows.find(flow => flow.id === flowId);
 
   if (!flow) {

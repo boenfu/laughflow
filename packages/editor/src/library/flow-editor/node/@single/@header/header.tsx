@@ -1,11 +1,10 @@
-import {SingleNode} from '@magicflow/core';
-import {ProcedureSingleTreeNode} from '@magicflow/procedure';
+import {ProcedureSingleTreeNode, SingleNode} from '@magicflow/procedure';
 import {updateNode} from '@magicflow/procedure/operators';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
+import {FlowContext} from '../../../../flow-context';
 import {transition} from '../../../@common';
-import {EditorContext} from '../../../context';
 
 import {DisplayName} from './@displayName';
 
@@ -34,7 +33,7 @@ export interface HeaderProps {
 }
 
 export const Header: FC<HeaderProps> = ({node}) => {
-  const {editor} = useContext(EditorContext);
+  const {editor} = useContext(FlowContext);
 
   const onNodeChange = (node: SingleNode): void => {
     void editor.edit(updateNode(node));

@@ -1,9 +1,10 @@
-import {Procedure} from '@magicflow/core';
 import {castArray} from 'lodash-es';
 
+import {ProcedureDefinition} from '../core';
+
 export type Operator<TRet = void> = (
-  definition: Procedure,
-) => TRet extends any[] ? [Procedure, ...TRet] : Procedure;
+  definition: ProcedureDefinition,
+) => TRet extends any[] ? [ProcedureDefinition, ...TRet] : ProcedureDefinition;
 
 export type OperatorFunction<TParams extends any[], TRet = void> = (
   ...args: TParams
@@ -27,7 +28,7 @@ export function out<TRet>(
 ): Operator {
   return definition => {
     let [nextDefinition, ...args] = castArray(operator(definition)) as [
-      Procedure,
+      ProcedureDefinition,
     ];
 
     return compose(
@@ -83,7 +84,10 @@ export function variables<TContext>(
 
     for (let expression of expressions) {
       let operator = expression(variable);
-      let ret = castArray(operator(definition)) as [Procedure, ...any[]];
+      let ret = castArray(operator(definition)) as [
+        ProcedureDefinition,
+        ...any[]
+      ];
 
       if (outedOperatorMap.has(operator)) {
         let [name, type] = outedOperatorMap.get(operator)!;

@@ -1,13 +1,14 @@
+import {compact} from 'lodash-es';
+
 import {
   BranchesNode,
   Flow,
   FlowId,
   Node,
   NodeId,
-  Procedure as ProcedureDefinition,
+  ProcedureDefinition,
   SingleNode,
-} from '@magicflow/core';
-import {compact} from 'lodash-es';
+} from './core';
 
 export interface IProcedure {
   definition: ProcedureDefinition;

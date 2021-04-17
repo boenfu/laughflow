@@ -1,4 +1,10 @@
-import {Flow, Node, NodeId, NodeType, Procedure} from '@magicflow/core';
+import {
+  Flow,
+  Node,
+  NodeId,
+  NodeType,
+  ProcedureDefinition,
+} from '@magicflow/procedure';
 import {Dict} from 'tslang';
 
 import {TaskFlowMetadata} from './flow';
@@ -6,7 +12,7 @@ import {TaskNodeMetadata, TaskSingleNodeMetadata} from './node';
 import {TaskMetadata} from './task';
 
 export interface TaskRuntimeMethodParams {
-  definition: Procedure;
+  definition: ProcedureDefinition;
   metadata: TaskMetadata;
 }
 

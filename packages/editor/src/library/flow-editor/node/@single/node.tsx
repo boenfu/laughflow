@@ -4,9 +4,9 @@ import classnames from 'classnames';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
+import {FlowContext} from '../../../flow-context';
 import {ActiveState} from '../../../procedure-editor';
 import {RESOURCE_WIDTH} from '../../@common';
-import {EditorContext} from '../../context';
 
 import {Header} from './@header';
 
@@ -146,7 +146,7 @@ export interface SingleNodeProps {
 }
 
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
-  const {editor} = useContext(EditorContext);
+  const {editor} = useContext(FlowContext);
 
   let activeInfo = editor.activeInfo;
   let active = editor.isActive(node);

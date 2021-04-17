@@ -1,4 +1,4 @@
-import {SingleNode} from '@magicflow/core';
+import {SingleNode} from '@magicflow/procedure';
 import {useDebounceFn} from 'ahooks';
 import React, {ChangeEvent, FC, MouseEvent, useEffect, useRef} from 'react';
 import styled from 'styled-components';

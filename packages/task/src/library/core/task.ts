@@ -1,9 +1,9 @@
 import {
   IOutputsEntity,
-  Procedure as ProcedureDefinition,
+  Procedure,
+  ProcedureDefinition,
   ProcedureId,
-} from '@magicflow/core';
-import {Procedure} from '@magicflow/procedure';
+} from '@magicflow/procedure';
 import {cloneDeep} from 'lodash-es';
 import {Dict, Nominal} from 'tslang';
 

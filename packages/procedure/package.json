@@ -9,7 +9,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@magicflow/core": "*",
     "lodash-es": "^4.17.20",
     "nanoid": "^3.1.20",
     "tslang": "^0.1.23",

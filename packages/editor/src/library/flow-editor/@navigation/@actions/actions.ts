@@ -1,4 +1,4 @@
-import {NodeType} from '@magicflow/core';
+import {NodeType} from '@magicflow/procedure';
 import {FC} from 'react';
 
 import {ProcedureEditor} from '../../../procedure-editor';

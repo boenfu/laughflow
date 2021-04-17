@@ -1,4 +1,4 @@
-import {Flow, FlowId, IOutputsEntity} from '@magicflow/core';
+import {Flow, FlowId, IOutputsEntity} from '@magicflow/procedure';
 import {Dict, Nominal} from 'tslang';
 
 import {getBranchesDefinition, getNodeDefinition} from '../utils';

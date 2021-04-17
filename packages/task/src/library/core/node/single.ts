@@ -1,4 +1,4 @@
-import {SingleNode} from '@magicflow/core';
+import {SingleNode} from '@magicflow/procedure';
 import {Dict} from 'tslang';
 
 import {getBranchesDefinition, getNodeDefinition} from '../../utils';

@@ -1,4 +1,4 @@
-import {NodeId} from '@magicflow/core';
+import {NodeId} from '@magicflow/procedure';
 
 import {ProcedureOperator, ProcedureUtil} from '../../library';
 

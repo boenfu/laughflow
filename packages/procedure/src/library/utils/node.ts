@@ -3,14 +3,14 @@ import {
   Node,
   NodeId,
   NodeType,
-  Procedure,
+  ProcedureDefinition,
   SingleNode,
-} from '@magicflow/core';
+} from '../core';
 
 import {createId} from './common';
 
 export function requireNode<TNodeType extends NodeType>(
-  definition: Procedure,
+  definition: ProcedureDefinition,
   nodeId: NodeId,
   type?: TNodeType,
 ): TNodeType extends NodeType

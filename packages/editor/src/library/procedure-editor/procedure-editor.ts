@@ -1,11 +1,9 @@
+import {IPlugin} from '@magicflow/plugins';
 import {
   FlowId,
   NodeId,
-  Procedure as ProcedureDefinition,
-} from '@magicflow/core';
-import {IPlugin} from '@magicflow/plugins';
-import {
   Procedure,
+  ProcedureDefinition,
   ProcedureFlow,
   ProcedureTreeNode,
   ProcedureTreeView,

@@ -3,9 +3,9 @@ import {ProcedureTreeNode} from '@magicflow/procedure';
 import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
 
+import {FlowContext} from '../../flow-context';
 import {deleteLinkNode} from '../../procedure-editor';
 import {transition} from '../@common';
-import {EditorContext} from '../context';
 
 export interface LinkNodeProps {
   node: ProcedureTreeNode;
@@ -68,7 +68,7 @@ const Content = styled.div`
 `;
 
 export const LinkNode: FC<LinkNodeProps> = ({className, style, node}) => {
-  const {editor} = useContext(EditorContext);
+  const {editor} = useContext(FlowContext);
 
   const onDelete = (): void => editor.edit(deleteLinkNode(node));
 

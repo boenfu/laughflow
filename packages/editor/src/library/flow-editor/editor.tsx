@@ -1,24 +1,20 @@
-import {FlowId, NodeId} from '@magicflow/core';
+import {
+  IPlugin,
+  PluginComponentProps,
+  PluginConfigComponent,
+} from '@magicflow/plugins';
+import {FlowId, NodeId, ProcedureDefinition} from '@magicflow/procedure';
 import {addFlowStart, addNodeNexts} from '@magicflow/procedure/operators';
 import {useCreation, useUpdate} from 'ahooks';
 import React, {FC, MouseEvent, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
+import {FlowContext} from '../flow-context';
 import {ActiveIdentity, ProcedureEditor} from '../procedure-editor';
 
 import {Footer} from './@footer';
 import {Navigation} from './@navigation';
-import {EditorContext} from './context';
-import {EditorProps as FlowEditorProps} from './editor.doc';
 import {Flow} from './flow';
-
-declare global {
-  namespace Magicflow {
-    interface SingleNodeExtension {
-      displayName?: string;
-    }
-  }
-}
 
 const Wrapper = styled.div`
   position: relative;
@@ -40,6 +36,21 @@ const Content = styled.div`
     pointer-events: none;
   }
 `;
+
+export interface EditorConfigObject {
+  [TPluginName: string]: PluginConfigComponent;
+}
+
+export interface FlowEditorProps {
+  definition: ProcedureDefinition;
+  plugins?: IPlugin[];
+  onChange?(definition: ProcedureDefinition): void;
+  onConfig?<TPayload>(
+    config: EditorConfigObject,
+    props: PluginComponentProps,
+    payload?: TPayload,
+  ): void;
+}
 
 export const FlowEditor: FC<FlowEditorProps> = ({
   definition,
@@ -107,13 +118,18 @@ export const FlowEditor: FC<FlowEditorProps> = ({
 
   return (
     <Wrapper ref={wrapperRef}>
-      <EditorContext.Provider value={{editor}}>
+      <FlowContext.Provider
+        value={{
+          type: 'editor',
+          editor,
+        }}
+      >
         <Navigation onFullScreenToggle={onFullScreenToggle} />
         <Content onClick={onContentClick}>
-          <Flow flow={editor.rootFlow} start />
+          <Flow flow={editor.rootFlow} />
         </Content>
         <Footer />
-      </EditorContext.Provider>
+      </FlowContext.Provider>
     </Wrapper>
   );
 };

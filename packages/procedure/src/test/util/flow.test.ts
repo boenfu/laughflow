@@ -1,6 +1,4 @@
-import {FlowId} from '@magicflow/core';
-
-import {ProcedureUtil} from '../../library';
+import {FlowId, ProcedureUtil} from '../../library';
 
 test('createFlow params', () => {
   expect(ProcedureUtil.createFlow()).toBeTruthy();

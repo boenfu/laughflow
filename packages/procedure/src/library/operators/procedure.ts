@@ -1,4 +1,4 @@
-import {BranchesNode, Flow, FlowId, NodeId, SingleNode} from '@magicflow/core';
+import {BranchesNode, Flow, FlowId, NodeId, SingleNode} from '../core';
 
 import {Operator} from './common';
 

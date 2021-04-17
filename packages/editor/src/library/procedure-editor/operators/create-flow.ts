@@ -1,4 +1,4 @@
-import {FlowId, NodeId, NodeType} from '@magicflow/core';
+import {FlowId, NodeId, NodeType} from '@magicflow/procedure';
 import {
   Operator,
   OperatorFunction,

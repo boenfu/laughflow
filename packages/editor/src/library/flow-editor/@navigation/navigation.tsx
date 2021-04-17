@@ -3,7 +3,7 @@ import React, {FC, MouseEvent, useContext} from 'react';
 import styled from 'styled-components';
 
 import {IconButton} from '../@common';
-import {EditorContext} from '../context';
+import {FlowContext} from '../../flow-context';
 
 import {ActionDefinition, actionDefinitionDict} from './@actions';
 
@@ -42,7 +42,7 @@ const Right = styled.div`
 
 export const Navigation: FC<NavigationProps> = React.memo(
   ({onFullScreenToggle}) => {
-    const {editor} = useContext(EditorContext);
+    const {editor} = useContext(FlowContext);
 
     let activeInfo = editor.activeInfo;
 

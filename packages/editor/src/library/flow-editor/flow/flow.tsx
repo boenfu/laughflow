@@ -3,9 +3,9 @@ import classNames from 'classnames';
 import React, {FC, Fragment, useContext} from 'react';
 import styled from 'styled-components';
 
+import {FlowContext} from '../../flow-context';
 import {RESOURCE_WIDTH, transition} from '../@common';
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../@connection-line';
-import {EditorContext} from '../context';
 import {Leaf} from '../leaf';
 import {Node} from '../node';
 
@@ -50,11 +50,10 @@ export interface FlowProps {
   className?: string;
   flow: ProcedureFlow;
   readOnly?: boolean;
-  start?: boolean;
 }
 
-export const Flow: FC<FlowProps> = ({flow, start}) => {
-  const {editor} = useContext(EditorContext);
+export const Flow: FC<FlowProps> = ({flow}) => {
+  const {editor} = useContext(FlowContext);
   let startNodes = flow.starts;
 
   return (
@@ -78,7 +77,6 @@ export const Flow: FC<FlowProps> = ({flow, start}) => {
       <Wrapper
         className={classNames({
           multi: startNodes.length > 1,
-          start,
         })}
       >
         {startNodes.length ? (

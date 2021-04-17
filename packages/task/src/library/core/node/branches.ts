@@ -1,4 +1,4 @@
-import {BranchesNode} from '@magicflow/core';
+import {BranchesNode} from '@magicflow/procedure';
 import {Dict} from 'tslang';
 
 import {

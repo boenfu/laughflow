@@ -1,7 +1,6 @@
 /* eslint-disable @mufan/import-path-shallowest */
 
-import {BranchesNode, Flow, SingleNode} from '@magicflow/core';
-
+import {BranchesNode, Flow, SingleNode} from '../../library';
 import {
   addFlow,
   addFlowStart,

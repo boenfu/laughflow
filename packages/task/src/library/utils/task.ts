@@ -3,9 +3,9 @@ import {
   Flow,
   FlowId,
   NodeId,
-  Procedure as ProcedureDefinition,
+  ProcedureDefinition,
   SingleNode,
-} from '@magicflow/core';
+} from '@magicflow/procedure';
 import {createId} from '@magicflow/procedure/utils';
 
 import {

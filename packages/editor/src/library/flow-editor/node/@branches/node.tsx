@@ -4,9 +4,9 @@ import classNames from 'classnames';
 import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
 
+import {FlowContext} from '../../../flow-context';
 import {createFlow} from '../../../procedure-editor';
 import {Icon, RESOURCE_WIDTH, transition} from '../../@common';
-import {EditorContext} from '../../context';
 import {Flow} from '../../flow';
 
 const AddFlow = styled(AddSolid)`
@@ -52,7 +52,7 @@ export interface BranchesNodeProps {
 }
 
 export const BranchesNode: FC<BranchesNodeProps> = ({node}) => {
-  const {editor} = useContext(EditorContext);
+  const {editor} = useContext(FlowContext);
 
   const onCreateFlow = (): void => {
     editor.edit(createFlow({node: node.id}));

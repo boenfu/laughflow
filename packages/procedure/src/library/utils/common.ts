@@ -1,14 +1,14 @@
-import {Flow, Procedure} from '@magicflow/core';
 import {castArray} from 'lodash-es';
 import {nanoid} from 'nanoid';
 
+import {Flow, ProcedureDefinition} from '../core';
 import {ProcedureOperator} from '../operators';
 
 export function createId<TId>(): TId {
   return (nanoid(8) as unknown) as TId;
 }
 
-export function createEmptyProcedure(): Procedure {
+export function createEmptyProcedure(): ProcedureDefinition {
   let flow: Flow = {
     id: createId(),
     starts: [],
@@ -27,7 +27,7 @@ export type ProcedureChain = {
     ...args: Parameters<typeof ProcedureOperator[TKey]>
   ) => ProcedureChain;
 } & {
-  exec(definition: Procedure): Procedure;
+  exec(definition: ProcedureDefinition): ProcedureDefinition;
 };
 
 export function chain(): ProcedureChain {
@@ -48,7 +48,7 @@ export function chain(): ProcedureChain {
           };
         }
 
-        return (definition: Procedure) => {
+        return (definition: ProcedureDefinition) => {
           for (let [fnName, params] of target._fns) {
             let fn = ((ProcedureOperator as unknown) as {
               [key in string]: (...args: any[]) => any;
