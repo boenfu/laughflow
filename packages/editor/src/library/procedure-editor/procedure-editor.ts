@@ -1,8 +1,4 @@
-import {
-  BranchesNodeEditorRender,
-  IPlugin,
-  SingleNodeEditorRender,
-} from '@magicflow/plugins';
+import {IPlugin} from '@magicflow/plugins';
 import {
   FlowId,
   NodeId,
@@ -18,6 +14,8 @@ import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
 import {enableAllPlugins, produce} from 'immer';
 import {compact, fromPairs, isEqual} from 'lodash-es';
+
+import {NodeRenderDescriptor, buildNodeRenderDescriptor} from '../@common';
 
 import {UndoStack} from './@undo-stack';
 
@@ -39,15 +37,6 @@ export type ActiveIdentity = (
 export interface ActiveInfo {
   value: ProcedureTreeNode | ProcedureFlow;
   state?: ActiveState;
-}
-
-export type NodeRenderCollect<TRender extends object> = {
-  [TK in keyof TRender]: NonNullable<TRender[TK]>[];
-};
-
-export interface NodeRenderDescriptor {
-  singleNode: NodeRenderCollect<NonNullable<SingleNodeEditorRender>>;
-  branchesNode: NodeRenderCollect<NonNullable<BranchesNodeEditorRender>>;
 }
 
 export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
@@ -166,50 +155,7 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   private setPlugins(plugins: IPlugin[]): void {
     this.plugins = plugins;
 
-    let nodeRenderDescriptor: NodeRenderDescriptor = {
-      singleNode: {
-        before: [],
-        after: [],
-        headLeft: [],
-        headRight: [],
-        body: [],
-        footer: [],
-        config: [],
-      },
-      branchesNode: {
-        before: [],
-        after: [],
-        config: [],
-      },
-    };
-
-    for (let plugin of plugins) {
-      let {singleNode, branchesNode} = plugin.editor || {};
-
-      if (singleNode) {
-        for (let [name, component] of Object.entries(singleNode)) {
-          if (component) {
-            // eslint-disable-next-line @mufan/no-unnecessary-type-assertion
-            nodeRenderDescriptor['singleNode'][
-              name as keyof NodeRenderDescriptor['singleNode']
-            ]!.push(component as any);
-          }
-        }
-      }
-
-      if (branchesNode) {
-        for (let [name, component] of Object.entries(branchesNode)) {
-          if (component) {
-            // eslint-disable-next-line @mufan/no-unnecessary-type-assertion
-            nodeRenderDescriptor['branchesNode'][
-              name as keyof NodeRenderDescriptor['branchesNode']
-            ]!.push(component as any);
-          }
-        }
-      }
-    }
-
-    this.nodeRenderDescriptor = nodeRenderDescriptor;
+    this.nodeRenderDescriptor = buildNodeRenderDescriptor(plugins, 'editor');
   }
 
   private updateActiveInfo(activeIdentity: ActiveIdentity | undefined): void {

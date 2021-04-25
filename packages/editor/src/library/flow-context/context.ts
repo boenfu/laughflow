@@ -4,18 +4,20 @@ import {createContext, useContext} from 'react';
 import {ProcedureEditor} from '../procedure-editor';
 import {ProcedureViewer} from '../procedure-viewer';
 
+export interface FlowEditorContext {
+  context: 'editor';
+  editor: ProcedureEditor;
+}
+
 export interface FlowViewerContext {
   context: 'viewer';
   viewer: ProcedureViewer;
   task?: Task;
 }
 
-export interface FlowEditorContext {
-  context: 'editor';
-  editor: ProcedureEditor;
-}
+export type FlowContext = FlowEditorContext | FlowViewerContext;
 
-export const FlowContext = createContext<FlowEditorContext | FlowViewerContext>(
+const FlowContext = createContext<FlowEditorContext | FlowViewerContext>(
   undefined!,
 );
 
