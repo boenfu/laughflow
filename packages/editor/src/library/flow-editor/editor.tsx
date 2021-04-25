@@ -6,7 +6,13 @@ import {
 import {FlowId, NodeId, ProcedureDefinition} from '@magicflow/procedure';
 import {addFlowStart, addNodeNexts} from '@magicflow/procedure/operators';
 import {useCreation, useUpdate} from 'ahooks';
-import React, {FC, MouseEvent, useEffect, useRef} from 'react';
+import React, {
+  MouseEvent,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import styled from 'styled-components';
 
 import {FlowContext} from '../flow-context';
@@ -52,84 +58,86 @@ export interface FlowEditorProps {
   ): void;
 }
 
-export const FlowEditor: FC<FlowEditorProps> = ({
-  definition,
-  plugins = [],
-  onChange,
-  onConfig,
-}) => {
-  // eslint-disable-next-line no-null/no-null
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const editor = useCreation(
-    () => new ProcedureEditor(definition, plugins),
-    [],
-  );
-  const reRender = useUpdate();
+export const FlowEditor = forwardRef<ProcedureEditor, FlowEditorProps>(
+  ({definition, plugins = [], onChange, onConfig}, ref) => {
+    // eslint-disable-next-line no-null/no-null
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    const editor = useCreation(
+      () => new ProcedureEditor(definition, plugins),
+      [],
+    );
+    const reRender = useUpdate();
 
-  const onFullScreenToggle = (): void => {
-    if (document.fullscreenElement) {
-      void document.exitFullscreen();
-    } else {
-      void wrapperRef.current?.requestFullscreen();
-    }
-  };
+    const onFullScreenToggle = (): void => {
+      if (document.fullscreenElement) {
+        void document.exitFullscreen();
+      } else {
+        void wrapperRef.current?.requestFullscreen();
+      }
+    };
 
-  const onContentClick = (event: MouseEvent): void => {
-    let elem = event.target as HTMLElement;
+    const onContentClick = (event: MouseEvent): void => {
+      let elem = event.target as HTMLElement;
 
-    while (elem && !elem.dataset?.['id']) {
-      elem = elem.parentNode as HTMLElement;
-    }
+      while (elem && !elem.dataset?.['id']) {
+        elem = elem.parentNode as HTMLElement;
+      }
 
-    if (!elem) {
-      editor.active();
-      return;
-    }
+      if (!elem) {
+        editor.active();
+        return;
+      }
 
-    let id = String(elem.dataset['id']);
-    let prev = elem.dataset['prev'] && String(elem.dataset['prev']);
+      let id = String(elem.dataset['id']);
+      let prev = elem.dataset['prev'] && String(elem.dataset['prev']);
 
-    let activeInfo = editor.activeInfo;
+      let activeInfo = editor.activeInfo;
 
-    if (activeInfo?.value.type !== 'flow' && activeInfo?.state === 'connect') {
-      editor.edit(
-        prev
-          ? addNodeNexts(id as NodeId, [activeInfo.value.id])
-          : addFlowStart(id as FlowId, activeInfo.value.id),
-      );
-      editor.active();
-      return;
-    }
+      if (
+        activeInfo?.value.type !== 'flow' &&
+        activeInfo?.state === 'connect'
+      ) {
+        editor.edit(
+          prev
+            ? addNodeNexts(id as NodeId, [activeInfo.value.id])
+            : addFlowStart(id as FlowId, activeInfo.value.id),
+        );
+        editor.active();
+        return;
+      }
 
-    editor.active((prev ? {prev, node: id} : {flow: id}) as ActiveIdentity);
-  };
+      editor.active((prev ? {prev, node: id} : {flow: id}) as ActiveIdentity);
+    };
 
-  useEffect(() => {
-    editor.on('update', () => {
-      onChange?.(editor.definition);
-      reRender();
-    });
+    useEffect(() => {
+      editor.on('update', () => {
+        onChange?.(editor.definition);
+        reRender();
+      });
 
-    if (onConfig) {
-      editor.on('config', onConfig);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      if (onConfig) {
+        editor.on('config', onConfig);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-  return (
-    <Wrapper ref={wrapperRef}>
-      <FlowContext.Provider
-        value={{
-          type: 'editor',
-          editor,
-        }}
-      >
-        <Navigation onFullScreenToggle={onFullScreenToggle} />
-        <Content onClick={onContentClick}>
-          <Flow flow={editor.rootFlow} />
-        </Content>
-        <Footer />
-      </FlowContext.Provider>
-    </Wrapper>
-  );
-};
+    useImperativeHandle(ref, () => editor);
+
+    return (
+      <Wrapper ref={wrapperRef}>
+        <FlowContext.Provider
+          value={{
+            type: 'editor',
+            editor,
+          }}
+        >
+          <Navigation onFullScreenToggle={onFullScreenToggle} />
+          <Content onClick={onContentClick}>
+            <Flow flow={editor.rootFlow} />
+          </Content>
+          <Footer />
+        </FlowContext.Provider>
+      </Wrapper>
+    );
+  },
+);

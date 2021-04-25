@@ -1,1 +1,1 @@
-module.exports = require('../bld/library/utils/namespace');
+export * from '../bld/library/utils/namespace';

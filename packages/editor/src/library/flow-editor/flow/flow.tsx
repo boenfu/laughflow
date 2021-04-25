@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import React, {FC, Fragment, useContext} from 'react';
 import styled from 'styled-components';
 
+import {RESOURCE_WIDTH, transition} from '../../@common';
 import {FlowContext} from '../../flow-context';
-import {RESOURCE_WIDTH, transition} from '../@common';
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../@connection-line';
 import {Leaf} from '../leaf';
 import {Node} from '../node';

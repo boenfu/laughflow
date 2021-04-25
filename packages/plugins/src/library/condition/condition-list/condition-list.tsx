@@ -90,7 +90,10 @@ export const ConditionList: FC<ConditionListProps> = ({
                     `${left.type}:${
                       'value' in left ? left.value : left.variable
                     }`,
-                  ) || `变量:${(left as any).variable}`}
+                  ) ||
+                    ('value' in left
+                      ? `值: ${left.value}`
+                      : `变量: ${left.variable}`)}
                 </DisplayText>
                 <OperatorText>{getOperatorDisplayName(operator)}</OperatorText>
                 <DisplayText>
@@ -100,8 +103,8 @@ export const ConditionList: FC<ConditionListProps> = ({
                     }`,
                   ) ||
                     ('value' in right
-                      ? `值:${right.value}`
-                      : `变量:${right.variable}`)}
+                      ? `值: ${right.value}`
+                      : `变量: ${right.variable}`)}
                 </DisplayText>
               </ConditionLine>
             );

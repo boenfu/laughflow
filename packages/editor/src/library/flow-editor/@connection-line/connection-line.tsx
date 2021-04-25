@@ -3,7 +3,7 @@ import {Bezier, BezierProps, BezierStroke} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {Mark} from '../@common';
+import {Mark} from '../../@common';
 
 export const LINE_HEIGHT_DEFAULT = 48;
 

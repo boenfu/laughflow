@@ -2,7 +2,7 @@ import {IPlugin} from '@magicflow/plugins';
 import {Procedure, ProcedureDefinition} from '@magicflow/procedure';
 import {Task, TaskMetadata, TaskRuntime} from '@magicflow/task';
 import {useCreation} from 'ahooks';
-import React, {FC, useRef} from 'react';
+import React, {forwardRef, useImperativeHandle} from 'react';
 import styled from 'styled-components';
 
 import {FlowContext} from '../flow-context';
@@ -33,39 +33,38 @@ const Content = styled.div`
 
 export interface FlowViewerProps {
   definition: ProcedureDefinition;
-  task: TaskMetadata;
+  task?: TaskMetadata;
   plugins?: IPlugin[];
 }
 
-export const FlowViewer: FC<FlowViewerProps> = ({
-  definition,
-  task: taskMetadata,
-  plugins = [],
-}) => {
-  // eslint-disable-next-line no-null/no-null
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const task = useCreation(
-    () =>
-      new Task(
-        new Procedure(definition),
-        taskMetadata,
-        new TaskRuntime(plugins.map(plugin => plugin.task)),
-      ),
-    [],
-  );
+export const FlowViewer = forwardRef<ProcedureEditor, FlowViewerProps>(
+  ({definition, task: taskMetadata, plugins = []}, ref) => {
+    const task = useCreation(
+      () =>
+        taskMetadata &&
+        new Task(
+          new Procedure(definition),
+          taskMetadata,
+          new TaskRuntime(plugins.map(plugin => plugin.task)),
+        ),
+      [],
+    );
 
-  const editor = useCreation(
-    () => new ProcedureEditor(definition, plugins),
-    [],
-  );
+    const editor = useCreation(
+      () => new ProcedureEditor(definition, plugins),
+      [],
+    );
 
-  return (
-    <Wrapper ref={wrapperRef}>
-      <FlowContext.Provider value={{type: 'viewer', task, editor}}>
-        <Content>
-          <Flow flow={task.procedure.treeView.root} />
-        </Content>
-      </FlowContext.Provider>
-    </Wrapper>
-  );
-};
+    useImperativeHandle(ref, () => editor);
+
+    return (
+      <Wrapper>
+        <FlowContext.Provider value={{type: 'viewer', task, editor}}>
+          <Content>
+            <Flow flow={editor.rootFlow} />
+          </Content>
+        </FlowContext.Provider>
+      </Wrapper>
+    );
+  },
+);

@@ -4,9 +4,9 @@ import classnames from 'classnames';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
+import {RESOURCE_WIDTH} from '../../../@common';
 import {FlowContext} from '../../../flow-context';
 import {ActiveState} from '../../../procedure-editor';
-import {RESOURCE_WIDTH} from '../../@common';
 
 import {Header} from './@header';
 

@@ -4,9 +4,9 @@ import classNames from 'classnames';
 import React, {CSSProperties, FC, useContext} from 'react';
 import styled from 'styled-components';
 
+import {Icon, RESOURCE_WIDTH, transition} from '../../../@common';
 import {FlowContext} from '../../../flow-context';
 import {createFlow} from '../../../procedure-editor';
-import {Icon, RESOURCE_WIDTH, transition} from '../../@common';
 import {Flow} from '../../flow';
 
 const AddFlow = styled(AddSolid)`

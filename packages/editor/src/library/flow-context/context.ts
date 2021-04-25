@@ -5,8 +5,8 @@ import {ProcedureEditor} from '../procedure-editor';
 
 export interface FlowViewerContext {
   type: 'viewer';
-  task: Task;
   editor: ProcedureEditor;
+  task?: Task;
 }
 
 export interface FlowEditorContext {

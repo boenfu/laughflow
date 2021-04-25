@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import React, {CSSProperties, FC} from 'react';
 import styled from 'styled-components';
 
-import {RESOURCE_WIDTH, transition} from '../../@common';
+import {RESOURCE_WIDTH, transition} from '../../../@common';
 import {Flow} from '../../flow';
 
 const Wrapper = styled.div`

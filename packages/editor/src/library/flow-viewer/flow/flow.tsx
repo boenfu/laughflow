@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {RESOURCE_WIDTH, transition} from '../@common';
+import {RESOURCE_WIDTH, transition} from '../../@common';
 import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../@connection-line';
 import {Leaf} from '../leaf';
 import {Node} from '../node';

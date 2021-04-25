@@ -6,6 +6,9 @@
 
     "lib": ["ESNext", "DOM"],
 
+    "module": "ESNext",
+    "moduleResolution": "Node",
+
     "outDir": "../../bld/library"
   },
   "references": []

@@ -2,7 +2,7 @@ import {ProcedureSingleTreeNode} from '@magicflow/procedure';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {transition} from '../../../@common';
+import {transition} from '../../../../@common';
 import {FlowContext} from '../../../../flow-context';
 
 import {DisplayName} from './@displayName';

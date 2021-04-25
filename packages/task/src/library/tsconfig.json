@@ -4,7 +4,10 @@
     "experimentalDecorators": true,
     "composite": true,
     "lib": ["ESNext", "DOM"],
-    "outDir": "../../bld/library"
+    "outDir": "../../bld/library",
+
+    "module": "ESNext",
+    "moduleResolution": "Node"
   },
   "references": [
     {

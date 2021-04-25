@@ -2,7 +2,7 @@ import {Expand} from '@magicflow/icons';
 import React, {FC, MouseEvent, useContext} from 'react';
 import styled from 'styled-components';
 
-import {IconButton} from '../@common';
+import {IconButton} from '../../@common';
 import {FlowContext} from '../../flow-context';
 
 import {ActionDefinition, actionDefinitionDict} from './@actions';

@@ -2,7 +2,7 @@ import {Check} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {transition} from '../@common';
+import {transition} from '../../@common';
 
 export interface LeafProps {}
 

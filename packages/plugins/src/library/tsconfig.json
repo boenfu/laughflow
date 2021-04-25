@@ -6,6 +6,8 @@
     "lib": ["ESNext", "DOM"],
     "jsx": "react",
     "downlevelIteration": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
 
     "outDir": "../../bld/library"
   },

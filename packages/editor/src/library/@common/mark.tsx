@@ -5,6 +5,7 @@ import {Bezier as _Bezier} from 'rc-bezier';
 import React, {FC, useContext} from 'react';
 import styled from 'styled-components';
 
+import {FlowContext} from '../flow-context';
 import {
   createNode,
   createNodeAsFlowStart,
@@ -12,8 +13,7 @@ import {
   pasteNode,
   pasteNodeAsFlowStart,
   pasteNodeBetweenNodes,
-} from '../../procedure-editor';
-import {FlowContext} from '../../flow-context';
+} from '../procedure-editor';
 
 import {Icon} from './icon';
 

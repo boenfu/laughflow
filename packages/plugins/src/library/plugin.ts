@@ -1,7 +1,6 @@
 import {Node, NodeType, ProcedureTreeNode} from '@magicflow/procedure';
 import {ITaskRuntime} from '@magicflow/task';
 import {ComponentType, ReactNode} from 'react';
-import {Dict} from 'tslang';
 
 export interface PluginComponentProps<TType extends NodeType = NodeType> {
   node: Extract<ProcedureTreeNode, {type: TType}>;
@@ -24,7 +23,7 @@ export type PluginConfigComponent<
   }
 >;
 
-export interface IPlugin<TConfigExtraProps extends Dict<any> = Dict<any>> {
+export interface IPlugin<TConfigExtraProps = any> {
   name: string;
 
   singleNode?: {

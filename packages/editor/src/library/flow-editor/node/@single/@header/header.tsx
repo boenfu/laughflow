@@ -3,8 +3,8 @@ import {updateNode} from '@magicflow/procedure/operators';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
+import {transition} from '../../../../@common';
 import {FlowContext} from '../../../../flow-context';
-import {transition} from '../../../@common';
 
 import {DisplayName} from './@displayName';
 
