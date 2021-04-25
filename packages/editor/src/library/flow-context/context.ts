@@ -15,9 +15,7 @@ export interface FlowViewerContext {
   task?: Task;
 }
 
-export type FlowContext = FlowEditorContext | FlowViewerContext;
-
-const FlowContext = createContext<FlowEditorContext | FlowViewerContext>(
+export const FlowContext = createContext<FlowEditorContext | FlowViewerContext>(
   undefined!,
 );
 
