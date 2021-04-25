@@ -3,7 +3,12 @@ import {ArrowDown} from '@magicflow/icons';
 import React from 'react';
 import styled from 'styled-components';
 
-import {IPlugin} from '../plugin';
+import {
+  EditorRender,
+  IPlugin,
+  SingleNodeEditorRender,
+  ViewerRender,
+} from '../plugin';
 
 import {ConditionOrGroup, CustomConditionCandidate} from './@custom-condition';
 import {ConditionEditor} from './condition-editor';
@@ -102,7 +107,23 @@ export class ConditionPlugin implements IConditionPlugin {
 
   private rightCandidates: CustomConditionCandidate[] = [];
 
-  readonly singleNode: IConditionPlugin['singleNode'] = {
+  get editor(): EditorRender {
+    let singleNode = this.singleNode;
+
+    return {
+      singleNode,
+    };
+  }
+
+  get viewer(): ViewerRender {
+    let singleNode = this.singleNode;
+
+    return {
+      singleNode,
+    };
+  }
+
+  private singleNode: SingleNodeEditorRender = {
     before: ({node, prevChildren}) => {
       let definition = node.definition;
 

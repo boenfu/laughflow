@@ -1,13 +1,13 @@
 import {AddSolid} from '@magicflow/icons';
 import {ProcedureBranchesTreeNode} from '@magicflow/procedure';
 import classNames from 'classnames';
-import React, {CSSProperties, FC, useContext} from 'react';
+import React, {CSSProperties, FC} from 'react';
 import styled from 'styled-components';
 
 import {Icon, RESOURCE_WIDTH, transition} from '../../../@common';
-import {FlowContext} from '../../../flow-context';
+import {useEditorContext} from '../../../flow-context';
 import {createFlow} from '../../../procedure-editor';
-import {Flow} from '../../flow';
+import {Flow} from '../../@flow';
 
 const AddFlow = styled(AddSolid)`
   ${Icon};
@@ -52,7 +52,7 @@ export interface BranchesNodeProps {
 }
 
 export const BranchesNode: FC<BranchesNodeProps> = ({node}) => {
-  const {editor} = useContext(FlowContext);
+  const {editor} = useEditorContext();
 
   const onCreateFlow = (): void => {
     editor.edit(createFlow({node: node.id}));

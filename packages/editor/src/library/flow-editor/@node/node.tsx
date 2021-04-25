@@ -3,8 +3,9 @@ import classNames from 'classnames';
 import React, {CSSProperties, FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../@connection-line';
-import {Leaf} from '../leaf';
+import {LINE_HEIGHT_DEFAULT} from '../../@common';
+import {ConnectionLine} from '../@connection-line';
+import {Leaf} from '../@leaf';
 
 import {BranchesNode} from './@branches';
 import {LinkNode} from './@link';
@@ -55,6 +56,8 @@ export const Node: FC<NodeProps> = ({style, node}) => {
               <Fragment key={`${next.id}-${index}`}>
                 <ConnectionLine
                   startNode={['parent', 'previousSibling']}
+                  start={node}
+                  next={next}
                   first={index === 0 && array.length > 1}
                   last={index === array.length - 1 && array.length > 1}
                 />
@@ -64,7 +67,10 @@ export const Node: FC<NodeProps> = ({style, node}) => {
           })
         ) : (
           <>
-            <ConnectionLine startNode={['parent', 'previousSibling']} />
+            <ConnectionLine
+              startNode={['parent', 'previousSibling']}
+              start={node}
+            />
             <Leaf />
           </>
         )}

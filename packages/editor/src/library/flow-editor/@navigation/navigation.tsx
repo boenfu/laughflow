@@ -1,9 +1,9 @@
 import {Expand} from '@magicflow/icons';
-import React, {FC, MouseEvent, useContext} from 'react';
+import React, {FC, MouseEvent} from 'react';
 import styled from 'styled-components';
 
 import {IconButton} from '../../@common';
-import {FlowContext} from '../../flow-context';
+import {useEditorContext} from '../../flow-context';
 
 import {ActionDefinition, actionDefinitionDict} from './@actions';
 
@@ -42,7 +42,7 @@ const Right = styled.div`
 
 export const Navigation: FC<NavigationProps> = React.memo(
   ({onFullScreenToggle}) => {
-    const {editor} = useContext(FlowContext);
+    const {editor} = useEditorContext();
 
     let activeInfo = editor.activeInfo;
 

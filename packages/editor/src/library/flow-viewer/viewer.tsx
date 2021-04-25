@@ -2,13 +2,14 @@ import {IPlugin} from '@magicflow/plugins';
 import {Procedure, ProcedureDefinition} from '@magicflow/procedure';
 import {Task, TaskMetadata, TaskRuntime} from '@magicflow/task';
 import {useCreation} from 'ahooks';
+import {compact} from 'lodash-es';
 import React, {forwardRef, useImperativeHandle} from 'react';
 import styled from 'styled-components';
 
 import {FlowContext} from '../flow-context';
-import {ProcedureEditor} from '../procedure-editor';
+import {ProcedureViewer} from '../procedure-viewer';
 
-import {Flow} from './flow';
+import {Flow} from './@flow';
 
 const Wrapper = styled.div`
   position: relative;
@@ -25,10 +26,6 @@ const Content = styled.div`
   text-align: center;
   overflow: auto;
   background-color: #e5e7eb;
-
-  * {
-    pointer-events: none;
-  }
 `;
 
 export interface FlowViewerProps {
@@ -37,7 +34,7 @@ export interface FlowViewerProps {
   plugins?: IPlugin[];
 }
 
-export const FlowViewer = forwardRef<ProcedureEditor, FlowViewerProps>(
+export const FlowViewer = forwardRef<ProcedureViewer, FlowViewerProps>(
   ({definition, task: taskMetadata, plugins = []}, ref) => {
     const task = useCreation(
       () =>
@@ -45,23 +42,23 @@ export const FlowViewer = forwardRef<ProcedureEditor, FlowViewerProps>(
         new Task(
           new Procedure(definition),
           taskMetadata,
-          new TaskRuntime(plugins.map(plugin => plugin.task)),
+          new TaskRuntime(compact(plugins.map(plugin => plugin.task))),
         ),
       [],
     );
 
-    const editor = useCreation(
-      () => new ProcedureEditor(definition, plugins),
+    const viewer = useCreation(
+      () => new ProcedureViewer(definition, plugins),
       [],
     );
 
-    useImperativeHandle(ref, () => editor);
+    useImperativeHandle(ref, () => viewer);
 
     return (
       <Wrapper>
-        <FlowContext.Provider value={{type: 'viewer', task, editor}}>
+        <FlowContext.Provider value={{context: 'viewer', task, viewer}}>
           <Content>
-            <Flow flow={editor.rootFlow} />
+            <Flow flow={viewer.rootFlow} />
           </Content>
         </FlowContext.Provider>
       </Wrapper>

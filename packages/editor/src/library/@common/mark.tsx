@@ -2,10 +2,10 @@ import {AddSolid as _AddSolid, CombineSolid} from '@magicflow/icons';
 import {NodeType, ProcedureFlow, ProcedureTreeNode} from '@magicflow/procedure';
 import classNames from 'classnames';
 import {Bezier as _Bezier} from 'rc-bezier';
-import React, {FC, useContext} from 'react';
+import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {FlowContext} from '../flow-context';
+import {useEditorContext} from '../flow-context';
 import {
   createNode,
   createNodeAsFlowStart,
@@ -76,7 +76,7 @@ interface MarkProps {
 }
 
 export const Mark: FC<MarkProps> = ({start, next, active}) => {
-  const {editor} = useContext(FlowContext);
+  const {editor} = useEditorContext();
 
   const onPasteSingleNode = (): void => {
     let activeInfo = editor.activeInfo;

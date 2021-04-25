@@ -1,13 +1,13 @@
 import {ProcedureFlow} from '@magicflow/procedure';
 import classNames from 'classnames';
-import React, {FC, Fragment, useContext} from 'react';
+import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {RESOURCE_WIDTH, transition} from '../../@common';
-import {FlowContext} from '../../flow-context';
-import {ConnectionLine, LINE_HEIGHT_DEFAULT} from '../@connection-line';
-import {Leaf} from '../leaf';
-import {Node} from '../node';
+import {LINE_HEIGHT_DEFAULT, RESOURCE_WIDTH, transition} from '../../@common';
+import {useEditorContext} from '../../flow-context';
+import {ConnectionLine} from '../@connection-line';
+import {Leaf} from '../@leaf';
+import {Node} from '../@node';
 
 const Container = styled.div`
   display: inline-flex;
@@ -49,11 +49,10 @@ const FlowStart = styled.div`
 export interface FlowProps {
   className?: string;
   flow: ProcedureFlow;
-  readOnly?: boolean;
 }
 
 export const Flow: FC<FlowProps> = ({flow}) => {
-  const {editor} = useContext(FlowContext);
+  const {editor} = useEditorContext();
   let startNodes = flow.starts;
 
   return (

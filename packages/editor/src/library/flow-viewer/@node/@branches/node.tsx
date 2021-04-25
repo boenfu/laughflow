@@ -4,7 +4,7 @@ import React, {CSSProperties, FC} from 'react';
 import styled from 'styled-components';
 
 import {RESOURCE_WIDTH, transition} from '../../../@common';
-import {Flow} from '../../flow';
+import {Flow} from '../../@flow';
 
 const Wrapper = styled.div`
   position: relative;
@@ -16,8 +16,6 @@ const Wrapper = styled.div`
   border-radius: 8px;
   margin: 0 17px;
   cursor: pointer;
-
-  pointer-events: all !important;
 
   &.active {
     border-color: #296dff;

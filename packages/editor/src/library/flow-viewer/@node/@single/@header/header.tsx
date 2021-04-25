@@ -1,9 +1,9 @@
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
-import React, {FC, createElement, useContext} from 'react';
+import React, {FC, createElement} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../../../../@common';
-import {FlowContext} from '../../../../flow-context';
+import {useViewerContext} from '../../../../flow-context';
 
 import {DisplayName} from './@displayName';
 
@@ -32,9 +32,9 @@ export interface HeaderProps {
 }
 
 export const Header: FC<HeaderProps> = ({node}) => {
-  const {editor} = useContext(FlowContext);
+  const {viewer} = useViewerContext();
 
-  let {headLeft, headRight} = editor.nodeRenderDescriptor['singleNode'];
+  let {headLeft, headRight} = viewer.nodeRenderDescriptor['singleNode'];
 
   return (
     <Wrapper className="header">

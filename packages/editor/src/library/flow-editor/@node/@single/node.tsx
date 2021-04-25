@@ -1,10 +1,12 @@
+import {Copy, Cut, Jump} from '@magicflow/icons';
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
 import classnames from 'classnames';
-import React, {FC, createElement, useContext} from 'react';
+import React, {FC, createElement} from 'react';
 import styled from 'styled-components';
 
 import {RESOURCE_WIDTH} from '../../../@common';
-import {FlowContext} from '../../../flow-context';
+import {useEditorContext} from '../../../flow-context';
+import {ActiveState} from '../../../procedure-editor';
 
 import {Header} from './@header';
 
@@ -96,6 +98,47 @@ const Footer = styled.div`
   display: flex;
 `;
 
+const EditingIconWrapper = styled.div`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 2px);
+
+  background: #296dff;
+  color: #fff;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
+  border-radius: 28px;
+
+  z-index: 3;
+`;
+
+const STATE_ICON_DICT: Partial<{[key in ActiveState]: React.ElementType}> = {
+  cut: Cut,
+  copy: Copy,
+  connect: Jump,
+};
+
+const EditingIcon: FC<{state: ActiveState}> = ({state}) => {
+  let Component = STATE_ICON_DICT[state];
+
+  if (!Component) {
+    return <></>;
+  }
+
+  return (
+    <EditingIconWrapper>
+      <Component />
+    </EditingIconWrapper>
+  );
+};
+
 export interface SingleNodeProps {
   node: ProcedureSingleTreeNode;
   className?: string;
@@ -103,7 +146,11 @@ export interface SingleNodeProps {
 }
 
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
-  const {editor} = useContext(FlowContext);
+  const {editor} = useEditorContext();
+
+  let activeInfo = editor.activeInfo;
+  let active = editor.isActive(node);
+  let editing = active ? activeInfo?.state : undefined;
 
   let {before, after, footer, body} = editor.nodeRenderDescriptor['singleNode'];
 
@@ -119,7 +166,14 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
         </BeforeWrapper>
       ) : undefined}
       <Wrapper
-        className={classnames([className, {}])}
+        className={classnames([
+          className,
+          {
+            active,
+            editing: !!editing,
+          },
+          editing,
+        ])}
         data-id={node.id}
         data-prev={node.prev.id}
       >
@@ -139,6 +193,8 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
             <></>,
           )}
         </Footer>
+
+        {editing ? <EditingIcon state={editing} /> : undefined}
       </Wrapper>
       {after?.length ? (
         <AfterWrapper>

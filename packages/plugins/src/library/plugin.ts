@@ -23,30 +23,48 @@ export type PluginConfigComponent<
   }
 >;
 
+export interface SingleNodeEditorRender<TConfigExtraProps = any> {
+  before?: PluginComponent<'singleNode'>;
+  after?: PluginComponent<'singleNode'>;
+  headLeft?: PluginComponent<'singleNode'>;
+  headRight?: PluginComponent<'singleNode'>;
+  /**
+   * default `flex-direction: column`
+   */
+  body?: PluginComponent<'singleNode'>;
+  /**
+   * default `flex-direction: row`
+   */
+  footer?: PluginComponent<'singleNode'>;
+  config?: PluginConfigComponent<'singleNode', TConfigExtraProps>;
+}
+
+export type SingleNodeViewerRender = Omit<SingleNodeEditorRender, 'config'>;
+
+export interface BranchesNodeEditorRender<TConfigExtraProps = any> {
+  before?: PluginComponent<'branchesNode'>;
+  after?: PluginComponent<'branchesNode'>;
+  config?: PluginConfigComponent<'branchesNode', TConfigExtraProps>;
+}
+
+export type BranchesNodeViewerRender = Omit<BranchesNodeEditorRender, 'config'>;
+
+export interface EditorRender<TConfigExtraProps = any> {
+  singleNode?: SingleNodeEditorRender<TConfigExtraProps>;
+  branchesNode?: BranchesNodeEditorRender<TConfigExtraProps>;
+}
+
+export interface ViewerRender {
+  singleNode?: SingleNodeViewerRender;
+  branchesNode?: BranchesNodeViewerRender;
+}
+
 export interface IPlugin<TConfigExtraProps = any> {
   name: string;
 
-  singleNode?: {
-    before?: PluginComponent<'singleNode'>;
-    after?: PluginComponent<'singleNode'>;
-    headLeft?: PluginComponent<'singleNode'>;
-    headRight?: PluginComponent<'singleNode'>;
-    /**
-     * default `flex-direction: column`
-     */
-    body?: PluginComponent<'singleNode'>;
-    /**
-     * default `flex-direction: row`
-     */
-    footer?: PluginComponent<'singleNode'>;
-    config?: PluginConfigComponent<'singleNode', TConfigExtraProps>;
-  };
+  editor?: EditorRender<TConfigExtraProps>;
 
-  branchesNode?: {
-    before?: PluginComponent<'branchesNode'>;
-    after?: PluginComponent<'branchesNode'>;
-    config?: PluginConfigComponent<'branchesNode', TConfigExtraProps>;
-  };
+  viewer?: ViewerRender;
 
-  task: ITaskRuntime;
+  task?: ITaskRuntime;
 }

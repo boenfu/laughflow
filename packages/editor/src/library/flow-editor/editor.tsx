@@ -18,9 +18,9 @@ import styled from 'styled-components';
 import {FlowContext} from '../flow-context';
 import {ActiveIdentity, ProcedureEditor} from '../procedure-editor';
 
+import {Flow} from './@flow';
 import {Footer} from './@footer';
 import {Navigation} from './@navigation';
-import {Flow} from './flow';
 
 const Wrapper = styled.div`
   position: relative;
@@ -127,7 +127,7 @@ export const FlowEditor = forwardRef<ProcedureEditor, FlowEditorProps>(
       <Wrapper ref={wrapperRef}>
         <FlowContext.Provider
           value={{
-            type: 'editor',
+            context: 'editor',
             editor,
           }}
         >

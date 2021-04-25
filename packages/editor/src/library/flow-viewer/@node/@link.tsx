@@ -15,11 +15,6 @@ const Container = styled.div`
   white-space: nowrap;
   vertical-align: top;
   margin: 0 16px;
-
-  &,
-  * {
-    pointer-events: all !important;
-  }
 `;
 
 const Content = styled.div`

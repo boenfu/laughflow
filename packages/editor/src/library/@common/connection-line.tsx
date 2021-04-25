@@ -33,6 +33,7 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
   startNode,
   endNode,
   placement,
+  marks,
 }) => {
   return (
     <Wrapper
@@ -45,6 +46,7 @@ export const ConnectionLine: FC<ConnectionLineProps> = ({
         attributes: true,
         subtree: true,
       }}
+      marks={marks}
       generatePath={points => {
         let start = points[0];
         let end = points[points.length - 1];
