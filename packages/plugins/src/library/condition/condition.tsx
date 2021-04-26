@@ -2,6 +2,7 @@ import {evaluate} from '@magicflow/condition';
 import {ArrowDown} from '@magicflow/icons';
 import React from 'react';
 import styled from 'styled-components';
+import {Dict} from 'tslang';
 
 import {
   EditorRender,
@@ -59,7 +60,7 @@ const NodeBodyWrapper = styled.div`
 `;
 
 const ConditionName = styled.div`
-  font-size: 12px;
+  font-size: 0.8em;
   line-height: 15px;
   padding-left: 16px;
   padding-top: 14px;
@@ -91,6 +92,11 @@ export type IConditionPlugin = IPlugin<{
   mode: 'enter' | 'visible';
 }>;
 
+export type ConditionVariableResolver = (
+  variable: string,
+  inputs?: Dict<any>,
+) => any;
+
 export class ConditionPlugin implements IConditionPlugin {
   readonly name = 'condition';
 
@@ -106,22 +112,6 @@ export class ConditionPlugin implements IConditionPlugin {
   ];
 
   private rightCandidates: CustomConditionCandidate[] = [];
-
-  get editor(): EditorRender {
-    let singleNode = this.singleNode;
-
-    return {
-      singleNode,
-    };
-  }
-
-  get viewer(): ViewerRender {
-    let singleNode = this.singleNode;
-
-    return {
-      singleNode,
-    };
-  }
 
   private singleNode: SingleNodeEditorRender = {
     before: ({node, prevChildren}) => {
@@ -191,19 +181,44 @@ export class ConditionPlugin implements IConditionPlugin {
   };
 
   task: IPlugin['task'] = {
-    nodeBroken({definition, inputs}) {
+    nodeBroken: ({definition, inputs}) => {
       if (!definition.enterConditions) {
         return false;
       }
 
-      return evaluate(definition.enterConditions, name => inputs[name]);
+      return evaluate(definition.enterConditions, name =>
+        this.resolver(name, inputs),
+      );
     },
-    nodeIgnored({definition, inputs}) {
+    nodeIgnored: ({definition, inputs}) => {
       if (!definition.visibleConditions) {
         return false;
       }
 
-      return !evaluate(definition.visibleConditions, name => inputs[name]);
+      return !evaluate(definition.visibleConditions, name =>
+        this.resolver(name, inputs),
+      );
     },
   };
+
+  get editor(): EditorRender {
+    let singleNode = this.singleNode;
+
+    return {
+      singleNode,
+    };
+  }
+
+  get viewer(): ViewerRender {
+    let singleNode = this.singleNode;
+
+    return {
+      singleNode,
+    };
+  }
+
+  constructor(
+    private resolver: ConditionVariableResolver = (name, inputs): any =>
+      inputs?.[name],
+  ) {}
 }

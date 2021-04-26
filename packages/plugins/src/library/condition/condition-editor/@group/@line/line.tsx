@@ -37,18 +37,18 @@ const Wrapper = styled.div`
 
   .variable-select {
     width: 186px;
-    font-size: 14px;
+    font-size: 0.9em;
   }
 
   .operator-select {
     width: 110px;
-    font-size: 14px;
+    font-size: 0.9em;
     margin: 0 10px;
   }
 
   .value-select {
     width: 312px;
-    font-size: 14px;
+    font-size: 0.9em;
   }
 `;
 
@@ -71,7 +71,7 @@ const RightModeWrapper = styled.div`
   height: calc(100% - 2px);
   display: flex;
   align-items: center;
-  font-size: 12px;
+  font-size: 0.8em;
 
   background-color: #fff;
   color: #999;
@@ -85,7 +85,7 @@ const RightModeWrapper = styled.div`
   }
 
   > svg {
-    font-size: 16px;
+    font-size: 1em;
   }
 `;
 

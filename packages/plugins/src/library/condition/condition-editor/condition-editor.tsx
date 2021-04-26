@@ -33,7 +33,7 @@ interface ConditionEditorProps {
 
 const TextSeparator = styled.div`
   margin: 14px 0;
-  font-size: 14px;
+  font-size: 0.9em;
   line-height: 18px;
   text-align: center;
 

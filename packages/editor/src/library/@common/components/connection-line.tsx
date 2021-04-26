@@ -4,7 +4,10 @@ import styled from 'styled-components';
 
 export const LINE_HEIGHT_DEFAULT = 48;
 
-const STROKE_DEFAULT: BezierStroke = {color: '#C8CDD8', width: 1};
+const STROKE_DEFAULT: BezierStroke = {
+  color: '#C8CDD8',
+  width: 1,
+};
 
 const ARC_RADIUS_DEFAULT = 8;
 

@@ -15,9 +15,10 @@ const ConditionGroup = styled.div`
 `;
 
 const ConditionLine = styled.div`
-  font-size: 12px;
+  font-size: 0.8em;
   line-height: 15px;
   text-align: left;
+  white-space: break-spaces;
 
   & + & {
     margin-top: 8px;

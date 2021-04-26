@@ -44,13 +44,12 @@ export const FlowViewer = forwardRef<ProcedureViewer, FlowViewerProps>(
           taskMetadata,
           new TaskRuntime(compact(plugins.map(plugin => plugin.task))),
         ),
-      [],
+      [definition],
     );
 
-    const viewer = useCreation(
-      () => new ProcedureViewer(definition, plugins),
-      [],
-    );
+    const viewer = useCreation(() => new ProcedureViewer(definition, plugins), [
+      definition,
+    ]);
 
     useImperativeHandle(ref, () => viewer);
 

@@ -21,7 +21,7 @@ const Line = styled.div`
 
 const Text = styled.span`
   flex: none;
-  font-size: 12px;
+  font-size: 0.8em;
   padding: 0 3px;
   color: #999999;
 `;
