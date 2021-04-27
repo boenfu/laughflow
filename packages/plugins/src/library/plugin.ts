@@ -28,13 +28,7 @@ export interface SingleNodeEditorRender<TConfigExtraProps = any> {
   after?: PluginComponent<'singleNode'>;
   headLeft?: PluginComponent<'singleNode'>;
   headRight?: PluginComponent<'singleNode'>;
-  /**
-   * default `flex-direction: column`
-   */
   body?: PluginComponent<'singleNode'>;
-  /**
-   * default `flex-direction: row`
-   */
   footer?: PluginComponent<'singleNode'>;
   config?: PluginConfigComponent<'singleNode', TConfigExtraProps>;
 }

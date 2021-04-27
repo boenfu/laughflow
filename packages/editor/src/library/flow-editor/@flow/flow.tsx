@@ -52,7 +52,7 @@ export interface FlowProps {
 }
 
 export const Flow: FC<FlowProps> = ({flow}) => {
-  const {editor} = useEditorContext();
+  const editor = useEditorContext();
   let startNodes = flow.starts;
 
   return (

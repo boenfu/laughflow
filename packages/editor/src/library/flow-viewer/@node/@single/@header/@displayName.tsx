@@ -52,7 +52,6 @@ const DisplayNameText = styled.div`
 
 export interface DisplayNameProps {
   node: SingleNode;
-  readOnly?: boolean;
   onChange?(node: SingleNode): void;
 }
 

@@ -33,7 +33,7 @@ export interface HeaderProps {
 }
 
 export const Header: FC<HeaderProps> = ({node}) => {
-  const {editor} = useEditorContext();
+  const editor = useEditorContext();
 
   const onNodeChange = (node: SingleNode): void => {
     void editor.edit(updateNode(node));

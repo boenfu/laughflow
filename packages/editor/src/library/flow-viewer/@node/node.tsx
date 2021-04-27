@@ -1,4 +1,5 @@
 import {ProcedureTreeNode} from '@magicflow/procedure';
+import {TaskBranchesNode, TaskSingleNode} from '@magicflow/task';
 import classNames from 'classnames';
 import React, {CSSProperties, FC, Fragment} from 'react';
 import styled from 'styled-components';
@@ -12,8 +13,8 @@ import {SingleNode} from './@single';
 
 export interface NodeProps {
   node: ProcedureTreeNode;
+  taskNode?: TaskSingleNode | TaskBranchesNode;
   className?: string;
-  readOnly?: boolean;
   style?: CSSProperties;
 }
 
@@ -33,19 +34,23 @@ const Row = styled.div`
   }
 `;
 
-export const Node: FC<NodeProps> = ({style, node}) => {
-  if (node.left) {
+export const Node: FC<NodeProps> = ({style, node, taskNode}) => {
+  if (node.left && !taskNode) {
     return <LinkNode node={node} />;
   }
 
   let nexts = node.nexts;
 
+  let definitionToTaskNodeMap = new Map(
+    taskNode?.nextNodes.map(node => [node.definition.id, node]),
+  );
+
   return (
     <Container style={style}>
       {node.type === 'singleNode' ? (
-        <SingleNode node={node} />
+        <SingleNode node={node} taskNode={taskNode as TaskSingleNode} />
       ) : (
-        <BranchesNode node={node} />
+        <BranchesNode node={node} taskNode={taskNode as TaskBranchesNode} />
       )}
 
       <Row className={classNames({multi: nexts.length > 1})}>
@@ -58,7 +63,10 @@ export const Node: FC<NodeProps> = ({style, node}) => {
                   first={index === 0 && array.length > 1}
                   last={index === array.length - 1 && array.length > 1}
                 />
-                <Node node={next} />
+                <Node
+                  node={next}
+                  taskNode={definitionToTaskNodeMap.get(next.id)}
+                />
               </Fragment>
             );
           })

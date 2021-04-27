@@ -1,4 +1,5 @@
 import {ProcedureBranchesTreeNode} from '@magicflow/procedure';
+import {TaskBranchesNode} from '@magicflow/task';
 import classNames from 'classnames';
 import React, {CSSProperties, FC} from 'react';
 import styled from 'styled-components';
@@ -26,12 +27,16 @@ const Wrapper = styled.div`
 
 export interface BranchesNodeProps {
   node: ProcedureBranchesTreeNode;
+  taskNode?: TaskBranchesNode;
   className?: string;
-  readOnly?: boolean;
   style?: CSSProperties;
 }
 
-export const BranchesNode: FC<BranchesNodeProps> = ({node}) => {
+export const BranchesNode: FC<BranchesNodeProps> = ({node, taskNode}) => {
+  let definitionToTaskFlowMap = new Map(
+    taskNode?.flows.map(flow => [flow.definition.id, flow]),
+  );
+
   return (
     <Wrapper
       // TODO
@@ -40,7 +45,11 @@ export const BranchesNode: FC<BranchesNodeProps> = ({node}) => {
       data-prev={node.prev.id}
     >
       {node.flows.map(flow => (
-        <Flow key={flow.id} flow={flow} />
+        <Flow
+          key={flow.id}
+          flow={flow}
+          taskFlow={definitionToTaskFlowMap.get(flow.id)}
+        />
       ))}
     </Wrapper>
   );

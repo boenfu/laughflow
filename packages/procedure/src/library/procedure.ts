@@ -97,7 +97,7 @@ function buildProcedureTreeView(
   let startFlow = flowDefinitionsMap.get(start);
 
   if (!startFlow) {
-    throw Error('todo');
+    throw Error('TODO');
   }
 
   return {

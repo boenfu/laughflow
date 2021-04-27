@@ -10,7 +10,6 @@ import {deleteLinkNode} from '../../procedure-editor';
 export interface LinkNodeProps {
   node: ProcedureTreeNode;
   className?: string;
-  readOnly?: boolean;
   style?: CSSProperties;
 }
 
@@ -68,7 +67,7 @@ const Content = styled.div`
 `;
 
 export const LinkNode: FC<LinkNodeProps> = ({className, style, node}) => {
-  const {editor} = useEditorContext();
+  const editor = useEditorContext();
 
   const onDelete = (): void => editor.edit(deleteLinkNode(node));
 

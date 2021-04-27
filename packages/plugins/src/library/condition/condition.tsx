@@ -1,8 +1,8 @@
 import {evaluate} from '@magicflow/condition';
 import {ArrowDown} from '@magicflow/icons';
+import {TaskNodeRuntimeMethodParams} from '@magicflow/task';
 import React from 'react';
 import styled from 'styled-components';
-import {Dict} from 'tslang';
 
 import {
   EditorRender,
@@ -94,7 +94,7 @@ export type IConditionPlugin = IPlugin<{
 
 export type ConditionVariableResolver = (
   variable: string,
-  inputs?: Dict<any>,
+  context?: TaskNodeRuntimeMethodParams,
 ) => any;
 
 export class ConditionPlugin implements IConditionPlugin {
@@ -181,22 +181,26 @@ export class ConditionPlugin implements IConditionPlugin {
   };
 
   task: IPlugin['task'] = {
-    nodeBroken: ({definition, inputs}) => {
+    nodeBroken: params => {
+      let {definition} = params;
+
       if (!definition.enterConditions) {
         return false;
       }
 
       return evaluate(definition.enterConditions, name =>
-        this.resolver(name, inputs),
+        this.resolver(name, params),
       );
     },
-    nodeIgnored: ({definition, inputs}) => {
+    nodeIgnored: params => {
+      let {definition} = params;
+
       if (!definition.visibleConditions) {
         return false;
       }
 
       return !evaluate(definition.visibleConditions, name =>
-        this.resolver(name, inputs),
+        this.resolver(name, params),
       );
     },
   };
@@ -218,7 +222,7 @@ export class ConditionPlugin implements IConditionPlugin {
   }
 
   constructor(
-    private resolver: ConditionVariableResolver = (name, inputs): any =>
-      inputs?.[name],
+    private resolver: ConditionVariableResolver = (name, context): any =>
+      context?.inputs?.[name],
   ) {}
 }

@@ -47,12 +47,11 @@ const Wrapper = styled.div`
 export interface BranchesNodeProps {
   node: ProcedureBranchesTreeNode;
   className?: string;
-  readOnly?: boolean;
   style?: CSSProperties;
 }
 
 export const BranchesNode: FC<BranchesNodeProps> = ({node}) => {
-  const {editor} = useEditorContext();
+  const editor = useEditorContext();
 
   const onCreateFlow = (): void => {
     editor.edit(createFlow({node: node.id}));

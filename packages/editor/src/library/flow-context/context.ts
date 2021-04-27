@@ -1,4 +1,3 @@
-import {Task} from '@magicflow/task';
 import {createContext, useContext} from 'react';
 
 import {ProcedureEditor} from '../procedure-editor';
@@ -12,15 +11,14 @@ export interface FlowEditorContext {
 export interface FlowViewerContext {
   context: 'viewer';
   viewer: ProcedureViewer;
-  task?: Task;
 }
 
 export const FlowContext = createContext<FlowEditorContext | FlowViewerContext>(
   undefined!,
 );
 
-export const useEditorContext = (): FlowEditorContext =>
-  useContext(FlowContext) as FlowEditorContext;
+export const useEditorContext = (): ProcedureEditor =>
+  (useContext(FlowContext) as FlowEditorContext)?.editor;
 
-export const useViewerContext = (): FlowViewerContext =>
-  useContext(FlowContext) as FlowViewerContext;
+export const useViewerContext = (): ProcedureViewer =>
+  (useContext(FlowContext) as FlowViewerContext)?.viewer;

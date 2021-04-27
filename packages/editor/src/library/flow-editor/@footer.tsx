@@ -26,7 +26,7 @@ const History = styled.div`
 `;
 
 export const Footer: FC<FooterProps> = React.memo(() => {
-  const {editor} = useEditorContext();
+  const editor = useEditorContext();
 
   const onUndo = (): void => editor.undo();
   const onRedo = (): void => editor.redo();

@@ -1,8 +1,7 @@
 import {IPlugin} from '@magicflow/plugins';
-import {Procedure, ProcedureDefinition} from '@magicflow/procedure';
-import {Task, TaskMetadata, TaskRuntime} from '@magicflow/task';
+import {ProcedureDefinition} from '@magicflow/procedure';
+import {TaskMetadata} from '@magicflow/task';
 import {useCreation} from 'ahooks';
-import {compact} from 'lodash-es';
 import React, {forwardRef, useImperativeHandle} from 'react';
 import styled from 'styled-components';
 
@@ -30,34 +29,24 @@ const Content = styled.div`
 
 export interface FlowViewerProps {
   definition: ProcedureDefinition;
-  task?: TaskMetadata;
   plugins?: IPlugin[];
+  task?: TaskMetadata;
 }
 
 export const FlowViewer = forwardRef<ProcedureViewer, FlowViewerProps>(
-  ({definition, task: taskMetadata, plugins = []}, ref) => {
-    const task = useCreation(
-      () =>
-        taskMetadata &&
-        new Task(
-          new Procedure(definition),
-          taskMetadata,
-          new TaskRuntime(compact(plugins.map(plugin => plugin.task))),
-        ),
-      [definition],
+  ({definition, task, plugins = []}, ref) => {
+    const viewer = useCreation(
+      () => new ProcedureViewer(definition, plugins, task),
+      [definition, task, plugins],
     );
-
-    const viewer = useCreation(() => new ProcedureViewer(definition, plugins), [
-      definition,
-    ]);
 
     useImperativeHandle(ref, () => viewer);
 
     return (
       <Wrapper>
-        <FlowContext.Provider value={{context: 'viewer', task, viewer}}>
+        <FlowContext.Provider value={{context: 'viewer', viewer}}>
           <Content>
-            <Flow flow={viewer.rootFlow} />
+            <Flow flow={viewer.rootFlow} taskFlow={viewer.task?.startFlow} />
           </Content>
         </FlowContext.Provider>
       </Wrapper>

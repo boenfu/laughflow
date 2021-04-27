@@ -1,4 +1,5 @@
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
+import {TaskSingleNode} from '@magicflow/task';
 import classnames from 'classnames';
 import React, {FC, createElement} from 'react';
 import styled from 'styled-components';
@@ -96,12 +97,16 @@ const Footer = styled.div`
 
 export interface SingleNodeProps {
   node: ProcedureSingleTreeNode;
+  taskNode?: TaskSingleNode;
   className?: string;
-  readOnly?: boolean;
 }
 
-export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
-  const {viewer} = useViewerContext();
+export const SingleNode: FC<SingleNodeProps> = ({
+  className,
+  node,
+  taskNode,
+}) => {
+  const viewer = useViewerContext();
 
   let {before, after, footer, body} = viewer.nodeRenderDescriptor['singleNode'];
 
@@ -117,7 +122,12 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
         </BeforeWrapper>
       ) : undefined}
       <Wrapper
-        className={classnames([className, {}])}
+        className={classnames([
+          className,
+          {
+            active: taskNode?.stage === 'in-progress',
+          },
+        ])}
         data-id={node.id}
         data-prev={node.prev.id}
       >

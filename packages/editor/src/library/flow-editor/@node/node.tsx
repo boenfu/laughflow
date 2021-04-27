@@ -14,7 +14,6 @@ import {SingleNode} from './@single';
 export interface NodeProps {
   node: ProcedureTreeNode;
   className?: string;
-  readOnly?: boolean;
   style?: CSSProperties;
 }
 

@@ -145,11 +145,10 @@ const EditingIcon: FC<{state: ActiveState}> = ({state}) => {
 export interface SingleNodeProps {
   node: ProcedureSingleTreeNode;
   className?: string;
-  readOnly?: boolean;
 }
 
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
-  const {editor} = useEditorContext();
+  const editor = useEditorContext();
 
   let activeInfo = editor.activeInfo;
   let active = editor.isActive(node);

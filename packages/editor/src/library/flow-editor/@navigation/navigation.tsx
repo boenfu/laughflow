@@ -42,7 +42,7 @@ const Right = styled.div`
 
 export const Navigation: FC<NavigationProps> = React.memo(
   ({onFullScreenToggle}) => {
-    const {editor} = useEditorContext();
+    const editor = useEditorContext();
 
     let activeInfo = editor.activeInfo;
 

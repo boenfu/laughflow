@@ -5,7 +5,6 @@ import styled from 'styled-components';
 export interface LinkNodeProps {
   node: ProcedureTreeNode;
   className?: string;
-  readOnly?: boolean;
   style?: CSSProperties;
 }
 

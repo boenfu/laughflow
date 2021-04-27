@@ -1,4 +1,5 @@
 import {ProcedureFlow} from '@magicflow/procedure';
+import {TaskFlow} from '@magicflow/task';
 import classNames from 'classnames';
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
@@ -51,11 +52,15 @@ const FlowStart = styled.div`
 export interface FlowProps {
   className?: string;
   flow: ProcedureFlow;
-  readOnly?: boolean;
+  taskFlow?: TaskFlow;
 }
 
-export const Flow: FC<FlowProps> = ({flow}) => {
+export const Flow: FC<FlowProps> = ({flow, taskFlow}) => {
   let startNodes = flow.starts;
+
+  let definitionToTaskNodeMap = new Map(
+    taskFlow?.startNodes.map(node => [node.definition.id, node]),
+  );
 
   return (
     <Container>
@@ -67,13 +72,7 @@ export const Flow: FC<FlowProps> = ({flow}) => {
           }}
         />
       ) : undefined}
-      <FlowStart
-        className={classNames({
-          // TODO
-          active: false,
-        })}
-        data-id={flow.id}
-      />
+      <FlowStart data-id={flow.id} />
       <Wrapper
         className={classNames({
           multi: startNodes.length > 1,
@@ -90,7 +89,10 @@ export const Flow: FC<FlowProps> = ({flow}) => {
                 first={index === 0 && array.length > 1}
                 last={index === array.length - 1 && array.length > 1}
               />
-              <Node node={node} />
+              <Node
+                node={node}
+                taskNode={definitionToTaskNodeMap.get(node.id)}
+              />
             </Fragment>
           ))
         ) : (

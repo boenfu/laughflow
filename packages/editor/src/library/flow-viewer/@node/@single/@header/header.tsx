@@ -32,7 +32,7 @@ export interface HeaderProps {
 }
 
 export const Header: FC<HeaderProps> = ({node}) => {
-  const {viewer} = useViewerContext();
+  const viewer = useViewerContext();
 
   let {headLeft, headRight} = viewer.nodeRenderDescriptor['singleNode'];
 

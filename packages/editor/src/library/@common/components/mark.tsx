@@ -76,7 +76,7 @@ interface MarkProps {
 }
 
 export const Mark: FC<MarkProps> = ({start, next, active}) => {
-  const {editor} = useEditorContext();
+  const editor = useEditorContext();
 
   const onPasteSingleNode = (): void => {
     let activeInfo = editor.activeInfo;
