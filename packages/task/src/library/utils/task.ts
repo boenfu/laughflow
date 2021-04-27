@@ -167,11 +167,12 @@ export function initTask({
         continue;
       }
 
+      edgeSet.add(edge);
+
       let node = nodesMap.get(nodeId)!;
       nodes.push(
         node.type === 'singleNode' ? initNode(node) : initBranchesNode(node),
       );
-      edgeSet.add(edge);
     }
 
     return {
@@ -196,11 +197,12 @@ export function initTask({
         continue;
       }
 
+      edgeSet.add(edge);
+
       let node = nodesMap.get(nextId)!;
       nexts.push(
         node.type === 'singleNode' ? initNode(node) : initBranchesNode(node),
       );
-      edgeSet.add(edge);
     }
 
     return {
@@ -222,9 +224,10 @@ export function initTask({
         continue;
       }
 
+      edgeSet.add(edge);
+
       let flow = flowsMap.get(flowId)!;
       flows.push(initFlow(flow));
-      edgeSet.add(edge);
     }
 
     return {

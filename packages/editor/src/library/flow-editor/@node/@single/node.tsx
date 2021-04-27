@@ -33,7 +33,8 @@ const Wrapper = styled.div`
   margin: 0 17px;
   width: ${RESOURCE_WIDTH}px;
   min-height: 83px;
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
   vertical-align: top;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
@@ -92,6 +93,8 @@ const Wrapper = styled.div`
 const Body = styled.div`
   display: flex;
   flex-direction: column;
+  flex: 1;
+  justify-content: center;
 `;
 
 const Footer = styled.div`

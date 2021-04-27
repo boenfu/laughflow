@@ -153,6 +153,8 @@ function buildProcedureTreeView(
         right: undefined,
         nexts,
       };
+
+      leftNodesMap.set(nodeId, procedureTreeNode);
     } else {
       let flows: ProcedureFlow[] = [];
 
@@ -167,18 +169,22 @@ function buildProcedureTreeView(
         nexts,
       };
 
-      for (let flowId of node.flows) {
-        let flow = flowDefinitionsMap.get(flowId);
+      leftNodesMap.set(nodeId, procedureTreeNode);
 
-        if (!flow) {
-          continue;
+      if (procedureTreeNode.left) {
+        procedureTreeNode.flows = [];
+      } else {
+        for (let flowId of node.flows) {
+          let flow = flowDefinitionsMap.get(flowId);
+
+          if (!flow) {
+            continue;
+          }
+
+          flows.push(buildProcedureFlow(flow, procedureTreeNode));
         }
-
-        flows.push(buildProcedureFlow(flow, procedureTreeNode));
       }
     }
-
-    leftNodesMap.set(nodeId, procedureTreeNode);
 
     if (left) {
       // 双向关联
