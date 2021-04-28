@@ -116,7 +116,10 @@ export const SingleNode: FC<SingleNodeProps> = ({
         <BeforeWrapper>
           {before.reduce(
             (reactNode, component) =>
-              createElement(component, {node, prevChildren: reactNode}),
+              createElement(component, {
+                node,
+                prevChildren: reactNode,
+              }),
             <></>,
           )}
         </BeforeWrapper>
@@ -131,11 +134,15 @@ export const SingleNode: FC<SingleNodeProps> = ({
         data-id={node.id}
         data-prev={node.prev.id}
       >
-        <Header node={node} />
+        <Header node={node} taskNode={taskNode} />
         <Body>
           {body?.reduce(
             (reactNode, component) =>
-              createElement(component, {node, prevChildren: reactNode}),
+              createElement(component, {
+                node,
+                taskNode,
+                prevChildren: reactNode,
+              }),
             <></>,
           )}
         </Body>
@@ -143,7 +150,11 @@ export const SingleNode: FC<SingleNodeProps> = ({
         <Footer>
           {footer?.reduce(
             (reactNode, component) =>
-              createElement(component, {node, prevChildren: reactNode}),
+              createElement(component, {
+                node,
+                taskNode,
+                prevChildren: reactNode,
+              }),
             <></>,
           )}
         </Footer>
@@ -152,7 +163,11 @@ export const SingleNode: FC<SingleNodeProps> = ({
         <AfterWrapper>
           {after.reduce(
             (reactNode, component) =>
-              createElement(component, {node, prevChildren: reactNode}),
+              createElement(component, {
+                node,
+                taskNode,
+                prevChildren: reactNode,
+              }),
             <></>,
           )}
         </AfterWrapper>

@@ -133,7 +133,7 @@ export class TaskRuntime implements Required<ITaskRuntime> {
     );
   };
 
-  next(metadata: TaskMetadata): TaskMetadata {
+  next = (metadata: TaskMetadata): TaskMetadata => {
     for (let {next} of this.runTimeArray) {
       if (!next) {
         continue;
@@ -143,9 +143,9 @@ export class TaskRuntime implements Required<ITaskRuntime> {
     }
 
     return metadata;
-  }
+  };
 
-  nextNode(metadata: TaskSingleNodeMetadata): TaskSingleNodeMetadata {
+  nextNode = (metadata: TaskSingleNodeMetadata): TaskSingleNodeMetadata => {
     for (let {nextNode} of this.runTimeArray) {
       if (!nextNode) {
         continue;
@@ -155,5 +155,5 @@ export class TaskRuntime implements Required<ITaskRuntime> {
     }
 
     return metadata;
-  }
+  };
 }

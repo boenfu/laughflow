@@ -1,8 +1,8 @@
 import {IPlugin} from '@magicflow/plugins';
 import {ProcedureDefinition} from '@magicflow/procedure';
 import {TaskMetadata} from '@magicflow/task';
-import {useCreation} from 'ahooks';
-import React, {forwardRef, useImperativeHandle} from 'react';
+import {useCreation, useUpdate} from 'ahooks';
+import React, {forwardRef, useEffect, useImperativeHandle} from 'react';
 import styled from 'styled-components';
 
 import {FlowContext} from '../flow-context';
@@ -40,7 +40,17 @@ export const FlowViewer = forwardRef<ProcedureViewer, FlowViewerProps>(
       [definition, task, plugins],
     );
 
+    const reRender = useUpdate();
+
     useImperativeHandle(ref, () => viewer);
+
+    useEffect(() => {
+      viewer.on('update', () => {
+        reRender();
+      });
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [viewer]);
 
     return (
       <Wrapper>

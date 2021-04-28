@@ -8,7 +8,12 @@ import {
 } from '@magicflow/procedure';
 import {Operator, compose} from '@magicflow/procedure/operators';
 import {createEmptyProcedure} from '@magicflow/procedure/utils';
-import {Task, TaskMetadata, TaskRuntime} from '@magicflow/task';
+import {
+  Operator as TaskOperator,
+  Task,
+  TaskMetadata,
+  TaskRuntime,
+} from '@magicflow/task';
 import Eventemitter from 'eventemitter3';
 import {enableAllPlugins, produce} from 'immer';
 import {compact} from 'lodash-es';
@@ -19,6 +24,7 @@ enableAllPlugins();
 
 export class ProcedureViewer extends Eventemitter<'update'> {
   private _definition!: ProcedureDefinition;
+  private _task: Task | undefined;
 
   private _treeView!: ProcedureTreeView;
 
@@ -27,8 +33,6 @@ export class ProcedureViewer extends Eventemitter<'update'> {
     branchesNode: {},
   };
 
-  task: Task | undefined;
-
   get definition(): ProcedureDefinition {
     return this._definition;
   }
@@ -36,6 +40,15 @@ export class ProcedureViewer extends Eventemitter<'update'> {
   set definition(definition: ProcedureDefinition) {
     this._definition = ProcedureUtil.cloneDeep(definition);
     this._treeView = new Procedure(definition).treeView;
+    this.emit('update');
+  }
+
+  get task(): Task | undefined {
+    return this._task;
+  }
+
+  set task(task: Task | undefined) {
+    this._task = task;
     this.emit('update');
   }
 
@@ -64,6 +77,10 @@ export class ProcedureViewer extends Eventemitter<'update'> {
 
   updateProcedure(operator: Operator): void {
     this.definition = produce(this.definition, compose([operator]));
+  }
+
+  updateTask(operator: TaskOperator): void {
+    this.task = this.task?.next(operator);
   }
 
   private setPlugins(plugins: IPlugin[]): void {

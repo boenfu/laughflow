@@ -52,7 +52,6 @@ export const Node: FC<NodeProps> = ({style, node, taskNode}) => {
       ) : (
         <BranchesNode node={node} taskNode={taskNode as TaskBranchesNode} />
       )}
-
       <Row className={classNames({multi: nexts.length > 1})}>
         {nexts.length ? (
           nexts.map((next, index, array) => {

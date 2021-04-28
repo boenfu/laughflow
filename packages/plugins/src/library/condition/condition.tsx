@@ -188,7 +188,7 @@ export class ConditionPlugin implements IConditionPlugin {
         return false;
       }
 
-      return evaluate(definition.enterConditions, name =>
+      return !evaluate(definition.enterConditions, name =>
         this.resolver(name, params),
       );
     },

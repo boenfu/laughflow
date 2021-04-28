@@ -1,4 +1,5 @@
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
+import {TaskSingleNode} from '@magicflow/task';
 import React, {FC, createElement} from 'react';
 import styled from 'styled-components';
 
@@ -29,9 +30,10 @@ const HeaderExtra = styled.div`
 
 export interface HeaderProps {
   node: ProcedureSingleTreeNode;
+  taskNode?: TaskSingleNode;
 }
 
-export const Header: FC<HeaderProps> = ({node}) => {
+export const Header: FC<HeaderProps> = ({node, taskNode}) => {
   const viewer = useViewerContext();
 
   let {headLeft, headRight} = viewer.nodeRenderDescriptor['singleNode'];
@@ -44,6 +46,7 @@ export const Header: FC<HeaderProps> = ({node}) => {
             (reactNode, component) =>
               createElement(component, {
                 node,
+                taskNode,
                 prevChildren: reactNode,
               }),
             <></>,
@@ -59,6 +62,7 @@ export const Header: FC<HeaderProps> = ({node}) => {
             (reactNode, component) =>
               createElement(component, {
                 node,
+                taskNode,
                 prevChildren: reactNode,
               }),
             <></>,

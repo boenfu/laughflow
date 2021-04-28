@@ -1,9 +1,14 @@
 import {Node, NodeType, ProcedureTreeNode} from '@magicflow/procedure';
-import {ITaskRuntime} from '@magicflow/task';
+import {ITaskRuntime, TaskBranchesNode, TaskSingleNode} from '@magicflow/task';
 import {ComponentType, ReactNode} from 'react';
 
 export interface PluginComponentProps<TType extends NodeType = NodeType> {
   node: Extract<ProcedureTreeNode, {type: TType}>;
+  taskNode?: Extract<
+    | {type: 'singleNode'; value: TaskSingleNode}
+    | {type: 'branchesNode'; value: TaskBranchesNode},
+    {type: TType}
+  >['value'];
   prevChildren?: ReactNode;
 }
 
