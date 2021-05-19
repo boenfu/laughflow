@@ -1,4 +1,4 @@
-import {Add, More, Trash} from '@magicflow/icons';
+import {More, Plus, Trash} from '@magicflow/icons';
 
 import {
   ProcedureEditor,
@@ -12,17 +12,17 @@ import {ActionDefinition} from './actions';
 const ACTIONS = [
   {
     type: 'singleNode',
-    icon: Add,
+    icon: Plus,
     title: '添加普通节点',
   },
   {
     type: 'branchesNode',
-    icon: Add,
+    icon: Plus,
     title: '添加分支节点',
   },
   {
     type: 'flow',
-    icon: Add,
+    icon: Plus,
     title: '添加新分支',
   },
   {

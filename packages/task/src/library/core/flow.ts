@@ -59,7 +59,8 @@ export class TaskFlow {
       return 'in-progress';
     }
 
-    return 'none';
+    // 非根 flow 具有自动开始的特性
+    return this.root ? 'none' : 'in-progress';
   }
 
   get startNodes(): TaskNode[] {
@@ -108,6 +109,10 @@ export class TaskFlow {
       ...this.leafNodes.map(node => node.outputs),
       this.stage === 'done' ? outputs : {},
     );
+  }
+
+  get root(): boolean {
+    return this === this.task.startFlow;
   }
 
   constructor(

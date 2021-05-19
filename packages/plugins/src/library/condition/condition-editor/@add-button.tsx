@@ -1,4 +1,4 @@
-import {Add} from '@magicflow/icons';
+import {Plus} from '@magicflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
@@ -33,7 +33,7 @@ export const AddButton: FC<AddButtonProps> = ({children, onClick}) => {
   return (
     <Wrapper className="add" onClick={onClick}>
       <AddIcon>
-        <Add />
+        <Plus />
       </AddIcon>
       {children}
     </Wrapper>

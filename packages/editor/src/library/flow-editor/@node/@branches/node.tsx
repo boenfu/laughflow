@@ -1,4 +1,4 @@
-import {AddSolid} from '@magicflow/icons';
+import {Plus} from '@magicflow/icons';
 import {ProcedureBranchesTreeNode} from '@magicflow/procedure';
 import classNames from 'classnames';
 import React, {CSSProperties, FC} from 'react';
@@ -9,7 +9,7 @@ import {useEditorContext} from '../../../flow-context';
 import {createFlow} from '../../../procedure-editor';
 import {Flow} from '../../@flow';
 
-const AddFlow = styled(AddSolid)`
+const AddFlow = styled(Plus)`
   ${Icon};
 
   pointer-events: all !important;

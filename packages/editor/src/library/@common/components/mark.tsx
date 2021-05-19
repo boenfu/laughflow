@@ -1,4 +1,4 @@
-import {AddSolid as _AddSolid, CombineSolid} from '@magicflow/icons';
+import {CombineSolid} from '@magicflow/icons';
 import {NodeType, ProcedureFlow, ProcedureTreeNode} from '@magicflow/procedure';
 import classNames from 'classnames';
 import {Bezier as _Bezier} from 'rc-bezier';
@@ -17,13 +17,13 @@ import {
 
 import {Icon} from './icon';
 
-const PasteNode = styled(_AddSolid)`
+const PasteNode = styled(CombineSolid)`
   ${Icon};
   margin: 6px;
   color: red;
 `;
 
-const SingleNode = styled(_AddSolid)`
+const SingleNode = styled(CombineSolid)`
   ${Icon};
   margin: 6px;
 `;

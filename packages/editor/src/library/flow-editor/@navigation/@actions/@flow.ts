@@ -1,4 +1,4 @@
-import {Add, Trash} from '@magicflow/icons';
+import {Plus, Trash} from '@magicflow/icons';
 import {removeBranchesNodeFlow} from '@magicflow/procedure/operators';
 
 import {
@@ -11,12 +11,12 @@ import {ActionDefinition} from './actions';
 const ACTIONS = [
   {
     type: 'singleNode',
-    icon: Add,
+    icon: Plus,
     title: '添加普通节点',
   },
   {
     type: 'branchesNode',
-    icon: Add,
+    icon: Plus,
     title: '添加分支节点',
   },
   {

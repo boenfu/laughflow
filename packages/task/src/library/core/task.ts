@@ -4,7 +4,8 @@ import {
   ProcedureDefinition,
   ProcedureId,
 } from '@magicflow/procedure';
-import {cloneDeep} from 'lodash-es';
+import {createId} from '@magicflow/procedure/utils';
+import {cloneDeep, compact} from 'lodash-es';
 import {Dict, Nominal} from 'tslang';
 
 import {Operator} from '../operators';
@@ -117,17 +118,96 @@ function correctionTaskMetadata(task: Task): TaskMetadata {
 function correctionTaskFlowMetadata(flow: TaskFlow): TaskFlowMetadata {
   let {stage, starts, ...rest} = flow.metadata;
 
-  return {
+  let nextFlowMetadata = {
     stage: flow.stage,
     starts: flow.startNodes.map(correctionTaskNodeMetadata),
     ...cloneDeep(rest),
   };
+
+  // 由于任务初始化，每个 edge (node|flow -> node) 只实例了一次
+  // 所以在 node 不为 none 的时候，就去检查一次是否有需要实例化的 node
+  if (
+    flow.stage !== 'none' &&
+    flow.definition.starts.length &&
+    flow.definition.starts.length !== nextFlowMetadata.starts?.length
+  ) {
+    let existedStartIdsSet = new Set(
+      nextFlowMetadata.starts?.map(starts => starts.definition),
+    );
+
+    nextFlowMetadata.starts = nextFlowMetadata.starts || [];
+
+    nextFlowMetadata.starts.push(
+      ...compact(
+        flow.definition.starts.map(start => {
+          if (existedStartIdsSet.has(start)) {
+            existedStartIdsSet.delete(start);
+            return undefined;
+          }
+
+          let nodeDefinition = flow.task.procedure.nodesMap.get(start);
+
+          return {
+            id: createId(),
+            definition: start,
+            type: nodeDefinition?.type,
+            stage: 'none',
+            nexts: [],
+          } as TaskNodeMetadata;
+        }),
+      ),
+    );
+  }
+
+  return nextFlowMetadata;
 }
 
 function correctionTaskNodeMetadata(node: TaskNode): TaskNodeMetadata {
-  return node instanceof TaskSingleNode
-    ? correctionTaskSingleNodeMetadata(node)
-    : correctionTaskBranchesNodeMetadata(node);
+  let nextNodeMetadata =
+    node instanceof TaskSingleNode
+      ? correctionTaskSingleNodeMetadata(node)
+      : correctionTaskBranchesNodeMetadata(node);
+
+  // 由于任务初始化，每个 edge (node|flow -> node) 只实例了一次
+  // 所以在 node 不为 none 的时候，就去检查一次是否有需要实例化的 node
+  if (
+    node.stage !== 'none' &&
+    node.definition.nexts.length &&
+    node.definition.nexts.length !== nextNodeMetadata.nexts?.length
+  ) {
+    let existedNextIdsSet = new Set(
+      nextNodeMetadata.nexts?.map(next => next.definition),
+    );
+
+    nextNodeMetadata.nexts = nextNodeMetadata.nexts || [];
+
+    console.log(node, '我需要补签');
+
+    nextNodeMetadata.nexts.push(
+      ...compact(
+        node.definition.nexts.map(next => {
+          if (existedNextIdsSet.has(next)) {
+            existedNextIdsSet.delete(next);
+            return undefined;
+          }
+
+          let nodeDefinition = node.task.procedure.nodesMap.get(next);
+
+          return {
+            id: createId(),
+            definition: next,
+            type: nodeDefinition?.type,
+            stage: 'none',
+            nexts: [],
+          } as TaskNodeMetadata;
+        }),
+      ),
+    );
+
+    console.log(nextNodeMetadata);
+  }
+
+  return nextNodeMetadata;
 }
 
 function correctionTaskSingleNodeMetadata(
@@ -149,10 +229,44 @@ function correctionTaskBranchesNodeMetadata(
 ): TaskBranchesNodeMetadata {
   let {stage, flows, nexts, ...rest} = node.metadata;
 
-  return {
+  let nextNodeMetadata = {
     stage: node.stage,
     flows: node.flows.map(correctionTaskFlowMetadata),
     nexts: node.nextNodes?.map(correctionTaskNodeMetadata),
     ...cloneDeep(rest),
   };
+
+  // 由于任务初始化，每个 edge (node|flow -> node|flow) 只实例了一次
+  // 所以在 node 不为 none 的时候，就去检查一次是否有需要实例化的 flows
+  if (
+    node.stage !== 'none' &&
+    node.definition.flows.length &&
+    node.definition.flows.length !== nextNodeMetadata.flows?.length
+  ) {
+    let existedFlowIdsSet = new Set(
+      nextNodeMetadata.flows?.map(flow => flow.definition),
+    );
+
+    nextNodeMetadata.flows = nextNodeMetadata.flows || [];
+
+    nextNodeMetadata.flows.push(
+      ...compact(
+        node.definition.flows.map(next => {
+          if (existedFlowIdsSet.has(next)) {
+            existedFlowIdsSet.delete(next);
+            return undefined;
+          }
+
+          return {
+            id: createId(),
+            definition: next,
+            stage: 'none',
+            starts: [],
+          } as TaskFlowMetadata;
+        }),
+      ),
+    );
+  }
+
+  return nextNodeMetadata;
 }

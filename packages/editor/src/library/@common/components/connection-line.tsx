@@ -9,7 +9,7 @@ const STROKE_DEFAULT: BezierStroke = {
   width: 1,
 };
 
-const ARC_RADIUS_DEFAULT = 8;
+const ARC_RADIUS_DEFAULT = 10;
 
 const Wrapper = styled(Bezier)`
   &.connection-line {
