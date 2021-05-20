@@ -3,16 +3,11 @@ import classNames from 'classnames';
 import React, {FC, Fragment, MouseEvent} from 'react';
 import styled from 'styled-components';
 
-import {
-  Icon,
-  LINE_HEIGHT_DEFAULT,
-  RESOURCE_WIDTH,
-  transition,
-} from '../@common';
+import {Icon, transition} from '../@common';
 
 import {useSkeletonContext} from './@context';
 import {Flow} from './@flow';
-import {Wire} from './@wire';
+import {LINE_HEIGHT_DEFAULT, LINE_HEIGHT_LEAF, Wire} from './@wire';
 import {INode} from './flow-skeleton';
 
 const Container = styled.div`
@@ -28,6 +23,10 @@ const Row = styled.div`
 
   &.multi {
     padding-top: ${LINE_HEIGHT_DEFAULT * 2}px;
+  }
+
+  &.leaf {
+    padding-top: ${LINE_HEIGHT_LEAF}px;
   }
 `;
 
@@ -77,7 +76,6 @@ const AddFlowWrapper = styled.div`
 const FlowsWrapper = styled.div`
   position: relative;
   display: inline-block;
-  min-width: ${RESOURCE_WIDTH}px;
   min-height: 83px;
 
   border: 1px solid #c8cdd8;
@@ -134,7 +132,12 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
         </NodeWrapper>
       )}
 
-      <Row className={classNames({multi: nexts.length > 1})}>
+      <Row
+        className={classNames({
+          multi: nexts.length > 1,
+          leaf: !nexts.length,
+        })}
+      >
         {nexts.length ? (
           nexts.map((next, index, array) => {
             return (

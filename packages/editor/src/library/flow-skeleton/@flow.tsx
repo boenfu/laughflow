@@ -2,11 +2,11 @@ import classNames from 'classnames';
 import React, {FC, Fragment, MouseEvent} from 'react';
 import styled from 'styled-components';
 
-import {LINE_HEIGHT_DEFAULT, RESOURCE_WIDTH, transition} from '../@common';
+import {transition} from '../@common';
 
 import {useSkeletonContext} from './@context';
 import {Node} from './@node';
-import {Wire} from './@wire';
+import {LINE_HEIGHT_DEFAULT, Wire} from './@wire';
 import {IFlow, INode} from './flow-skeleton';
 
 const Container = styled.div`
@@ -20,7 +20,6 @@ const Container = styled.div`
 `;
 
 const Wrapper = styled.div`
-  min-width: ${RESOURCE_WIDTH}px;
   padding-top: ${LINE_HEIGHT_DEFAULT}px;
   padding-bottom: 16px;
 
