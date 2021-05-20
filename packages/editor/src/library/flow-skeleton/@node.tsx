@@ -61,6 +61,7 @@ const AddFlowWrapper = styled.div`
   border: 1px solid #c8cdd8;
   box-sizing: border-box;
   border-radius: 28px;
+  z-index: 2;
 
   ${transition(['border-color'])}
 
@@ -76,6 +77,7 @@ const AddFlowWrapper = styled.div`
 const FlowsWrapper = styled.div`
   position: relative;
   display: inline-block;
+  min-width: 140px;
   min-height: 83px;
 
   border: 1px solid #c8cdd8;
@@ -110,6 +112,8 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
         onClick: onActiveNode,
       };
 
+  let multi = nexts.length > 1;
+
   return (
     <Container>
       {'flows' in node ? (
@@ -134,7 +138,7 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
 
       <Row
         className={classNames({
-          multi: nexts.length > 1,
+          multi,
           leaf: !nexts.length,
         })}
       >
@@ -148,6 +152,7 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
                   next={next}
                   first={index === 0 && array.length > 1}
                   last={index === array.length - 1 && array.length > 1}
+                  multiMark={multi}
                 />
                 <Node node={next} component={Component} />
               </Fragment>

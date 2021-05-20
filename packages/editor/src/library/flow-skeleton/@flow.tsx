@@ -64,6 +64,7 @@ export const Flow: FC<FlowProps> = ({flow, nodeRender, root}) => {
   };
 
   let startNodes = flow.starts;
+  let multi = startNodes.length > 1;
 
   return (
     <Container className={classNames({readonly})}>
@@ -95,7 +96,7 @@ export const Flow: FC<FlowProps> = ({flow, nodeRender, root}) => {
 
       <Wrapper
         className={classNames({
-          multi: startNodes.length > 1,
+          multi,
         })}
       >
         {startNodes.length ? (
@@ -110,6 +111,7 @@ export const Flow: FC<FlowProps> = ({flow, nodeRender, root}) => {
                 next={node}
                 first={index === 0 && array.length > 1}
                 last={index === array.length - 1 && array.length > 1}
+                multiMark={multi}
               />
               <Node node={node} component={nodeRender} />
             </Fragment>

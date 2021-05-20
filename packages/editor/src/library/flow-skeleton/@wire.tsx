@@ -1,7 +1,7 @@
-import {PlusSmall} from '@magicflow/icons';
+import {Plus, PlusSmall, Union} from '@magicflow/icons';
 import {useBoolean} from 'ahooks';
 import classNames from 'classnames';
-import {Bezier, BezierPoint, BezierProps, BezierStroke} from 'rc-bezier';
+import {Bezier, BezierPoint, BezierProps, BezierStroke, Mark} from 'rc-bezier';
 import React, {FC, MouseEvent} from 'react';
 import styled from 'styled-components';
 
@@ -21,13 +21,13 @@ const STROKE_DEFAULT: BezierStroke = {
 const ARC_RADIUS_DEFAULT = 10;
 
 const Wrapper = styled(Bezier)`
-  height: 0 !important;
+  display: inline-block;
+  width: 0px !important;
+  height: 0px !important;
+  cursor: pointer;
 
-  &.connection-line {
-    display: inline-block;
-    width: 0px !important;
-    height: 0px !important;
-    cursor: pointer;
+  .rc-bezier-mark-wrapper {
+    height: 16px;
   }
 
   * {
@@ -43,13 +43,57 @@ const PlusButtonIcon = styled(PlusSmall)`
   color: #848b9a;
   border: 1px solid ${STROKE_DEFAULT.color};
   background-color: transparent;
+
   ${transition(['color', 'border-color', 'transform'])}
 `;
 
-const PlusButtonWrapper = styled.div`
+const Menu = styled.div`
+  opacity: 0;
+  pointer-events: none;
+
+  position: absolute;
+  left: 100%;
+  top: -8px;
+  padding-left: 8px;
+
+  ${transition(['opacity'])}
+`;
+
+const MenuItem = styled.div`
   display: flex;
+  align-items: center;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 28px;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 6px 12px;
+  background-color: #fafafa;
+
+  ${transition(['transform'])}
+
+  svg {
+    margin-right: 6px;
+  }
+
+  & + & {
+    margin-top: 8px;
+  }
+
+  &:nth-child(1) {
+    transform: translateX(-8px);
+  }
+
+  &:nth-child(2) {
+    transform: translateX(-12px);
+  }
+`;
+
+const PlusButtonWrapper = styled.div`
+  position: relative;
+  display: inline-flex;
   align-items: flex-start;
   justify-content: center;
+  background-color: #e5e7eb;
 
   &.active {
     ${PlusButtonIcon} {
@@ -57,10 +101,27 @@ const PlusButtonWrapper = styled.div`
       border-color: #296dff;
       transform: rotate(45deg);
     }
+
+    ${Menu} {
+      opacity: 1;
+      pointer-events: all;
+
+      ${MenuItem} {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  &.start {
+    transform: translateY(22px);
+  }
+
+  &.end {
+    transform: translateY(-22px);
   }
 `;
 
-const PlusButton: FC = () => {
+const PlusButton: FC<{className?: string}> = ({className}) => {
   const [active, {toggle}] = useBoolean();
 
   const onClick = (event: MouseEvent): void => {
@@ -68,9 +129,24 @@ const PlusButton: FC = () => {
     toggle();
   };
 
+  const onAddNode = (): void => {};
+
+  const onAddBranchesNode = (): void => {};
+
   return (
-    <PlusButtonWrapper className={classNames({active})} onClick={onClick}>
+    <PlusButtonWrapper
+      className={classNames({active}, className)}
+      onClick={onClick}
+    >
       <PlusButtonIcon />
+      <Menu>
+        <MenuItem onClick={onAddNode}>
+          <Plus /> 新建普通节点
+        </MenuItem>
+        <MenuItem onClick={onAddBranchesNode}>
+          <Union /> 新建分支节点
+        </MenuItem>
+      </Menu>
     </PlusButtonWrapper>
   );
 };
@@ -87,8 +163,49 @@ export const Wire: FC<
      * false 不展示 mark
      */
     next?: INode | false;
+    multiMark?: boolean;
   }
-> = ({next, first, last, startNode, endNode, placement, marks}) => {
+> = ({next, first, last, startNode, endNode, placement, multiMark}) => {
+  let marks: Mark[] =
+    multiMark !== undefined
+      ? !multiMark
+        ? [
+            {
+              key: 'single',
+              render: <PlusButton />,
+              position: 0.5,
+            },
+          ]
+        : first
+        ? [
+            {
+              key: 'start',
+              render: <PlusButton className="start" />,
+              position: 0,
+            },
+            {
+              key: 'end',
+              render: <PlusButton className="end" />,
+              position: 1,
+            },
+          ]
+        : last
+        ? [
+            {
+              key: 'end',
+              render: <PlusButton className="end" />,
+              position: 1,
+            },
+          ]
+        : [
+            {
+              key: 'end',
+              render: <PlusButton className="end" />,
+              position: 1,
+            },
+          ]
+      : [];
+
   return (
     <>
       <Wrapper
