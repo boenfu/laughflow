@@ -1,16 +1,26 @@
 import {createContext, useContext} from 'react';
 
-import {IFlowSkeletonEditor} from './editor';
-import {IFlow} from './flow-skeleton';
+import {Action, IFlow} from './flow-skeleton';
 
-interface FlowSkeletonContext {
+export interface FlowSkeletonContext<
+  TFlow extends IFlow,
+  TNode = TFlow['starts'][number]
+> {
+  active: TFlow | TNode | undefined;
+  setActive(source: TFlow | TNode | undefined): void;
+  isActive(source?: TFlow | TNode): boolean;
+
   readonly?: boolean;
-  editor?: IFlowSkeletonEditor<IFlow>;
+
+  getActions?(source?: TFlow | TNode): Action[];
+  onAction?(action: Action): void;
 }
 
-export const FlowSkeletonContext = createContext<FlowSkeletonContext>(
+export const FlowSkeletonContext = createContext<FlowSkeletonContext<IFlow>>(
   undefined!,
 );
 
-export const useSkeletonContext = (): FlowSkeletonContext =>
-  useContext(FlowSkeletonContext);
+export const useSkeletonContext = <
+  TFlow extends IFlow
+>(): FlowSkeletonContext<TFlow> =>
+  useContext(FlowSkeletonContext) as FlowSkeletonContext<TFlow>;

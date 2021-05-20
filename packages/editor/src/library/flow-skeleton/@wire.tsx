@@ -2,7 +2,7 @@ import {PlusSmall} from '@magicflow/icons';
 import {useBoolean} from 'ahooks';
 import classNames from 'classnames';
 import {Bezier, BezierPoint, BezierProps, BezierStroke} from 'rc-bezier';
-import React, {FC} from 'react';
+import React, {FC, MouseEvent} from 'react';
 import styled from 'styled-components';
 
 import {Icon, transition} from '../@common';
@@ -59,11 +59,13 @@ const PlusButtonWrapper = styled.div`
 const PlusButton: FC = () => {
   const [active, {toggle}] = useBoolean();
 
+  const onClick = (event: MouseEvent): void => {
+    event.stopPropagation();
+    toggle();
+  };
+
   return (
-    <PlusButtonWrapper
-      className={classNames({active})}
-      onClick={() => toggle()}
-    >
+    <PlusButtonWrapper className={classNames({active})} onClick={onClick}>
       <PlusButtonIcon />
     </PlusButtonWrapper>
   );

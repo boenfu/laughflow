@@ -98,11 +98,11 @@ export interface NodeProps {
 }
 
 export const Node: FC<NodeProps> = ({node, component: Component}) => {
-  const {readonly, editor} = useSkeletonContext();
+  const {readonly, setActive, isActive} = useSkeletonContext();
 
   const onActiveNode = (event: MouseEvent): void => {
     event.stopPropagation();
-    editor?.active(node);
+    setActive(node);
   };
 
   let nexts = node.nexts;
@@ -116,7 +116,7 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
     <Container>
       {'flows' in node ? (
         <FlowsWrapper
-          className={classNames({active: editor?.isActive(node)})}
+          className={classNames({active: isActive(node)})}
           {...editingProps}
         >
           {node.flows!.map(flow => (

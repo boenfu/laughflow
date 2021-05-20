@@ -54,11 +54,11 @@ export interface FlowProps {
 }
 
 export const Flow: FC<FlowProps> = ({flow, nodeRender, root}) => {
-  const {readonly, editor} = useSkeletonContext();
+  const {readonly, setActive, isActive} = useSkeletonContext();
 
   const onActiveFlow = (event: MouseEvent): void => {
     event.stopPropagation();
-    editor?.active(flow);
+    setActive(flow);
   };
 
   let startNodes = flow.starts;
@@ -77,7 +77,7 @@ export const Flow: FC<FlowProps> = ({flow, nodeRender, root}) => {
       ) : undefined}
       <FlowStart
         className={classNames({
-          active: editor?.isActive(flow),
+          active: isActive(flow),
         })}
         {...(readonly
           ? {}

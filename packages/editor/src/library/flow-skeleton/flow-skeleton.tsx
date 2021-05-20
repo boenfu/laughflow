@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import {FlowSkeletonContext} from './@context';
 import {Flow} from './@flow';
 import {Footer} from './@footer';
-import {IFlowSkeletonEditor} from './editor';
+import {Navigation} from './@navigation';
 
 const Wrapper = styled.div`
   position: relative;
@@ -23,6 +23,12 @@ const Content = styled.div`
   background-color: #e5e7eb;
 `;
 
+export interface Action {
+  type: string;
+  icon: FC;
+  title: string;
+}
+
 export interface INode {
   id: string;
   nexts: INode[];
@@ -37,42 +43,54 @@ export interface IFlow {
   starts: INode[];
 }
 
-export interface FlowSkeletonProps<TFLow extends IFlow> {
+export type FlowSkeletonProps<TFLow extends IFlow> = {
   flow: TFLow;
   nodeRender: FC<{node: TFLow['starts'][number]}>;
-  editor?: IFlowSkeletonEditor<TFLow>;
+} & FlowSkeletonPropsSegment<TFLow>;
+
+export type FlowSkeletonPropsSegment<TFLow extends IFlow> =
+  | FlowSkeletonPropsReadonlySegment
+  | FlowSkeletonPropsEditingSegment<TFLow>;
+
+export interface FlowSkeletonPropsReadonlySegment {
+  readonly: true;
+}
+
+export interface FlowSkeletonPropsEditingSegment<TFLow extends IFlow> {
+  getActions: FlowSkeletonContext<TFLow>['getActions'];
+  onAction: FlowSkeletonContext<TFLow>['onAction'];
 }
 
 export const FlowSkeleton = <TFlow extends IFlow>({
   flow,
   nodeRender,
-  editor,
+  ...props
 }: FlowSkeletonProps<TFlow>): ReactElement<any, any> => {
-  const readonly = !editor;
-
   const [active, setActive] = useState<IFlow | INode | undefined>();
+
   const isActive = useCallback(
-    (source: IFlow | INode) => source.id === active?.id,
+    (source?: IFlow | INode) => (source ? source.id === active?.id : !!active),
     [active],
   );
+
   const onContentClick = (): void => setActive(undefined);
 
+  const context: FlowSkeletonContext<IFlow> = {
+    active,
+    setActive,
+    isActive,
+    ...props,
+  };
+
   return (
-    <Wrapper>
-      <FlowSkeletonContext.Provider
-        value={{
-          editor: {
-            active: setActive,
-            isActive,
-          },
-          readonly,
-        }}
-      >
+    <Wrapper className="flow-skeleton">
+      <FlowSkeletonContext.Provider value={context}>
         <Content onClick={onContentClick}>
-          {readonly ? (
+          {context.readonly ? (
             <Flow flow={flow} nodeRender={nodeRender} root />
           ) : (
             <>
+              <Navigation />
               <Flow flow={flow} nodeRender={nodeRender} root />
               <Footer />
             </>
