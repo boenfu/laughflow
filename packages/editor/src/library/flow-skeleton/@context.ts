@@ -1,6 +1,7 @@
 import {createContext, useContext} from 'react';
 
-import {Action, IFlow} from './flow-skeleton';
+import {IAction} from './@actions';
+import {IFlow} from './flow-skeleton';
 
 export interface FlowSkeletonContext<
   TFlow extends IFlow,
@@ -12,8 +13,7 @@ export interface FlowSkeletonContext<
 
   readonly?: boolean;
 
-  getActions?(source?: TFlow | TNode): Action[];
-  onAction?(action: Action): void;
+  onAction?(action: IAction): void;
 }
 
 export const FlowSkeletonContext = createContext<FlowSkeletonContext<IFlow>>(

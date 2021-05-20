@@ -122,9 +122,11 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
           {node.flows!.map(flow => (
             <Flow key={flow.id} flow={flow} nodeRender={Component} />
           ))}
-          <AddFlowWrapper>
-            <AddFlow onClick={() => {}} />
-          </AddFlowWrapper>
+          {!readonly ? (
+            <AddFlowWrapper>
+              <AddFlow onClick={() => {}} />
+            </AddFlowWrapper>
+          ) : undefined}
         </FlowsWrapper>
       ) : (
         <NodeWrapper {...editingProps}>
@@ -148,9 +150,9 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
               </Fragment>
             );
           })
-        ) : (
+        ) : !readonly ? (
           <Wire startNode={['parent', 'previousSibling']} start={node} />
-        )}
+        ) : undefined}
       </Row>
     </Container>
   );

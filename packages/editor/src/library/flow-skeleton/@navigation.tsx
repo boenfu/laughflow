@@ -3,10 +3,10 @@ import classNames from 'classnames';
 import React, {FC, MouseEvent} from 'react';
 import styled from 'styled-components';
 
-import {IconButton} from '../@common';
+import {IconButton, transition} from '../@common';
 
+import {IAction, getActions} from './@actions';
 import {useSkeletonContext} from './@context';
-import {Action} from './flow-skeleton';
 
 const Wrapper = styled.div`
   position: absolute;
@@ -19,16 +19,11 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   z-index: 2;
-  pointer-events: none;
+
+  ${transition(['background-color'])}
 
   &.active {
-    * {
-      color: #fff;
-      box-shadow: none;
-      background-color: transparent;
-    }
-
-    background: #414c63;
+    background-color: #414c63;
     box-shadow: 0px 4px 8px rgba(50, 57, 72, 0.3);
     backdrop-filter: blur(3px);
   }
@@ -43,15 +38,11 @@ const Mid = styled.div`
 const Right = styled.div`
   display: flex;
   align-items: center;
-
-  * {
-    pointer-events: all !important;
-  }
 `;
 
 export const Navigation: FC = React.memo(() => {
-  const {active, isActive, getActions, onAction} = useSkeletonContext();
-  const actions: Action[] = getActions?.(active) || [];
+  const {active, onAction} = useSkeletonContext();
+  const actions: IAction[] = (active && getActions?.(active)) || [];
 
   const onNodeActionClick = (event: MouseEvent<HTMLDivElement>): void => {
     event.stopPropagation();
@@ -87,9 +78,11 @@ export const Navigation: FC = React.memo(() => {
     }
   };
 
+  let activeClass = !!active;
+
   return (
     <Wrapper
-      className={classNames({active: isActive()})}
+      className={classNames({active: activeClass})}
       onClick={event => event.stopPropagation()}
     >
       <Left />
@@ -98,6 +91,7 @@ export const Navigation: FC = React.memo(() => {
         {actions.map(({type, icon: Icon, title}) => (
           <IconButton
             key={type}
+            light={activeClass}
             tooltip={title}
             data-type={type}
             onClick={onNodeActionClick}
@@ -105,7 +99,11 @@ export const Navigation: FC = React.memo(() => {
             <Icon />
           </IconButton>
         ))}
-        <IconButton tooltip="全屏" onClick={onFullScreenToggle}>
+        <IconButton
+          tooltip="全屏"
+          light={activeClass}
+          onClick={onFullScreenToggle}
+        >
           <Expand />
         </IconButton>
       </Right>

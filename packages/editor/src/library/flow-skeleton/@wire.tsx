@@ -11,6 +11,8 @@ import {IFlow, INode} from './flow-skeleton';
 
 export const LINE_HEIGHT_DEFAULT = 48;
 
+export const LINE_HEIGHT_LEAF = 20;
+
 const STROKE_DEFAULT: BezierStroke = {
   color: '#C8CDD8',
   width: 1,
@@ -19,6 +21,8 @@ const STROKE_DEFAULT: BezierStroke = {
 const ARC_RADIUS_DEFAULT = 10;
 
 const Wrapper = styled(Bezier)`
+  position: absolute !important;
+
   &.connection-line {
     display: inline-block;
     width: 0px !important;
@@ -98,7 +102,11 @@ export const Wire: FC<
           subtree: true,
         }}
         marks={marks}
-        generatePath={getGeneratePath({first, last})}
+        generatePath={getGeneratePath({
+          first,
+          last,
+          height: next === undefined ? LINE_HEIGHT_LEAF : LINE_HEIGHT_DEFAULT,
+        })}
       />
       {next === undefined ? <PlusButton /> : undefined}
     </>
@@ -106,9 +114,11 @@ export const Wire: FC<
 };
 
 function getGeneratePath({
+  height,
   first,
   last,
 }: {
+  height: number;
   first?: boolean;
   last?: boolean;
 }): (points: BezierPoint[]) => string {
@@ -122,7 +132,7 @@ function getGeneratePath({
 
     let radius = ARC_RADIUS_DEFAULT;
     let direction = end.x > start.x ? 1 : -1;
-    let midline = start.y + LINE_HEIGHT_DEFAULT;
+    let midline = start.y + height;
 
     if (first) {
       return `M ${start.x},${start.y} V ${

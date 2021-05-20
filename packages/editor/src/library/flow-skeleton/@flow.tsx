@@ -13,7 +13,10 @@ const Container = styled.div`
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  padding-top: ${LINE_HEIGHT_DEFAULT / 2}px;
+
+  &:not(.readonly) {
+    padding-top: ${LINE_HEIGHT_DEFAULT / 2}px;
+  }
 `;
 
 const Wrapper = styled.div`
@@ -64,27 +67,33 @@ export const Flow: FC<FlowProps> = ({flow, nodeRender, root}) => {
   let startNodes = flow.starts;
 
   return (
-    <Container>
-      {!root ? (
-        <Wire
-          startNode="parent"
-          placement={{
-            start: 'top',
-          }}
-          start={flow}
-          next={false}
+    <Container className={classNames({readonly})}>
+      {root ? (
+        <FlowStart
+          className={classNames({
+            active: isActive(flow),
+          })}
+          onClick={onActiveFlow}
         />
-      ) : undefined}
-      <FlowStart
-        className={classNames({
-          active: isActive(flow),
-        })}
-        {...(readonly
-          ? {}
-          : {
-              onClick: onActiveFlow,
+      ) : !readonly ? (
+        <>
+          <Wire
+            startNode="parent"
+            placement={{
+              start: 'top',
+            }}
+            start={flow}
+            next={false}
+          />
+          <FlowStart
+            className={classNames({
+              active: isActive(flow),
             })}
-      />
+            onClick={onActiveFlow}
+          />
+        </>
+      ) : undefined}
+
       <Wrapper
         className={classNames({
           multi: startNodes.length > 1,

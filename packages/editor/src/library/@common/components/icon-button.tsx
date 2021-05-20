@@ -6,6 +6,7 @@ import styled from 'styled-components';
 export interface IconButtonProps extends React.HTMLAttributes<HTMLDivElement> {
   tooltip?: string | string[];
   tooltipPlacement?: 'top' | 'bottom';
+  light?: boolean;
   disable?: boolean | boolean[];
 }
 
@@ -91,8 +92,28 @@ const ButtonWrapper = styled.div`
   align-items: center;
   padding: 2px;
   border-radius: 4px;
-  background: #d8dade;
+  background-color: #d8dade;
   box-shadow: 0px 2px 4px rgba(185, 188, 196, 0.77);
+
+  &.light {
+    box-shadow: none;
+    background-color: transparent;
+
+    ${Button} {
+      opacity: 1;
+      color: rgba(255, 255, 255, 0.7);
+
+      &:hover {
+        color: #fff;
+      }
+
+      &::before,
+      &::after {
+        color: #333333;
+        background-color: #fff;
+      }
+    }
+  }
 
   & + & {
     margin-left: 8px;
@@ -100,12 +121,19 @@ const ButtonWrapper = styled.div`
 `;
 
 export const IconButton: FC<IconButtonProps> = React.memo(
-  ({children, tooltip, tooltipPlacement = 'bottom', disable, ...props}) => {
+  ({
+    children,
+    tooltip,
+    tooltipPlacement = 'bottom',
+    disable,
+    light,
+    ...props
+  }) => {
     let tooltips = castArray(tooltip);
     let disables = castArray(disable);
 
     return (
-      <ButtonWrapper {...props}>
+      <ButtonWrapper {...props} className={classNames({light})}>
         {React.Children.toArray(children)
           .flatMap((child: React.ReactElement, index) => {
             let {onClick, ...restProps} = child.props;

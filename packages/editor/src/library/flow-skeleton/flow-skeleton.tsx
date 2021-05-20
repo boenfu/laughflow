@@ -23,12 +23,6 @@ const Content = styled.div`
   background-color: #e5e7eb;
 `;
 
-export interface Action {
-  type: string;
-  icon: FC;
-  title: string;
-}
-
 export interface INode {
   id: string;
   nexts: INode[];
@@ -43,21 +37,20 @@ export interface IFlow {
   starts: INode[];
 }
 
-export type FlowSkeletonProps<TFLow extends IFlow> = {
+export type FlowSkeletonProps<TFLow extends IFlow> =
+  | (FlowSkeletonCommonProps<TFLow> & FlowSkeletonPropsReadonlySegment)
+  | (FlowSkeletonCommonProps<TFLow> & FlowSkeletonPropsEditingSegment<TFLow>);
+
+interface FlowSkeletonCommonProps<TFLow extends IFlow> {
   flow: TFLow;
   nodeRender: FC<{node: TFLow['starts'][number]}>;
-} & FlowSkeletonPropsSegment<TFLow>;
+}
 
-export type FlowSkeletonPropsSegment<TFLow extends IFlow> =
-  | FlowSkeletonPropsReadonlySegment
-  | FlowSkeletonPropsEditingSegment<TFLow>;
-
-export interface FlowSkeletonPropsReadonlySegment {
+interface FlowSkeletonPropsReadonlySegment {
   readonly: true;
 }
 
-export interface FlowSkeletonPropsEditingSegment<TFLow extends IFlow> {
-  getActions: FlowSkeletonContext<TFLow>['getActions'];
+interface FlowSkeletonPropsEditingSegment<TFLow extends IFlow> {
   onAction: FlowSkeletonContext<TFLow>['onAction'];
 }
 
