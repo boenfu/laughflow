@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 
   display: flex;
   align-items: center;
-  z-index: 2;
+  z-index: 3;
 
   ${transition(['background-color'])}
 
@@ -41,7 +41,7 @@ const Right = styled.div`
 `;
 
 export const Navigation: FC = React.memo(() => {
-  const {active, onAction} = useSkeletonContext();
+  const {active, onAction, activeState, setActiveState} = useSkeletonContext();
   const actions: IAction[] = (active && getActions?.(active)) || [];
 
   const onNodeActionClick = (event: MouseEvent<HTMLDivElement>): void => {
@@ -53,6 +53,13 @@ export const Navigation: FC = React.memo(() => {
 
     if (!action) {
       return;
+    }
+
+    if (action.state) {
+      setActiveState(action.state);
+      return;
+    } else {
+      setActiveState(undefined);
     }
 
     onAction?.(action);
@@ -88,10 +95,11 @@ export const Navigation: FC = React.memo(() => {
       <Left />
       <Mid />
       <Right>
-        {actions.map(({type, icon: Icon, title}) => (
+        {actions.map(({type, icon: Icon, title, state}) => (
           <IconButton
             key={type}
             light={activeClass}
+            active={state && activeState === state}
             tooltip={title}
             data-type={type}
             onClick={onNodeActionClick}

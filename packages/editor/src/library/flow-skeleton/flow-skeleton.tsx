@@ -1,9 +1,8 @@
 import React, {FC, ReactElement, useCallback, useState} from 'react';
 import styled from 'styled-components';
 
-import {FlowSkeletonContext} from './@context';
+import {ActiveState, FlowSkeletonContext} from './@context';
 import {Flow} from './@flow';
-import {Footer} from './@footer';
 import {Navigation} from './@navigation';
 
 const Wrapper = styled.div`
@@ -61,17 +60,24 @@ export const FlowSkeleton = <TFlow extends IFlow>({
 }: FlowSkeletonProps<TFlow>): ReactElement<any, any> => {
   const [active, setActive] = useState<IFlow | INode | undefined>();
 
+  const [activeState, setActiveState] = useState<ActiveState>();
+
   const isActive = useCallback(
     (source?: IFlow | INode) => (source ? source.id === active?.id : !!active),
     [active],
   );
 
-  const onContentClick = (): void => setActive(undefined);
+  const onContentClick = (): void => {
+    setActive(undefined);
+    setActiveState(undefined);
+  };
 
   const context: FlowSkeletonContext<IFlow> = {
     active,
     setActive,
     isActive,
+    activeState,
+    setActiveState,
     ...props,
   };
 
@@ -85,7 +91,6 @@ export const FlowSkeleton = <TFlow extends IFlow>({
             <>
               <Navigation />
               <Flow flow={flow} nodeRender={nodeRender} root />
-              <Footer />
             </>
           )}
         </Content>

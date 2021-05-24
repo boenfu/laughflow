@@ -2,11 +2,12 @@ import {Plus, PlusSmall, Union} from '@magicflow/icons';
 import {useBoolean} from 'ahooks';
 import classNames from 'classnames';
 import {Bezier, BezierPoint, BezierProps, BezierStroke, Mark} from 'rc-bezier';
-import React, {FC, MouseEvent} from 'react';
+import React, {FC, MouseEvent, createContext, useContext} from 'react';
 import styled from 'styled-components';
 
 import {Icon, transition} from '../@common';
 
+import {useSkeletonContext} from './@context';
 import {IFlow, INode} from './flow-skeleton';
 
 export const LINE_HEIGHT_DEFAULT = 48;
@@ -33,6 +34,20 @@ const Wrapper = styled(Bezier)`
   * {
     z-index: 1;
   }
+`;
+
+const PasteButtonIcon = styled.div`
+  width: 16px;
+  height: 16px;
+  border: 1px dashed #296dff;
+  box-sizing: border-box;
+  border-radius: 2px;
+
+  &:hover {
+    background-color: #296dff;
+  }
+
+  ${transition(['background-color', 'border-color'])}
 `;
 
 const PlusButtonIcon = styled(PlusSmall)`
@@ -68,6 +83,7 @@ const MenuItem = styled.div`
   line-height: 16px;
   padding: 6px 12px;
   background-color: #fafafa;
+  cursor: pointer;
 
   ${transition(['transform'])}
 
@@ -88,7 +104,7 @@ const MenuItem = styled.div`
   }
 `;
 
-const PlusButtonWrapper = styled.div`
+const MarkWrapper = styled.div`
   position: relative;
   display: inline-flex;
   align-items: flex-start;
@@ -121,7 +137,28 @@ const PlusButtonWrapper = styled.div`
   }
 `;
 
+const WireContext = createContext<Pick<WireProps, 'start' | 'next'>>(
+  undefined!,
+);
+
+const PasteButton: FC<{className?: string}> = ({className}) => {
+  const {start, next} = useContext(WireContext);
+  const {activeState} = useSkeletonContext();
+
+  const onClick = (event: MouseEvent): void => {
+    event.stopPropagation();
+    console.log(activeState, start, next);
+  };
+
+  return (
+    <MarkWrapper className={className} onClick={onClick}>
+      <PasteButtonIcon />
+    </MarkWrapper>
+  );
+};
+
 const PlusButton: FC<{className?: string}> = ({className}) => {
+  const {start, next} = useContext(WireContext);
   const [active, {toggle}] = useBoolean();
 
   const onClick = (event: MouseEvent): void => {
@@ -129,15 +166,16 @@ const PlusButton: FC<{className?: string}> = ({className}) => {
     toggle();
   };
 
-  const onAddNode = (): void => {};
+  const onAddNode = (): void => {
+    console.log(start, next);
+  };
 
-  const onAddBranchesNode = (): void => {};
+  const onAddBranchesNode = (): void => {
+    console.log(start, next);
+  };
 
   return (
-    <PlusButtonWrapper
-      className={classNames({active}, className)}
-      onClick={onClick}
-    >
+    <MarkWrapper className={classNames({active}, className)} onClick={onClick}>
       <PlusButtonIcon />
       <Menu>
         <MenuItem onClick={onAddNode}>
@@ -147,32 +185,47 @@ const PlusButton: FC<{className?: string}> = ({className}) => {
           <Union /> 新建分支节点
         </MenuItem>
       </Menu>
-    </PlusButtonWrapper>
+    </MarkWrapper>
   );
 };
 
 export interface WireProps extends BezierProps {
   first?: boolean;
   last?: boolean;
+
+  start: IFlow | INode;
+  /**
+   * false 不展示 mark
+   */
+  next?: INode | false;
+
+  multiMark?: boolean;
 }
 
-export const Wire: FC<
-  WireProps & {
-    start: IFlow | INode;
-    /**
-     * false 不展示 mark
-     */
-    next?: INode | false;
-    multiMark?: boolean;
-  }
-> = ({next, first, last, startNode, endNode, placement, multiMark}) => {
+export const Wire: FC<WireProps> = ({
+  start,
+  next,
+  first,
+  last,
+  startNode,
+  endNode,
+  placement,
+  multiMark,
+}) => {
+  const {activeState} = useSkeletonContext();
+
+  let Mark =
+    activeState === 'cutting' || activeState === 'copying'
+      ? PasteButton
+      : PlusButton;
+
   let marks: Mark[] =
     multiMark !== undefined
       ? !multiMark
         ? [
             {
               key: 'single',
-              render: <PlusButton />,
+              render: <Mark />,
               position: 0.5,
             },
           ]
@@ -180,12 +233,12 @@ export const Wire: FC<
         ? [
             {
               key: 'start',
-              render: <PlusButton className="start" />,
+              render: <Mark className="start" />,
               position: 0,
             },
             {
               key: 'end',
-              render: <PlusButton className="end" />,
+              render: <Mark className="end" />,
               position: 1,
             },
           ]
@@ -193,21 +246,26 @@ export const Wire: FC<
         ? [
             {
               key: 'end',
-              render: <PlusButton className="end" />,
+              render: <Mark className="end" />,
               position: 1,
             },
           ]
         : [
             {
               key: 'end',
-              render: <PlusButton className="end" />,
+              render: <Mark className="end" />,
               position: 1,
             },
           ]
       : [];
 
   return (
-    <>
+    <WireContext.Provider
+      value={{
+        start,
+        next,
+      }}
+    >
       <Wrapper
         className="wire"
         stroke={STROKE_DEFAULT}
@@ -221,8 +279,8 @@ export const Wire: FC<
         marks={marks}
         generatePath={getGeneratePath({first, last})}
       />
-      {next === undefined ? <PlusButton /> : undefined}
-    </>
+      {next === undefined ? <Mark /> : undefined}
+    </WireContext.Provider>
   );
 };
 

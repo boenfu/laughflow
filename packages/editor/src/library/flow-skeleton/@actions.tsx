@@ -1,6 +1,7 @@
 import {Copy, Cut, Jump, More, Plus, Trash, Union} from '@magicflow/icons';
 import {FC} from 'react';
 
+import {ActiveState} from './@context';
 import {IFlow, INode} from './flow-skeleton';
 
 export interface IAction {
@@ -8,6 +9,7 @@ export interface IAction {
   icon: FC;
   title: string;
   tip?: string;
+  state?: ActiveState;
 }
 
 const AddNodeAction: IAction = {
@@ -38,18 +40,21 @@ const ConnectNodeAction: IAction = {
   type: 'connect-node',
   icon: Jump,
   title: '连接节点',
+  state: 'connecting',
 };
 
 const CutNodeAction: IAction = {
   type: 'cut-node',
   icon: Cut,
   title: '剪切节点',
+  state: 'cutting',
 };
 
 const CopyNodeAction: IAction = {
   type: 'copy-node',
   icon: Copy,
   title: '复制节点',
+  state: 'copying',
 };
 
 const NodeActions: IAction[] = [

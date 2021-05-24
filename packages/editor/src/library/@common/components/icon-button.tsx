@@ -8,6 +8,7 @@ export interface IconButtonProps extends React.HTMLAttributes<HTMLDivElement> {
   tooltipPlacement?: 'top' | 'bottom';
   light?: boolean;
   disable?: boolean | boolean[];
+  active?: boolean;
 }
 
 const Button = styled.div`
@@ -115,6 +116,12 @@ const ButtonWrapper = styled.div`
     }
   }
 
+  &.active {
+    ${Button} {
+      color: #fff;
+    }
+  }
+
   & + & {
     margin-left: 8px;
   }
@@ -127,13 +134,14 @@ export const IconButton: FC<IconButtonProps> = React.memo(
     tooltipPlacement = 'bottom',
     disable,
     light,
+    active,
     ...props
   }) => {
     let tooltips = castArray(tooltip);
     let disables = castArray(disable);
 
     return (
-      <ButtonWrapper {...props} className={classNames({light})}>
+      <ButtonWrapper {...props} className={classNames({light, active})}>
         {React.Children.toArray(children)
           .flatMap((child: React.ReactElement, index) => {
             let {onClick, ...restProps} = child.props;
