@@ -1,10 +1,10 @@
 import {Copy, Cut, Jump, More, Plus, Trash, Union} from '@magicflow/icons';
 import {FC} from 'react';
 
-import {ActiveState} from './@context';
+import {ActiveState} from './context';
 import {IFlow, INode} from './flow-skeleton';
 
-export interface IAction {
+export interface IMenu {
   type: string;
   icon: FC;
   title: string;
@@ -12,71 +12,71 @@ export interface IAction {
   state?: ActiveState;
 }
 
-const AddNodeAction: IAction = {
+const AddNodeMenu: IMenu = {
   type: 'add-node',
   icon: Plus,
   title: '添加普通节点',
 };
 
-const AddBranchesNodeAction: IAction = {
+const AddBranchesNodeMenu: IMenu = {
   type: 'add-branches-node',
   icon: Union,
   title: '添加分支节点',
 };
 
-const DeleteAction: IAction = {
+const DeleteMenu: IMenu = {
   type: 'delete',
   icon: Trash,
   title: '删除',
 };
 
-const MoreAction: IAction = {
+const MoreMenu: IMenu = {
   type: 'more',
   icon: More,
   title: '更多',
 };
 
-const ConnectNodeAction: IAction = {
+const ConnectNodeMenu: IMenu = {
   type: 'connect-node',
   icon: Jump,
   title: '连接节点',
   state: 'connecting',
 };
 
-const CutNodeAction: IAction = {
+const CutNodeMenu: IMenu = {
   type: 'cut-node',
   icon: Cut,
   title: '剪切节点',
   state: 'cutting',
 };
 
-const CopyNodeAction: IAction = {
+const CopyNodeMenu: IMenu = {
   type: 'copy-node',
   icon: Copy,
   title: '复制节点',
   state: 'copying',
 };
 
-const NodeActions: IAction[] = [
-  AddNodeAction,
-  AddBranchesNodeAction,
-  ConnectNodeAction,
-  CutNodeAction,
-  CopyNodeAction,
-  DeleteAction,
-  MoreAction,
+const NodeMenus: IMenu[] = [
+  AddNodeMenu,
+  AddBranchesNodeMenu,
+  ConnectNodeMenu,
+  CutNodeMenu,
+  CopyNodeMenu,
+  DeleteMenu,
+  MoreMenu,
 ];
 
-const BranchesOrFlowNodeActions: IAction[] = [
-  AddNodeAction,
-  AddBranchesNodeAction,
-  DeleteAction,
+const BranchesOrFlowNodeMenus: IMenu[] = [
+  AddNodeMenu,
+  AddBranchesNodeMenu,
+  DeleteMenu,
 ];
 
-export function getActions(source: IFlow | INode): IAction[] {
+export function getMenus(source: IFlow | INode): IMenu[] {
   if ('flows' in source || 'starts' in source) {
-    return BranchesOrFlowNodeActions;
+    return BranchesOrFlowNodeMenus;
   }
 
-  return NodeActions;
+  return NodeMenus;
 }

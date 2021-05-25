@@ -23,7 +23,7 @@ type ProcedureEventType = 'update' | 'config';
 
 enableAllPlugins();
 
-export type ActiveState = 'connect' | 'cut' | 'copy';
+export type ActiveState2 = 'connect' | 'cut' | 'copy';
 
 export type ActiveIdentity = (
   | {
@@ -31,12 +31,12 @@ export type ActiveIdentity = (
     }
   | {prev: NodeId | FlowId; node: NodeId}
 ) & {
-  state?: ActiveState;
+  state?: ActiveState2;
 };
 
 export interface ActiveInfo {
   value: ProcedureTreeNode | ProcedureFlow;
-  state?: ActiveState;
+  state?: ActiveState2;
 }
 
 export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
@@ -94,7 +94,7 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
     return this.activeInfo?.value.id === resource.id;
   }
 
-  active(identityOrState?: ActiveIdentity | ActiveState): void {
+  active(identityOrState?: ActiveIdentity | ActiveState2): void {
     if (typeof identityOrState === 'string') {
       if (!this.activeIdentity) {
         return;

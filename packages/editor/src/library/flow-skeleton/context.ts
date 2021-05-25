@@ -1,6 +1,6 @@
 import {createContext, useContext} from 'react';
 
-import {IAction} from './@actions';
+import {Action} from './@actions';
 import {IFlow} from './flow-skeleton';
 
 export type ActiveState = 'cutting' | 'copying' | 'connecting' | undefined;
@@ -17,12 +17,14 @@ export interface FlowSkeletonContext<
 
   readonly?: boolean;
 
-  onAction?(action: IAction): void;
+  onAction?(action: Action<TFlow>): void;
 }
 
-export const FlowSkeletonContext = createContext<FlowSkeletonContext<IFlow>>(
+const FlowSkeletonContext = createContext<FlowSkeletonContext<IFlow>>(
   undefined!,
 );
+
+export const FlowSkeletonContextProvider = FlowSkeletonContext.Provider;
 
 export const useSkeletonContext = <
   TFlow extends IFlow

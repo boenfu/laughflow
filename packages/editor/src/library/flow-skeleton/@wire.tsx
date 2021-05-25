@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 import {Icon, transition} from '../@common';
 
-import {useSkeletonContext} from './@context';
+import {useSkeletonContext} from './context';
 import {IFlow, INode} from './flow-skeleton';
 
 export const LINE_HEIGHT_DEFAULT = 48;

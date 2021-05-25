@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import {RESOURCE_WIDTH} from '../../../@common';
 import {useEditorContext} from '../../../flow-context';
-import {ActiveState} from '../../../procedure-editor';
+import {ActiveState2} from '../../../procedure-editor';
 
 import {Header} from './@header';
 
@@ -122,13 +122,13 @@ const EditingIconWrapper = styled.div`
   z-index: 3;
 `;
 
-const STATE_ICON_DICT: Partial<{[key in ActiveState]: React.ElementType}> = {
+const STATE_ICON_DICT: Partial<{[key in ActiveState2]: React.ElementType}> = {
   cut: Cut,
   copy: Copy,
   connect: Jump,
 };
 
-const EditingIcon: FC<{state: ActiveState}> = ({state}) => {
+const EditingIcon: FC<{state: ActiveState2}> = ({state}) => {
   let Component = STATE_ICON_DICT[state];
 
   if (!Component) {

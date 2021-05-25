@@ -4,9 +4,9 @@ import styled from 'styled-components';
 
 import {transition} from '../@common';
 
-import {useSkeletonContext} from './@context';
 import {Node} from './@node';
 import {LINE_HEIGHT_DEFAULT, Wire} from './@wire';
+import {useSkeletonContext} from './context';
 import {IFlow, INode} from './flow-skeleton';
 
 const Container = styled.div`

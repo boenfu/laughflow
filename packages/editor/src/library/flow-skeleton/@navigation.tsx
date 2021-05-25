@@ -5,8 +5,8 @@ import styled from 'styled-components';
 
 import {IconButton, transition} from '../@common';
 
-import {IAction, getActions} from './@actions';
-import {useSkeletonContext} from './@context';
+import {IMenu, getMenus} from './@menus';
+import {useSkeletonContext} from './context';
 
 const Wrapper = styled.div`
   position: absolute;
@@ -41,28 +41,28 @@ const Right = styled.div`
 `;
 
 export const Navigation: FC = React.memo(() => {
-  const {active, onAction, activeState, setActiveState} = useSkeletonContext();
-  const actions: IAction[] = (active && getActions?.(active)) || [];
+  const {active, activeState, setActiveState} = useSkeletonContext();
+  const menus: IMenu[] = (active && getMenus?.(active)) || [];
 
-  const onNodeActionClick = (event: MouseEvent<HTMLDivElement>): void => {
+  const onNodeMenuClick = (event: MouseEvent<HTMLDivElement>): void => {
     event.stopPropagation();
 
-    let action = actions.find(
-      action => action.type === String(event.currentTarget.dataset.type),
+    let menu = menus.find(
+      menu => menu.type === String(event.currentTarget.dataset.type),
     );
 
-    if (!action) {
+    if (!menu) {
       return;
     }
 
-    if (action.state) {
-      setActiveState(action.state);
+    if (menu.state) {
+      setActiveState(menu.state);
       return;
     } else {
       setActiveState(undefined);
     }
 
-    onAction?.(action);
+    // onAction?.(menu);
   };
 
   const onFullScreenToggle = (event: MouseEvent): void => {
@@ -95,14 +95,14 @@ export const Navigation: FC = React.memo(() => {
       <Left />
       <Mid />
       <Right>
-        {actions.map(({type, icon: Icon, title, state}) => (
+        {menus.map(({type, icon: Icon, title, state}) => (
           <IconButton
             key={type}
             light={activeClass}
             active={state && activeState === state}
             tooltip={title}
             data-type={type}
-            onClick={onNodeActionClick}
+            onClick={onNodeMenuClick}
           >
             <Icon />
           </IconButton>
