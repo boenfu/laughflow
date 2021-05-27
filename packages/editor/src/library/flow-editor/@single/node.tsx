@@ -1,12 +1,11 @@
 import {Copy, Cut, Jump} from '@magicflow/icons';
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
 import classnames from 'classnames';
-import React, {FC, createElement} from 'react';
+import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {RESOURCE_WIDTH} from '../../../@common';
-import {useEditorContext} from '../../../flow-context';
-import {ActiveState2} from '../../../procedure-editor';
+import {RESOURCE_WIDTH} from '../../@common';
+import {FlowEditorContext} from '../flow-editor';
 
 import {Header} from './@header';
 
@@ -122,13 +121,13 @@ const EditingIconWrapper = styled.div`
   z-index: 3;
 `;
 
-const STATE_ICON_DICT: Partial<{[key in ActiveState2]: React.ElementType}> = {
+const STATE_ICON_DICT: Partial<{[key in any]: React.ElementType}> = {
   cut: Cut,
   copy: Copy,
   connect: Jump,
 };
 
-const EditingIcon: FC<{state: ActiveState2}> = ({state}) => {
+const EditingIcon: FC<{state: any}> = ({state}) => {
   let Component = STATE_ICON_DICT[state];
 
   if (!Component) {
@@ -148,10 +147,10 @@ export interface SingleNodeProps {
 }
 
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
-  const editor = useEditorContext();
+  const {editor} = useContext(FlowEditorContext);
 
-  let activeInfo = editor.activeInfo;
-  let active = editor.isActive(node);
+  let activeInfo = {} as any;
+  let active = false;
   let editing = active ? activeInfo?.state : undefined;
 
   let {before, after, footer, body} = editor.nodeRenderDescriptor['singleNode'];

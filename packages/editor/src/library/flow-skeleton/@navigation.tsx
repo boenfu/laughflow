@@ -62,6 +62,14 @@ export const Navigation: FC = React.memo(() => {
       setActiveState(undefined);
     }
 
+    switch (menu.type) {
+      case '':
+        break;
+
+      default:
+        break;
+    }
+
     // onAction?.(menu);
   };
 

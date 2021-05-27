@@ -1,4 +1,10 @@
-import React, {FC, ReactElement, useCallback, useState} from 'react';
+import React, {
+  FC,
+  PropsWithChildren,
+  ReactElement,
+  useCallback,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 
 import {Flow} from './@flow';
@@ -60,8 +66,9 @@ interface FlowSkeletonPropsEditingSegment<TFLow extends IFlow> {
 export const FlowSkeleton = <TFlow extends IFlow>({
   flow,
   nodeRender,
+  children,
   ...props
-}: FlowSkeletonProps<TFlow>): ReactElement<any, any> => {
+}: PropsWithChildren<FlowSkeletonProps<TFlow>>): ReactElement<any, any> => {
   const [active, setActive] = useState<IFlow | INode | undefined>();
 
   const [activeState, setActiveState] = useState<ActiveState>();
@@ -90,11 +97,15 @@ export const FlowSkeleton = <TFlow extends IFlow>({
       <FlowSkeletonContextProvider value={context}>
         <Content onClick={onContentClick}>
           {context.readonly ? (
-            <Flow flow={flow} nodeRender={nodeRender} root />
+            <>
+              <Flow flow={flow} nodeRender={nodeRender} root />
+              {children}
+            </>
           ) : (
             <>
               <Navigation />
               <Flow flow={flow} nodeRender={nodeRender} root />
+              {children}
             </>
           )}
         </Content>

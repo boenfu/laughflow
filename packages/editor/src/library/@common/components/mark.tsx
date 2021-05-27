@@ -5,7 +5,6 @@ import {Bezier as _Bezier} from 'rc-bezier';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {useEditorContext} from '../../flow-context';
 import {
   createNode,
   createNodeAsFlowStart,
@@ -76,7 +75,7 @@ interface MarkProps {
 }
 
 export const Mark: FC<MarkProps> = ({start, next, active}) => {
-  const editor = useEditorContext();
+  const editor = {} as any;
 
   const onPasteSingleNode = (): void => {
     let activeInfo = editor.activeInfo;

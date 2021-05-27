@@ -9,8 +9,6 @@ import {
 } from '@magicflow/procedure/operators';
 import {copyNode} from '@magicflow/procedure/utils';
 
-import {ActiveInfo} from '../procedure-editor';
-
 import {insertNodeAsFlowStart} from './@insert-node-as-flow-start';
 import {insertNodeBeforeNexts} from './@insert-node-before-nexts';
 import {insertNodeBetweenNodes} from './@insert-node-between-nodes';
@@ -19,12 +17,13 @@ import {stripNode} from './@strip-node';
 export interface PasteNodeOperatorParam {
   from: NodeId;
   to?: NodeId;
-  activeInfo: ActiveInfo;
+  activeInfo: any;
 }
 
-const getPasteNode: OperatorFunction<
-  [ActiveInfo, (value: NodeId) => Operator]
-> = ({value, state}, callback) => {
+const getPasteNode: OperatorFunction<[any, (value: NodeId) => Operator]> = (
+  {value, state},
+  callback,
+) => {
   if (value.type !== 'singleNode' || state === 'connect') {
     return compose([]);
   }
@@ -82,7 +81,7 @@ export const pasteNodeBeforeNexts: OperatorFunction<
 export const pasteNodeAsFlowStart: OperatorFunction<
   [
     {
-      activeInfo: ActiveInfo;
+      activeInfo: any;
       flow: FlowId;
       originStart?: NodeId;
     },

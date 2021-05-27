@@ -1,9 +1,10 @@
 import {Redo, Undo} from '@magicflow/icons';
-import React, {FC} from 'react';
+import React, {FC, useContext} from 'react';
 import styled from 'styled-components';
 
 import {IconButton} from '../@common';
-import {useEditorContext} from '../flow-context';
+
+import {FlowEditorContext} from './flow-editor';
 
 export interface FooterProps {}
 
@@ -26,7 +27,7 @@ const History = styled.div`
 `;
 
 export const Footer: FC<FooterProps> = React.memo(() => {
-  const editor = useEditorContext();
+  const {editor} = useContext(FlowEditorContext);
 
   const onUndo = (): void => editor.undo();
   const onRedo = (): void => editor.redo();
