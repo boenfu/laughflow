@@ -11,15 +11,15 @@ import {useSkeletonContext} from './context';
 import {INode} from './flow-skeleton';
 
 const Container = styled.div`
-  display: inline-block;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: top;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const Row = styled.div`
+  display: flex;
+  justify-content: center;
   padding-top: ${LINE_HEIGHT_DEFAULT}px;
-  text-align: center;
 
   &.multi {
     padding-top: ${LINE_HEIGHT_DEFAULT * 2}px;
@@ -39,9 +39,7 @@ const AddFlow = styled(Branch)`
   background-color: transparent;
 `;
 
-const NodeWrapper = styled.div`
-  display: inline-flex;
-`;
+const NodeWrapper = styled.div``;
 
 const AddFlowWrapper = styled.div`
   position: absolute;
@@ -77,6 +75,8 @@ const AddFlowWrapper = styled.div`
 const FlowsWrapper = styled.div`
   position: relative;
   display: flex;
+  justify-content: center;
+
   min-width: 140px;
   min-height: 83px;
 

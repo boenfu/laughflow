@@ -13,6 +13,7 @@ const Container = styled.div`
   display: inline-flex;
   flex-direction: column;
   align-items: center;
+  min-width: 80px;
 
   &:not(.readonly) {
     padding-top: ${LINE_HEIGHT_DEFAULT / 2}px;
@@ -20,8 +21,10 @@ const Container = styled.div`
 `;
 
 const Wrapper = styled.div`
+  display: flex;
   padding-top: ${LINE_HEIGHT_DEFAULT}px;
   padding-bottom: 16px;
+  white-space: nowrap;
 
   &.multi {
     padding-top: ${LINE_HEIGHT_DEFAULT * 2}px;
@@ -31,7 +34,6 @@ const Wrapper = styled.div`
 `;
 
 const FlowStart = styled.div`
-  display: inline-block;
   box-sizing: border-box;
   width: 40px;
   height: 24px;

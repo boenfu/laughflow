@@ -23,7 +23,6 @@ const STROKE_DEFAULT: BezierStroke = {
 const ARC_RADIUS_DEFAULT = 10;
 
 const Wrapper = styled(Bezier)`
-  display: inline-block;
   width: 0px !important;
   height: 0px !important;
   cursor: pointer;
@@ -111,7 +110,6 @@ const MarkWrapper = styled.div`
   display: inline-flex;
   align-items: flex-start;
   justify-content: center;
-  background-color: #e5e7eb;
 
   &.active {
     ${PlusButtonIcon} {
@@ -234,6 +232,9 @@ const PlusButton: FC<{className?: string}> = ({className}) => {
   return (
     <MarkWrapper
       className={classNames({active}, className)}
+      style={{
+        zIndex: active ? 2 : 1,
+      }}
       ref={ref}
       onClick={onClick}
     >
