@@ -150,6 +150,10 @@ export interface SingleNodeProps {
 }
 
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
+  if (node.left) {
+    return <div>断电</div>;
+  }
+
   const {editor} = useContext(FlowEditorContext);
   const {active: activeSource, activeState} = useSkeletonContext();
 

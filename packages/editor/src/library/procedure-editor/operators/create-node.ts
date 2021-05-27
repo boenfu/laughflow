@@ -1,21 +1,76 @@
-import {NodeId} from '@magicflow/procedure';
+import {FlowId, NodeId, NodeType} from '@magicflow/procedure';
 import {
+  Operator,
   OperatorFunction,
-  addFlow,
   addNode as _addNode,
-  compose,
+  addNodeNexts,
+  out,
 } from '@magicflow/procedure/operators';
-import {createFlow as createFlowHelper} from '@magicflow/procedure/utils';
+import {
+  createBranchesNode,
+  createNode as createNodeHelper,
+} from '@magicflow/procedure/utils';
 
-export interface CreateFlowOperatorParam {
-  node: NodeId;
+import {insertNodeAsFlowStart} from './@insert-node-as-flow-start';
+import {insertNodeBeforeNexts} from './@insert-node-before-nexts';
+import {insertNodeBetweenNodes} from './@insert-node-between-nodes';
+
+export interface CreateNodeOperatorParam {
+  from: NodeId;
+  type: NodeType;
+  to?: NodeId;
 }
 
+const addNode: OperatorFunction<[NodeType, (value: NodeId) => Operator]> = (
+  type,
+  callback,
+) => {
+  return out(
+    _addNode(type === 'singleNode' ? createNodeHelper() : createBranchesNode()),
+    node => callback(node.id),
+  );
+};
+
 /**
- * 新增 flow
+ * 在节点之后新增节点
  * @param param0
  * @returns
  */
-export const createFlow: OperatorFunction<[CreateFlowOperatorParam]> = ({
-  node,
-}) => compose([addFlow(node, createFlowHelper())]);
+export const createNode: OperatorFunction<[CreateNodeOperatorParam]> = ({
+  from,
+  type,
+}) => addNode(type, id => addNodeNexts(from, [id]));
+
+/**
+ * 在两个节点间新增节点
+ * @param param0
+ * @returns
+ */
+export const createNodeBetweenNodes: OperatorFunction<
+  [Required<CreateNodeOperatorParam>]
+> = ({from, to, type}) => addNode(type, insertNodeBetweenNodes({from, to}));
+
+/**
+ * 在节点之后新增节点并迁移 nexts
+ * @param param0
+ * @returns
+ */
+export const createNodeBeforeNexts: OperatorFunction<
+  [CreateNodeOperatorParam]
+> = ({from, type}) => addNode(type, insertNodeBeforeNexts(from));
+
+/**
+ * 新增节点并作为 flow start
+ * @param param0
+ * @returns
+ */
+export const createNodeAsFlowStart: OperatorFunction<
+  [
+    {
+      flow: FlowId;
+      type: NodeType;
+      originStart?: NodeId;
+    },
+  ]
+> = ({flow, type, originStart}) =>
+  addNode(type, insertNodeAsFlowStart({flow, originStart}));

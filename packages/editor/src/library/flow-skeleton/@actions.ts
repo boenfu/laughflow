@@ -7,7 +7,7 @@ export interface IAction<
 > {
   type: TType;
   target: TTarget;
-  position?: TPosition;
+  position: TPosition;
 }
 
 export type ActionPosition =
@@ -47,6 +47,7 @@ type _BranchesNodeAction<
 > =
   | AddNodeAction<TBranchesNode>
   | AddBranchesNodeAction<TBranchesNode>
+  | NodeActionWithPresetPosition<'add', TFlow, undefined>
   | AddFlowAction<TBranchesNode>
   | DeleteAction<TBranchesNode>;
 

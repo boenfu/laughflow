@@ -1,4 +1,4 @@
-import {FlowId, NodeId} from '@magicflow/procedure';
+import {FlowId, NodeId, ProcedureSingleTreeNode} from '@magicflow/procedure';
 import {
   Operator,
   OperatorFunction,
@@ -14,31 +14,33 @@ import {insertNodeBeforeNexts} from './@insert-node-before-nexts';
 import {insertNodeBetweenNodes} from './@insert-node-between-nodes';
 import {stripNode} from './@strip-node';
 
+type PasteType = 'move' | 'copy';
+
 export interface PasteNodeOperatorParam {
+  type: PasteType;
+  node: ProcedureSingleTreeNode;
   from: NodeId;
   to?: NodeId;
-  activeInfo: any;
 }
 
-const getPasteNode: OperatorFunction<[any, (value: NodeId) => Operator]> = (
-  {value, state},
-  callback,
-) => {
-  if (value.type !== 'singleNode' || state === 'connect') {
-    return compose([]);
-  }
+const getPasteNode: OperatorFunction<
+  [
+    PasteNodeOperatorParam['type'],
+    PasteNodeOperatorParam['node'],
+    (value: NodeId) => Operator,
+  ]
+> = (type, node, callback) => {
+  let nodeId = node.id;
 
-  let nodeId = value.id;
-
-  if (state === 'cut') {
+  if (type === 'move') {
     return compose([
-      stripNode({prev: value.prev, node: value.id}),
+      stripNode({prev: node.prev, node: nodeId}),
       callback(nodeId),
     ]);
   }
 
   return out(
-    definition => addNode(copyNode(value.definition))(definition),
+    definition => addNode(copyNode(node.definition))(definition),
     node => callback(node.id),
   );
 };
@@ -49,9 +51,10 @@ const getPasteNode: OperatorFunction<[any, (value: NodeId) => Operator]> = (
  * @returns
  */
 export const pasteNode: OperatorFunction<[PasteNodeOperatorParam]> = ({
+  type,
+  node,
   from,
-  activeInfo,
-}) => getPasteNode(activeInfo, node => addNodeNexts(from, [node]));
+}) => getPasteNode(type, node, node => addNodeNexts(from, [node]));
 
 /**
  * 在两个节点间粘贴节点
@@ -60,8 +63,8 @@ export const pasteNode: OperatorFunction<[PasteNodeOperatorParam]> = ({
  */
 export const pasteNodeBetweenNodes: OperatorFunction<
   [Required<PasteNodeOperatorParam>]
-> = ({from, to, activeInfo}) =>
-  getPasteNode(activeInfo, insertNodeBetweenNodes({from, to}));
+> = ({from, to, type, node}) =>
+  getPasteNode(type, node, insertNodeBetweenNodes({from, to}));
 
 /**
  * 在节点之后粘贴节点并迁移 nexts
@@ -70,8 +73,8 @@ export const pasteNodeBetweenNodes: OperatorFunction<
  */
 export const pasteNodeBeforeNexts: OperatorFunction<
   [PasteNodeOperatorParam]
-> = ({from, activeInfo}) =>
-  getPasteNode(activeInfo, insertNodeBeforeNexts(from));
+> = ({from, type, node}) =>
+  getPasteNode(type, node, insertNodeBeforeNexts(from));
 
 /**
  * 粘贴节点并作为 flow start
@@ -81,10 +84,11 @@ export const pasteNodeBeforeNexts: OperatorFunction<
 export const pasteNodeAsFlowStart: OperatorFunction<
   [
     {
-      activeInfo: any;
       flow: FlowId;
+      type: PasteNodeOperatorParam['type'];
+      node: PasteNodeOperatorParam['node'];
       originStart?: NodeId;
     },
   ]
-> = ({flow, activeInfo, originStart}) =>
-  getPasteNode(activeInfo, insertNodeAsFlowStart({flow, originStart}));
+> = ({flow, type, node, originStart}) =>
+  getPasteNode(type, node, insertNodeAsFlowStart({flow, originStart}));

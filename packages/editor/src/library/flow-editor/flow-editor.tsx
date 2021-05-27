@@ -1,6 +1,6 @@
 import {IPlugin} from '@magicflow/plugins';
 import {ProcedureDefinition} from '@magicflow/procedure';
-import {useCreation, useUpdate} from 'ahooks';
+import {useCreation, useKeyPress, useUpdate} from 'ahooks';
 import React, {
   FC,
   createContext,
@@ -10,9 +10,10 @@ import React, {
 } from 'react';
 
 import {FlowSkeleton} from '../flow-skeleton';
-import {ProcedureEditor, createNode} from '../procedure-editor';
+import {ProcedureEditor} from '../procedure-editor';
 
 import {Footer} from './@footer';
+import {actionHandler} from './@handler';
 import {SingleNode} from './@node';
 
 export interface FlowEditorProps {
@@ -54,30 +55,14 @@ export const FlowEditor: FC<FlowEditorProps> = forwardRef<
 
   useImperativeHandle(ref, () => editor);
 
+  useKeyPress('ctrl.z', () => editor.undo());
+  useKeyPress('ctrl.y', () => editor.redo());
+
   return (
     <FlowEditorContext.Provider value={{editor}}>
       <FlowSkeleton
         flow={editor.rootFlow}
-        onAction={action => {
-          console.log(action);
-
-          switch (action.type) {
-            case 'node:add-node':
-              editor.edit(
-                createNode({
-                  type: 'singleNode',
-                  from: action.target.id,
-                }),
-              );
-
-              break;
-            case 'branches-node:add-node':
-              // let a = action.target;
-              break;
-            default:
-              break;
-          }
-        }}
+        onAction={action => actionHandler(editor, action)}
         nodeRender={SingleNode}
       >
         <Footer />

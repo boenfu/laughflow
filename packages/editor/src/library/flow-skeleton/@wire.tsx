@@ -78,6 +78,7 @@ const Menu = styled.div`
 const MenuItem = styled.div`
   display: flex;
   align-items: center;
+  white-space: nowrap;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 28px;
   font-size: 12px;
@@ -175,15 +176,17 @@ function buildAction(
 const PasteButton: FC<{className?: string}> = ({className}) => {
   const {start, next} = useContext(WireContext);
   const {active, activeState, setActiveState, onAction} = useSkeletonContext();
+  const notStartState = className !== 'start';
 
   const onClick = (event: MouseEvent): void => {
     event.stopPropagation();
+
     onAction?.(
       buildAction(
         activeState === 'moving' ? 'move' : 'copy',
         active as INode,
         start,
-        next,
+        notStartState && next,
       ),
     );
 
@@ -199,10 +202,11 @@ const PasteButton: FC<{className?: string}> = ({className}) => {
 
 const PlusButton: FC<{className?: string}> = ({className}) => {
   const {start, next} = useContext(WireContext);
-  const {activeState, onAction} = useSkeletonContext();
+  const {onAction} = useSkeletonContext();
   // eslint-disable-next-line no-null/no-null
   const ref = useRef<HTMLDivElement>(null);
   const [active, {toggle, setFalse}] = useBoolean();
+  const notStartState = className !== 'start';
 
   const onClick = (event: MouseEvent): void => {
     event.stopPropagation();
@@ -210,23 +214,16 @@ const PlusButton: FC<{className?: string}> = ({className}) => {
   };
 
   const onAddNode = (): void => {
-    onAction?.(
-      buildAction(
-        activeState === 'moving' ? 'move' : 'copy',
-        undefined,
-        start,
-        next,
-      ),
-    );
+    onAction?.(buildAction('add', undefined, start, notStartState && next));
   };
 
   const onAddBranchesNode = (): void => {
     onAction?.(
       buildAction(
-        activeState === 'moving' ? 'move' : 'copy',
+        'add',
         undefined,
         start,
-        next,
+        notStartState && next,
         'branches-node',
       ),
     );

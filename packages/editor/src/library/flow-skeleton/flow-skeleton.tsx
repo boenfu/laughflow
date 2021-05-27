@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 
+import {Action} from './@actions';
 import {Flow} from './@flow';
 import {Navigation} from './@navigation';
 import {
@@ -46,6 +47,8 @@ export interface IFlow {
   id: string;
   starts: INode[];
 }
+
+export type FlowAction<TFlow extends IFlow> = Action<TFlow>;
 
 export type FlowSkeletonProps<TFLow extends IFlow> =
   | (FlowSkeletonCommonProps<TFLow> & FlowSkeletonPropsReadonlySegment)

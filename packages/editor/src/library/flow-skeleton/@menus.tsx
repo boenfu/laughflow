@@ -31,14 +31,17 @@ const AddNodeMenu: IMenu = {
       flow: {
         type: 'flow:add-node',
         target: target as IFlow,
+        position: undefined,
       },
       'branches-node': {
         type: 'branches-node:add-node',
         target: target as IBranchesNode,
+        position: undefined,
       },
       node: {
         type: 'node:add-node',
         target: target as INode,
+        position: undefined,
       },
     }),
 };
@@ -52,14 +55,17 @@ const AddBranchesNodeMenu: IMenu = {
       flow: {
         type: 'flow:add-branches-node',
         target: target as IFlow,
+        position: undefined,
       },
       'branches-node': {
         type: 'branches-node:add-branches-node',
         target: target as IBranchesNode,
+        position: undefined,
       },
       node: {
         type: 'node:add-branches-node',
         target: target as INode,
+        position: undefined,
       },
     }),
 };
@@ -73,14 +79,17 @@ const DeleteMenu: IMenu = {
       flow: {
         type: 'flow:delete',
         target: target as IFlow,
+        position: undefined,
       },
       'branches-node': {
         type: 'branches-node:delete',
         target: target as IBranchesNode,
+        position: undefined,
       },
       node: {
         type: 'node:delete',
         target: target as INode,
+        position: undefined,
       },
     }),
 };
@@ -92,6 +101,7 @@ const MoreMenu: IMenu = {
   action: (target: INode) => ({
     type: 'node:configure-node',
     target,
+    position: undefined,
   }),
 };
 

@@ -98,7 +98,7 @@ export interface NodeProps {
 }
 
 export const Node: FC<NodeProps> = ({node, component: Component}) => {
-  const {readonly, setActive, isActive} = useSkeletonContext();
+  const {readonly, setActive, isActive, onAction} = useSkeletonContext();
 
   const onActiveNode = (event: MouseEvent): void => {
     event.stopPropagation();
@@ -126,7 +126,15 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
           ))}
           {!readonly ? (
             <AddFlowWrapper>
-              <AddFlow onClick={() => {}} />
+              <AddFlow
+                onClick={() =>
+                  onAction?.({
+                    type: 'branches-node:add-flow',
+                    target: node,
+                    position: undefined,
+                  })
+                }
+              />
             </AddFlowWrapper>
           ) : undefined}
         </FlowsWrapper>
