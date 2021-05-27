@@ -69,7 +69,7 @@ export const createNodeAsFlowStart: OperatorFunction<
     {
       flow: FlowId;
       type: NodeType;
-      originStart?: NodeId;
+      originStart?: NodeId | 'all';
     },
   ]
 > = ({flow, type, originStart}) =>

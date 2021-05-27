@@ -29,6 +29,7 @@ const ACTION_HANDLER_DICT: {
     editor.edit(
       createNodeAsFlowStart({
         flow: action.position[0].id,
+        originStart: 'all',
         type: 'singleNode',
       }),
     );
@@ -103,9 +104,9 @@ const ACTION_HANDLER_DICT: {
     editor.edit(
       pasteNodeAsFlowStart({
         flow: action.position[0].id,
-        type: 'copy',
         node: action.target,
         originStart: action.position[1].id,
+        type: 'copy',
       }),
     );
   },
@@ -144,9 +145,9 @@ const ACTION_HANDLER_DICT: {
     editor.edit(
       pasteNodeAsFlowStart({
         flow: action.position[0].id,
-        type: 'move',
         node: action.target,
         originStart: action.position[1].id,
+        type: 'move',
       }),
     );
   },
@@ -188,6 +189,7 @@ const ACTION_HANDLER_DICT: {
     editor.edit(
       createNodeAsFlowStart({
         flow: action.position[0].id,
+        originStart: 'all',
         type: 'branchesNode',
       }),
     );

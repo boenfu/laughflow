@@ -118,10 +118,22 @@ export function removeFlowStart(flowId: FlowId, nodeId: NodeId): Operator {
   };
 }
 
-export function removeAllFlowStart(flowId: FlowId, nodeId: NodeId): Operator {
+export function removeAllFlowStart(
+  flowId: FlowId,
+  nodeId?: NodeId,
+): Operator<[NodeId[]]> {
   return definition => {
     let flow = ProcedureUtil.requireFlow(definition, flowId);
-    flow.starts = flow.starts.filter(id => id !== nodeId);
-    return definition;
+
+    if (nodeId) {
+      flow.starts = flow.starts.filter(id => id !== nodeId);
+      return [definition, [nodeId]];
+    }
+
+    let oldStarts = [...flow.starts];
+
+    flow.starts = [];
+
+    return [definition, oldStarts];
   };
 }

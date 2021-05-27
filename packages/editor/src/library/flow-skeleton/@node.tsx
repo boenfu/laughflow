@@ -76,7 +76,7 @@ const AddFlowWrapper = styled.div`
 
 const FlowsWrapper = styled.div`
   position: relative;
-  display: inline-block;
+  display: flex;
   min-width: 140px;
   min-height: 83px;
 
@@ -105,6 +105,15 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
     setActive(node);
   };
 
+  const onAddFlow = (event: MouseEvent): void => {
+    event.stopPropagation();
+    onAction?.({
+      type: 'branches-node:add-flow',
+      target: node,
+      position: undefined,
+    });
+  };
+
   let nexts = node.nexts;
   let editingProps = readonly
     ? {}
@@ -125,16 +134,8 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
             <Flow key={flow.id} flow={flow} nodeRender={Component} />
           ))}
           {!readonly ? (
-            <AddFlowWrapper>
-              <AddFlow
-                onClick={() =>
-                  onAction?.({
-                    type: 'branches-node:add-flow',
-                    target: node,
-                    position: undefined,
-                  })
-                }
-              />
+            <AddFlowWrapper onClick={onAddFlow}>
+              <AddFlow />
             </AddFlowWrapper>
           ) : undefined}
         </FlowsWrapper>

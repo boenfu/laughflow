@@ -35,11 +35,12 @@ export const FlowEditor: FC<FlowEditorProps> = forwardRef<
   ProcedureEditor,
   FlowEditorProps
 >(({definition, plugins, onChange}, ref) => {
+  const reRender = useUpdate();
+
   const editor = useCreation(
     () => new ProcedureEditor(definition, plugins),
     [],
   );
-  const reRender = useUpdate();
 
   useEffect(() => {
     editor.on('update', () => {
@@ -53,10 +54,10 @@ export const FlowEditor: FC<FlowEditorProps> = forwardRef<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useImperativeHandle(ref, () => editor);
-
   useKeyPress('ctrl.z', () => editor.undo());
   useKeyPress('ctrl.y', () => editor.redo());
+
+  useImperativeHandle(ref, () => editor);
 
   return (
     <FlowEditorContext.Provider value={{editor}}>
