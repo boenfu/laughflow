@@ -1,12 +1,13 @@
 import {Plus, PlusSmall, Union} from '@magicflow/icons';
-import {useBoolean} from 'ahooks';
+import {useBoolean, useClickAway} from 'ahooks';
 import classNames from 'classnames';
 import {Bezier, BezierPoint, BezierProps, BezierStroke, Mark} from 'rc-bezier';
-import React, {FC, MouseEvent, createContext, useContext} from 'react';
+import React, {FC, MouseEvent, createContext, useContext, useRef} from 'react';
 import styled from 'styled-components';
 
 import {Icon, transition} from '../@common';
 
+import {Action, SuffixToPosition} from './@actions';
 import {useSkeletonContext} from './context';
 import {IFlow, INode} from './flow-skeleton';
 
@@ -141,13 +142,52 @@ const WireContext = createContext<Pick<WireProps, 'start' | 'next'>>(
   undefined!,
 );
 
+function buildAction(
+  type: 'add' | 'move' | 'copy',
+  active: INode | undefined,
+  start: WireProps['start'],
+  next: WireProps['next'],
+  prefix: 'node' | 'branches-node' = 'node',
+): Action {
+  let suffix!: keyof SuffixToPosition;
+
+  if (next) {
+    if ('starts' in start) {
+      suffix = 'between-flow-and-node';
+    } else {
+      suffix = 'between-nodes';
+    }
+  } else {
+    if ('starts' in start) {
+      suffix = 'after-flow';
+    } else {
+      suffix = 'after-node';
+    }
+  }
+
+  return ({
+    type: `${prefix}:${type}-${suffix}`,
+    target: active,
+    position: next ? [start, next] : [start],
+  } as unknown) as Action;
+}
+
 const PasteButton: FC<{className?: string}> = ({className}) => {
   const {start, next} = useContext(WireContext);
-  const {activeState} = useSkeletonContext();
+  const {active, activeState, setActiveState, onAction} = useSkeletonContext();
 
   const onClick = (event: MouseEvent): void => {
     event.stopPropagation();
-    console.log(activeState, start, next);
+    onAction?.(
+      buildAction(
+        activeState === 'moving' ? 'move' : 'copy',
+        active as INode,
+        start,
+        next,
+      ),
+    );
+
+    setActiveState(undefined);
   };
 
   return (
@@ -159,7 +199,10 @@ const PasteButton: FC<{className?: string}> = ({className}) => {
 
 const PlusButton: FC<{className?: string}> = ({className}) => {
   const {start, next} = useContext(WireContext);
-  const [active, {toggle}] = useBoolean();
+  const {activeState, onAction} = useSkeletonContext();
+  // eslint-disable-next-line no-null/no-null
+  const ref = useRef<HTMLDivElement>(null);
+  const [active, {toggle, setFalse}] = useBoolean();
 
   const onClick = (event: MouseEvent): void => {
     event.stopPropagation();
@@ -167,15 +210,36 @@ const PlusButton: FC<{className?: string}> = ({className}) => {
   };
 
   const onAddNode = (): void => {
-    console.log(start, next);
+    onAction?.(
+      buildAction(
+        activeState === 'moving' ? 'move' : 'copy',
+        undefined,
+        start,
+        next,
+      ),
+    );
   };
 
   const onAddBranchesNode = (): void => {
-    console.log(start, next);
+    onAction?.(
+      buildAction(
+        activeState === 'moving' ? 'move' : 'copy',
+        undefined,
+        start,
+        next,
+        'branches-node',
+      ),
+    );
   };
 
+  useClickAway(setFalse, ref);
+
   return (
-    <MarkWrapper className={classNames({active}, className)} onClick={onClick}>
+    <MarkWrapper
+      className={classNames({active}, className)}
+      ref={ref}
+      onClick={onClick}
+    >
       <PlusButtonIcon />
       <Menu>
         <MenuItem onClick={onAddNode}>
@@ -215,7 +279,7 @@ export const Wire: FC<WireProps> = ({
   const {activeState} = useSkeletonContext();
 
   let Mark =
-    activeState === 'cutting' || activeState === 'copying'
+    activeState === 'moving' || activeState === 'copying'
       ? PasteButton
       : PlusButton;
 

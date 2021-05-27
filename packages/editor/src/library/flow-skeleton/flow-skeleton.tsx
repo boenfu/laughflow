@@ -3,6 +3,7 @@ import React, {
   PropsWithChildren,
   ReactElement,
   useCallback,
+  useEffect,
   useState,
 } from 'react';
 import styled from 'styled-components';
@@ -91,6 +92,10 @@ export const FlowSkeleton = <TFlow extends IFlow>({
     setActiveState,
     ...props,
   };
+
+  useEffect(() => {
+    setActiveState(undefined);
+  }, [active]);
 
   return (
     <Wrapper className="flow-skeleton">

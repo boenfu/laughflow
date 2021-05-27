@@ -3,7 +3,7 @@ import {createContext, useContext} from 'react';
 import {Action} from './@actions';
 import {IFlow} from './flow-skeleton';
 
-export type ActiveState = 'cutting' | 'copying' | 'connecting' | undefined;
+export type ActiveState = 'moving' | 'copying' | 'connecting' | undefined;
 
 export interface FlowSkeletonContext<
   TFlow extends IFlow,

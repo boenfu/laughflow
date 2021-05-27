@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 
   display: flex;
   align-items: center;
-  z-index: 3;
+  z-index: 10;
 
   ${transition(['background-color'])}
 
@@ -41,7 +41,7 @@ const Right = styled.div`
 `;
 
 export const Navigation: FC = React.memo(() => {
-  const {active, activeState, setActiveState} = useSkeletonContext();
+  const {active, activeState, setActiveState, onAction} = useSkeletonContext();
   const menus: IMenu[] = (active && getMenus?.(active)) || [];
 
   const onNodeMenuClick = (event: MouseEvent<HTMLDivElement>): void => {
@@ -58,19 +58,15 @@ export const Navigation: FC = React.memo(() => {
     if (menu.state) {
       setActiveState(menu.state);
       return;
-    } else {
-      setActiveState(undefined);
     }
 
-    switch (menu.type) {
-      case '':
-        break;
+    let action = menu?.action?.(active!);
 
-      default:
-        break;
+    if (action) {
+      onAction?.(action);
     }
 
-    // onAction?.(menu);
+    setActiveState(undefined);
   };
 
   const onFullScreenToggle = (event: MouseEvent): void => {

@@ -5,6 +5,7 @@ import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
 import {RESOURCE_WIDTH} from '../../@common';
+import {ActiveState, useSkeletonContext} from '../../flow-skeleton';
 import {FlowEditorContext} from '../flow-editor';
 
 import {Header} from './@header';
@@ -61,15 +62,15 @@ const Wrapper = styled.div`
       opacity: 0;
       margin: 0px;
       height: 100%;
-      transform: translate(-12px, -12px);
-      padding: 12px;
+      transform: translate(-10px, -10px);
+      padding: 10px;
       position: absolute;
       top: 0px;
       left: 0px;
       width: 100%;
       content: '';
       z-index: 2;
-      border: 1px dashed #296dff;
+      border: 1px dashed #a9b7d7;
       border-radius: 4px;
       pointer-events: none;
     }
@@ -83,7 +84,7 @@ const Wrapper = styled.div`
     &.active {
       &::before {
         opacity: 1;
-        background-color: rgba(255, 255, 255, 0.5);
+        background-color: rgba(255, 255, 255, 0.88);
       }
     }
   }
@@ -109,11 +110,11 @@ const EditingIconWrapper = styled.div`
   width: 32px;
   height: 32px;
 
-  top: 100%;
+  top: 50%;
   left: 50%;
-  transform: translate(-50%, 2px);
+  transform: translate(-50%, -50%);
 
-  background: #296dff;
+  background: #83a9ff;
   color: #fff;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
   border-radius: 28px;
@@ -121,13 +122,15 @@ const EditingIconWrapper = styled.div`
   z-index: 3;
 `;
 
-const STATE_ICON_DICT: Partial<{[key in any]: React.ElementType}> = {
-  cut: Cut,
-  copy: Copy,
-  connect: Jump,
+const STATE_ICON_DICT: Partial<
+  {[key in NonNullable<ActiveState>]: React.ElementType}
+> = {
+  moving: Cut,
+  copying: Copy,
+  connecting: Jump,
 };
 
-const EditingIcon: FC<{state: any}> = ({state}) => {
+const EditingIcon: FC<{state: NonNullable<ActiveState>}> = ({state}) => {
   let Component = STATE_ICON_DICT[state];
 
   if (!Component) {
@@ -148,12 +151,12 @@ export interface SingleNodeProps {
 
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
   const {editor} = useContext(FlowEditorContext);
-
-  let activeInfo = {} as any;
-  let active = false;
-  let editing = active ? activeInfo?.state : undefined;
+  const {active: activeSource, activeState} = useSkeletonContext();
 
   let {before, after, footer, body} = editor.nodeRenderDescriptor['singleNode'];
+
+  let active = activeSource?.id === node.id;
+  let editing = active ? activeState : undefined;
 
   return (
     <Container>
@@ -175,8 +178,6 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
           },
           editing,
         ])}
-        data-id={node.id}
-        data-prev={node.prev.id}
       >
         <Header node={node} />
         <Body>

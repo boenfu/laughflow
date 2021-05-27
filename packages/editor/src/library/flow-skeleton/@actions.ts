@@ -1,13 +1,13 @@
 import {IFlow, INode} from './flow-skeleton';
 
-interface IAction<
+export interface IAction<
   TType extends string,
   TTarget extends IFlow | INode | undefined,
   TPosition extends ActionPosition | undefined = undefined
 > {
   type: TType;
   target: TTarget;
-  position: TPosition;
+  position?: TPosition;
 }
 
 export type ActionPosition =
@@ -19,11 +19,11 @@ export type ActionPosition =
   | [IFlow];
 
 export type Action<TFlow extends IFlow = IFlow> =
-  | ActionWithPrefix<NodeAction<TFlow>, 'node'>
-  | ActionWithPrefix<BranchesNodeAction<TFlow>, 'branches-node'>
-  | ActionWithPrefix<FlowAction<TFlow>, 'flow'>;
+  | NodeAction<TFlow>
+  | BranchesNodeAction<TFlow>
+  | FlowAction<TFlow>;
 
-type NodeAction<
+type _NodeAction<
   TFlow extends IFlow = IFlow,
   TNode extends INode = Exclude<TFlow['starts'][number], {flows: any}>
 > =
@@ -36,19 +36,34 @@ type NodeAction<
   | DeleteAction<TNode>
   | ConfigureNodeAction<TNode>;
 
-type BranchesNodeAction<
+export type NodeAction<TFlow extends IFlow = IFlow> = ActionWithPrefix<
+  _NodeAction<TFlow>,
+  'node'
+>;
+
+type _BranchesNodeAction<
   TFlow extends IFlow = IFlow,
-  TBranchesNode extends INode = Extract<TFlow['starts'][number], {flows: any}>
+  TBranchesNode extends INode = Extract<TFlow['starts'][number], {flows?: any}>
 > =
   | AddNodeAction<TBranchesNode>
   | AddBranchesNodeAction<TBranchesNode>
   | AddFlowAction<TBranchesNode>
   | DeleteAction<TBranchesNode>;
 
-type FlowAction<TFlow extends IFlow = IFlow> =
+export type BranchesNodeAction<TFlow extends IFlow = IFlow> = ActionWithPrefix<
+  _BranchesNodeAction<TFlow>,
+  'branches-node'
+>;
+
+type _FlowAction<TFlow extends IFlow = IFlow> =
   | AddNodeAction<TFlow>
   | AddBranchesNodeAction<TFlow>
   | DeleteAction<TFlow>;
+
+export type FlowAction<TFlow extends IFlow = IFlow> = ActionWithPrefix<
+  _FlowAction<TFlow>,
+  'flow'
+>;
 
 type ActionWithPrefix<
   TAction extends IAction<string, any, any>,
@@ -72,7 +87,7 @@ type AddFlowAction<T extends INode> = IAction<'add-flow', T>;
 
 type ConnectNodeAction<T extends INode> = IAction<'connect-node', T, T>;
 
-interface SuffixToPosition<
+export interface SuffixToPosition<
   TFlow extends IFlow = IFlow,
   TNode extends INode = TFlow['starts'][number]
 > {

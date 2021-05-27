@@ -13,7 +13,7 @@ import {FlowSkeleton} from '../flow-skeleton';
 import {ProcedureEditor, createNode} from '../procedure-editor';
 
 import {Footer} from './@footer';
-import {SingleNode} from './@single';
+import {SingleNode} from './@node';
 
 export interface FlowEditorProps {
   definition: ProcedureDefinition;
@@ -59,6 +59,8 @@ export const FlowEditor: FC<FlowEditorProps> = forwardRef<
       <FlowSkeleton
         flow={editor.rootFlow}
         onAction={action => {
+          console.log(action);
+
           switch (action.type) {
             case 'node:add-node':
               editor.edit(
@@ -69,7 +71,9 @@ export const FlowEditor: FC<FlowEditorProps> = forwardRef<
               );
 
               break;
-
+            case 'branches-node:add-node':
+              // let a = action.target;
+              break;
             default:
               break;
           }
