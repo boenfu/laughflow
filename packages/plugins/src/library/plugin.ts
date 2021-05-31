@@ -15,7 +15,7 @@ export type PluginConfigComponent<TProps = {}> = ComponentType<
   }
 >;
 
-export interface NodeEditorRender<TConfigExtraProps = any> {
+export interface NodeEditorRender<TConfigExtraProps = {}> {
   before?: PluginRenderComponent;
   after?: PluginRenderComponent;
   headLeft?: PluginRenderComponent;
@@ -27,7 +27,7 @@ export interface NodeEditorRender<TConfigExtraProps = any> {
 
 export type NodeViewerRender = Omit<NodeEditorRender, 'config'>;
 
-export interface EditorRender<TConfigExtraProps = any> {
+export interface EditorRender<TConfigExtraProps = {}> {
   node?: NodeEditorRender<TConfigExtraProps>;
 }
 
@@ -35,7 +35,7 @@ export interface ViewerRender {
   node?: NodeViewerRender;
 }
 
-export interface IPlugin<TConfigExtraProps = any> {
+export interface IPlugin<TConfigExtraProps = {}> {
   name: string;
 
   editor?: EditorRender<TConfigExtraProps>;

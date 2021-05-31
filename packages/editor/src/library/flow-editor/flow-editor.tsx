@@ -51,8 +51,20 @@ export const FlowEditor: FC<FlowEditorProps> = forwardRef<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useKeyPress('ctrl.z', () => editor.undo());
-  useKeyPress('ctrl.y', () => editor.redo());
+  useKeyPress('ctrl.z', () => {
+    if (window.document.activeElement !== window.document.body) {
+      return;
+    }
+
+    editor.undo();
+  });
+  useKeyPress('ctrl.y', () => {
+    if (window.document.activeElement !== window.document.body) {
+      return;
+    }
+
+    editor.redo();
+  });
 
   useImperativeHandle(ref, () => editor);
 

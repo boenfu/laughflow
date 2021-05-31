@@ -1,4 +1,5 @@
 import {IPlugin, NodeEditorRender} from '@magicflow/plugins';
+import {ComponentType} from 'react';
 
 export type NodeRenderCollect<TRender extends object> = {
   [TK in keyof TRender]: NonNullable<TRender[TK]>[];
@@ -33,7 +34,7 @@ export function buildNodeRenderDescriptor(
           // eslint-disable-next-line @mufan/no-unnecessary-type-assertion
           nodeRenderDescriptor['node'][
             name as keyof NodeRenderDescriptor['node']
-          ]!.push(component);
+          ]!.push(component as ComponentType<any>);
         }
       }
     }

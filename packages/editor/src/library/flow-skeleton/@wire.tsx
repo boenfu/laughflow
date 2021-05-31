@@ -354,8 +354,8 @@ function getGeneratePath({
   last?: boolean;
 }): (points: BezierPoint[]) => string {
   return (points: BezierPoint[]): string => {
-    let start = points[0];
-    let end = points[points.length - 1];
+    let start = formatPoint(points[0]);
+    let end = formatPoint(points[points.length - 1]);
 
     if (start.x === end.x) {
       return `M ${start.x},${start.y} V ${end.y}`;
@@ -386,5 +386,12 @@ function getGeneratePath({
     }
 
     return `M ${end.x},${midline} V ${end.y}`;
+  };
+}
+
+function formatPoint({x, y}: BezierPoint): BezierPoint {
+  return {
+    x: +x.toFixed(2),
+    y: +y.toFixed(2),
   };
 }

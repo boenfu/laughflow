@@ -93,16 +93,16 @@ const ConnectArrow = styled.div`
   z-index: 2;
 `;
 
-export type IConditionPlugin = IPlugin<{
-  mode: 'enter' | 'visible';
-}>;
-
 export type ConditionVariableResolver = (
   variable: string,
   context?: TaskNodeRuntimeMethodParams,
 ) => any;
 
-export class ConditionPlugin implements IConditionPlugin {
+interface ConditionProps {
+  mode: 'enter' | 'visible';
+}
+
+export class ConditionPlugin implements IPlugin<ConditionProps> {
   readonly name = 'condition';
 
   private leftCandidates: CustomConditionCandidate[] = [
@@ -118,7 +118,7 @@ export class ConditionPlugin implements IConditionPlugin {
 
   private rightCandidates: CustomConditionCandidate[] = [];
 
-  private singleNode: NodeEditorRender = {
+  private singleNode: NodeEditorRender<ConditionProps> = {
     before: ({node, prevChildren}) => {
       let definition = node.definition;
 
@@ -169,16 +169,22 @@ export class ConditionPlugin implements IConditionPlugin {
       );
     },
     config: ({value: definition, onChange, mode}) => {
-      let conditionField: keyof typeof definition =
-        mode === 'enter' ? 'visibleConditions' : 'enterConditions';
+      let conditionField: 'visible' | 'enter' =
+        mode === 'enter' ? 'visible' : 'enter';
 
       return (
         <ConditionEditor
           leftCandidates={this.leftCandidates}
           rightCandidates={this.rightCandidates}
-          conditions={definition[conditionField]}
+          conditions={definition.conditions?.[conditionField]}
           onChange={conditions =>
-            onChange?.({...definition, [conditionField]: conditions})
+            onChange?.({
+              ...definition,
+              conditions: {
+                ...definition.conditions,
+                [conditionField]: conditions,
+              },
+            })
           }
         />
       );
@@ -210,7 +216,7 @@ export class ConditionPlugin implements IConditionPlugin {
     },
   };
 
-  get editor(): EditorRender {
+  get editor(): EditorRender<ConditionProps> {
     return {
       node: this.singleNode,
     };
