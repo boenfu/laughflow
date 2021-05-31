@@ -1,61 +1,38 @@
-import {Node, NodeType, ProcedureTreeNode} from '@magicflow/procedure';
-import {ITaskRuntime, TaskBranchesNode, TaskSingleNode} from '@magicflow/task';
+import {ProcedureSingleTreeNode, SingleNode} from '@magicflow/procedure';
+import {ITaskRuntime} from '@magicflow/task';
 import {ComponentType, ReactNode} from 'react';
 
-export interface PluginComponentProps<TType extends NodeType = NodeType> {
-  node: Extract<ProcedureTreeNode, {type: TType}>;
-  taskNode?: Extract<
-    | {type: 'singleNode'; value: TaskSingleNode}
-    | {type: 'branchesNode'; value: TaskBranchesNode},
-    {type: TType}
-  >['value'];
+export type PluginRenderComponent = ComponentType<{
+  node: ProcedureSingleTreeNode;
   prevChildren?: ReactNode;
-}
+}>;
 
-export type PluginComponent<
-  TType extends NodeType,
-  TProps = {}
-> = ComponentType<PluginComponentProps<TType> & TProps>;
-
-export type PluginConfigComponent<
-  TType extends NodeType = NodeType,
-  TProps = {}
-> = PluginComponent<
-  TType,
+export type PluginConfigComponent<TProps = {}> = ComponentType<
   TProps & {
-    value: Extract<Node, {type: TType}>;
-    onChange(node: Extract<Node, {type: TType}>): void;
+    node: ProcedureSingleTreeNode;
+    value: SingleNode;
+    onChange(node: SingleNode): void;
   }
 >;
 
-export interface SingleNodeEditorRender<TConfigExtraProps = any> {
-  before?: PluginComponent<'singleNode'>;
-  after?: PluginComponent<'singleNode'>;
-  headLeft?: PluginComponent<'singleNode'>;
-  headRight?: PluginComponent<'singleNode'>;
-  body?: PluginComponent<'singleNode'>;
-  footer?: PluginComponent<'singleNode'>;
-  config?: PluginConfigComponent<'singleNode', TConfigExtraProps>;
+export interface NodeEditorRender<TConfigExtraProps = any> {
+  before?: PluginRenderComponent;
+  after?: PluginRenderComponent;
+  headLeft?: PluginRenderComponent;
+  headRight?: PluginRenderComponent;
+  body?: PluginRenderComponent;
+  footer?: PluginRenderComponent;
+  config?: PluginConfigComponent<TConfigExtraProps>;
 }
 
-export type SingleNodeViewerRender = Omit<SingleNodeEditorRender, 'config'>;
-
-export interface BranchesNodeEditorRender<TConfigExtraProps = any> {
-  before?: PluginComponent<'branchesNode'>;
-  after?: PluginComponent<'branchesNode'>;
-  config?: PluginConfigComponent<'branchesNode', TConfigExtraProps>;
-}
-
-export type BranchesNodeViewerRender = Omit<BranchesNodeEditorRender, 'config'>;
+export type NodeViewerRender = Omit<NodeEditorRender, 'config'>;
 
 export interface EditorRender<TConfigExtraProps = any> {
-  singleNode?: SingleNodeEditorRender<TConfigExtraProps>;
-  branchesNode?: BranchesNodeEditorRender<TConfigExtraProps>;
+  node?: NodeEditorRender<TConfigExtraProps>;
 }
 
 export interface ViewerRender {
-  singleNode?: SingleNodeViewerRender;
-  branchesNode?: BranchesNodeViewerRender;
+  node?: NodeViewerRender;
 }
 
 export interface IPlugin<TConfigExtraProps = any> {

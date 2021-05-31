@@ -2,6 +2,7 @@ import {IPlugin} from '@magicflow/plugins';
 import {ProcedureDefinition} from '@magicflow/procedure';
 import {useCreation, useKeyPress, useUpdate} from 'ahooks';
 import React, {
+  ComponentType,
   FC,
   createContext,
   forwardRef,
@@ -20,11 +21,7 @@ export interface FlowEditorProps {
   definition: ProcedureDefinition;
   plugins?: IPlugin[];
   onChange?(definition: ProcedureDefinition): void;
-  // onConfig?<TPayload>(
-  //   config: EditorConfigObject,
-  //   props: PluginComponentProps,
-  //   payload?: TPayload,
-  // ): void;
+  onConfig?(config: {[key in IPlugin['name']]: ComponentType}): void;
 }
 
 export const FlowEditorContext = createContext<{
@@ -34,7 +31,7 @@ export const FlowEditorContext = createContext<{
 export const FlowEditor: FC<FlowEditorProps> = forwardRef<
   ProcedureEditor,
   FlowEditorProps
->(({definition, plugins, onChange}, ref) => {
+>(({definition, plugins, onChange, onConfig}, ref) => {
   const reRender = useUpdate();
 
   const editor = useCreation(
@@ -48,9 +45,9 @@ export const FlowEditor: FC<FlowEditorProps> = forwardRef<
       reRender();
     });
 
-    // if (onConfig) {
-    //   editor.on('config', onConfig);
-    // }
+    if (onConfig) {
+      editor.on('config', onConfig);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

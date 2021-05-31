@@ -1,17 +1,19 @@
-import {IPlugin} from '@magicflow/plugins';
+import {IPlugin, PluginConfigComponent} from '@magicflow/plugins';
 import {
   Procedure,
   ProcedureDefinition,
   ProcedureFlow,
-  ProcedureTreeNode,
+  ProcedureSingleTreeNode,
   ProcedureTreeView,
   ProcedureUtil,
+  SingleNode,
 } from '@magicflow/procedure';
-import {Operator, compose} from '@magicflow/procedure/operators';
+import {Operator, compose, updateNode} from '@magicflow/procedure/operators';
 import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
 import {enableAllPlugins, produce} from 'immer';
 import {compact, fromPairs} from 'lodash-es';
+import {createElement} from 'react';
 
 import {NodeRenderDescriptor, buildNodeRenderDescriptor} from '../@common';
 
@@ -31,8 +33,7 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   readonly undoStack = new UndoStack();
 
   nodeRenderDescriptor: NodeRenderDescriptor = {
-    singleNode: {},
-    branchesNode: {},
+    node: {},
   };
 
   get definition(): ProcedureDefinition {
@@ -69,16 +70,28 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   }
 
   emitConfig<TPayload extends {}>(
-    node: ProcedureTreeNode,
+    node: ProcedureSingleTreeNode,
     payload?: TPayload,
   ): void {
+    let onChange = (node: SingleNode): void => void this.edit(updateNode(node));
+
     this.emit(
       'config',
       fromPairs(
         compact(
           this.plugins.map(plugin =>
-            plugin.editor?.[node.type]?.config
-              ? [plugin.name, plugin.editor[node.type]!['config']]
+            plugin.editor?.node?.config
+              ? [
+                  plugin.name,
+                  () => {
+                    // eslint-disable-next-line @mufan/no-unnecessary-type-assertion
+                    let Component = plugin.editor!.node!.config!;
+
+                    return createElement<
+                      NonNullable<PluginConfigComponent['defaultProps']>
+                    >(Component, {node, value: node.definition, onChange});
+                  },
+                ]
               : undefined,
           ),
         ),
@@ -86,8 +99,8 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
       {
         editor: this,
         node,
+        payload,
       },
-      payload,
     );
   }
 

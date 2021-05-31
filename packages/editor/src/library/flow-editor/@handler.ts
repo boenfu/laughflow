@@ -78,7 +78,7 @@ const ACTION_HANDLER_DICT: {
     );
   },
   'node:configure-node': (editor, action) => {
-    console.log(editor, action);
+    editor.emitConfig(action.target);
   },
   'node:connect-node': (editor, action) => {
     editor.edit(addNodeNexts(action.position.id, [action.target.id]));

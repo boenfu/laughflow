@@ -4,12 +4,7 @@ import {TaskNodeRuntimeMethodParams} from '@magicflow/task';
 import React from 'react';
 import styled from 'styled-components';
 
-import {
-  EditorRender,
-  IPlugin,
-  SingleNodeEditorRender,
-  ViewerRender,
-} from '../plugin';
+import {EditorRender, IPlugin, NodeEditorRender, ViewerRender} from '../plugin';
 
 import {ConditionOrGroup, CustomConditionCandidate} from './@custom-condition';
 import {ConditionEditor} from './condition-editor';
@@ -113,7 +108,7 @@ export class ConditionPlugin implements IConditionPlugin {
 
   private rightCandidates: CustomConditionCandidate[] = [];
 
-  private singleNode: SingleNodeEditorRender = {
+  private singleNode: NodeEditorRender = {
     before: ({node, prevChildren}) => {
       let definition = node.definition;
 
@@ -209,7 +204,7 @@ export class ConditionPlugin implements IConditionPlugin {
     let singleNode = this.singleNode;
 
     return {
-      singleNode,
+      node: singleNode,
     };
   }
 
@@ -217,7 +212,7 @@ export class ConditionPlugin implements IConditionPlugin {
     let singleNode = this.singleNode;
 
     return {
-      singleNode,
+      node: singleNode,
     };
   }
 
