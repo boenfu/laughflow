@@ -17,6 +17,7 @@ export interface FlowSkeletonContext<
 
   readonly?: boolean;
 
+  nodeNextsRender?(node: TNode): boolean;
   onAction?(action: Action<TFlow>): void;
 }
 

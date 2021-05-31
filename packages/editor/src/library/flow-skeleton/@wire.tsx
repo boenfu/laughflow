@@ -25,7 +25,6 @@ const ARC_RADIUS_DEFAULT = 10;
 const Wrapper = styled(Bezier)`
   width: 0px !important;
   height: 0px !important;
-  cursor: pointer;
 
   .rc-bezier-mark-wrapper {
     height: 16px;
@@ -84,6 +83,7 @@ const MenuItem = styled.div`
   line-height: 16px;
   padding: 6px 12px;
   background-color: #fafafa;
+  user-select: none;
   cursor: pointer;
 
   ${transition(['transform'])}
@@ -233,7 +233,7 @@ const PlusButton: FC<{className?: string}> = ({className}) => {
     <MarkWrapper
       className={classNames({active}, className)}
       style={{
-        zIndex: active ? 2 : 1,
+        zIndex: active ? 3 : 2,
       }}
       ref={ref}
       onClick={onClick}

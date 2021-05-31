@@ -43,6 +43,18 @@ const FlowStart = styled.div`
   z-index: 1;
   cursor: pointer;
 
+  &.start {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 32px;
+    border-color: #296dff;
+    background-color: #296dff;
+    color: #fff;
+    font-size: 12px;
+  }
+
   &.active {
     border-color: #296dff;
   }
@@ -71,12 +83,7 @@ export const Flow: FC<FlowProps> = ({flow, nodeRender, root}) => {
   return (
     <Container className={classNames({readonly})}>
       {root ? (
-        <FlowStart
-          className={classNames({
-            active: isActive(flow),
-          })}
-          onClick={onActiveFlow}
-        />
+        <FlowStart className={classNames(['start'])}>开始</FlowStart>
       ) : !readonly ? (
         <>
           <Wire

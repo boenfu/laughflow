@@ -65,6 +65,7 @@ export const FlowEditor: FC<FlowEditorProps> = forwardRef<
         flow={editor.rootFlow}
         onAction={action => actionHandler(editor, action)}
         nodeRender={SingleNode}
+        nodeNextsRender={node => !node.left}
       >
         <Footer />
       </FlowSkeleton>

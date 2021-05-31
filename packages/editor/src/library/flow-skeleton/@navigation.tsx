@@ -41,7 +41,13 @@ const Right = styled.div`
 `;
 
 export const Navigation: FC = React.memo(() => {
-  const {active, activeState, setActiveState, onAction} = useSkeletonContext();
+  const {
+    active,
+    activeState,
+    setActive,
+    setActiveState,
+    onAction,
+  } = useSkeletonContext();
   const menus: IMenu[] = (active && getMenus?.(active)) || [];
 
   const onNodeMenuClick = (event: MouseEvent<HTMLDivElement>): void => {
@@ -64,6 +70,10 @@ export const Navigation: FC = React.memo(() => {
 
     if (action) {
       onAction?.(action);
+    }
+
+    if (menu.clearActive) {
+      setActive(undefined);
     }
 
     setActiveState(undefined);

@@ -57,6 +57,7 @@ export type FlowSkeletonProps<TFLow extends IFlow> =
 interface FlowSkeletonCommonProps<TFLow extends IFlow> {
   flow: TFLow;
   nodeRender: FC<{node: TFLow['starts'][number]}>;
+  nodeNextsRender?(node: TFLow['starts'][number]): boolean;
 }
 
 interface FlowSkeletonPropsReadonlySegment {
@@ -70,6 +71,7 @@ interface FlowSkeletonPropsEditingSegment<TFLow extends IFlow> {
 export const FlowSkeleton = <TFlow extends IFlow>({
   flow,
   nodeRender,
+  nodeNextsRender,
   children,
   ...props
 }: PropsWithChildren<FlowSkeletonProps<TFlow>>): ReactElement<any, any> => {
@@ -93,6 +95,7 @@ export const FlowSkeleton = <TFlow extends IFlow>({
     isActive,
     activeState,
     setActiveState,
+    nodeNextsRender,
     ...props,
   };
 

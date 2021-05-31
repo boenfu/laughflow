@@ -11,6 +11,7 @@ export interface IMenu {
   title: string;
   tip?: string;
   state?: ActiveState;
+  clearActive?: boolean;
   action?(target: IFlow | INode): Action;
 }
 
@@ -74,6 +75,7 @@ const DeleteMenu: IMenu = {
   type: 'delete',
   icon: Trash,
   title: '删除',
+  clearActive: true,
   action: target =>
     getTypeValue<ActionTypeDict>(target, {
       flow: {

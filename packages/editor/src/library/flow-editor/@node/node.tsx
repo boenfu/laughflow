@@ -1,20 +1,14 @@
-import {Copy, Cut, Jump} from '@magicflow/icons';
+import {Copy, Cut, Jump, Wrong} from '@magicflow/icons';
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
 import classnames from 'classnames';
-import React, {FC, createElement, useContext} from 'react';
+import React, {FC, HtmlHTMLAttributes, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {RESOURCE_WIDTH} from '../../@common';
+import {RESOURCE_WIDTH, transition} from '../../@common';
 import {ActiveState, useSkeletonContext} from '../../flow-skeleton';
 import {FlowEditorContext} from '../flow-editor';
 
 import {Header} from './@header';
-
-const Container = styled.div`
-  * {
-    pointer-events: all !important;
-  }
-`;
 
 const BeforeWrapper = styled.div`
   display: flex;
@@ -122,6 +116,63 @@ const EditingIconWrapper = styled.div`
   z-index: 3;
 `;
 
+const DeleteIcon = styled.div`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: -6px;
+  top: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #e55a3a;
+  color: #fff;
+  font-size: 10px;
+  cursor: pointer;
+  opacity: 0;
+
+  ${transition(['opacity'])}
+  transition-delay: 0.2s;
+`;
+
+const LinkNode = styled.div`
+  min-width: 64px;
+  max-width: 110px;
+  padding: 8px 12px;
+  height: 16px;
+  line-height: 16px;
+  font-size: 12px;
+  margin: 0 14px;
+  background-color: #ffffff;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.07);
+  border-radius: 28px;
+`;
+
+const Container = styled.div`
+  position: relative;
+
+  &:hover {
+    ${DeleteIcon} {
+      opacity: 1;
+    }
+  }
+
+  > ${LinkNode} + ${DeleteIcon} {
+    right: 8px;
+  }
+`;
+
+const DeleteButton: FC<HtmlHTMLAttributes<HTMLDivElement>> = ({...props}) => {
+  return (
+    <DeleteIcon {...props}>
+      <Wrong />
+    </DeleteIcon>
+  );
+};
+
 const STATE_ICON_DICT: Partial<
   {[key in NonNullable<ActiveState>]: React.ElementType}
 > = {
@@ -150,12 +201,21 @@ export interface SingleNodeProps {
 }
 
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
-  if (node.left) {
-    return <div>断电</div>;
-  }
-
   const {editor} = useContext(FlowEditorContext);
   const {active: activeSource, activeState} = useSkeletonContext();
+
+  const onDisconnectClick = (): void => {};
+
+  const onDeleteClick = (): void => {};
+
+  if (node.left) {
+    return (
+      <Container onClick={event => event.stopPropagation()}>
+        <LinkNode>{node.definition.displayName}</LinkNode>
+        <DeleteButton onClick={onDisconnectClick} />
+      </Container>
+    );
+  }
 
   let {before, after, footer, body} = editor.nodeRenderDescriptor['singleNode'];
 
@@ -183,6 +243,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
           editing,
         ])}
       >
+        <DeleteButton onClick={onDeleteClick} />
         <Header node={node} />
         <Body>
           {body?.reduce(

@@ -14,6 +14,7 @@ import {
 import {insertNodeAsFlowStart} from './@insert-node-as-flow-start';
 import {insertNodeBeforeNexts} from './@insert-node-before-nexts';
 import {insertNodeBetweenNodes} from './@insert-node-between-nodes';
+import {createFlow} from './create-flow';
 
 export interface CreateNodeOperatorParam {
   from: NodeId;
@@ -25,10 +26,16 @@ const addNode: OperatorFunction<[NodeType, (value: NodeId) => Operator]> = (
   type,
   callback,
 ) => {
-  return out(
-    _addNode(type === 'singleNode' ? createNodeHelper() : createBranchesNode()),
-    node => callback(node.id),
-  );
+  if (type === 'singleNode') {
+    return out(_addNode(createNodeHelper()), node => callback(node.id));
+  }
+
+  return out(_addNode(createBranchesNode()), node => [
+    createFlow({
+      node: node.id,
+    }),
+    callback(node.id),
+  ]);
 };
 
 /**

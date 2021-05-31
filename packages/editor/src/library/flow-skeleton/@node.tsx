@@ -98,10 +98,31 @@ export interface NodeProps {
 }
 
 export const Node: FC<NodeProps> = ({node, component: Component}) => {
-  const {readonly, setActive, isActive, onAction} = useSkeletonContext();
+  const {
+    readonly,
+    active,
+    activeState,
+    setActive,
+    isActive,
+    nodeNextsRender,
+    onAction,
+  } = useSkeletonContext();
 
   const onActiveNode = (event: MouseEvent): void => {
     event.stopPropagation();
+
+    if (activeState === 'connecting') {
+      onAction?.({
+        type: 'node:connect-node',
+        target: active as INode,
+        position: node,
+      });
+
+      setActive(undefined);
+
+      return;
+    }
+
     setActive(node);
   };
 
@@ -122,6 +143,8 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
       };
 
   let multi = nexts.length > 1;
+
+  let toRenderNodeNexts = nodeNextsRender ? nodeNextsRender(node) : true;
 
   return (
     <Container>
@@ -145,32 +168,34 @@ export const Node: FC<NodeProps> = ({node, component: Component}) => {
         </NodeWrapper>
       )}
 
-      <Row
-        className={classNames({
-          multi,
-          leaf: !nexts.length,
-        })}
-      >
-        {nexts.length ? (
-          nexts.map((next, index, array) => {
-            return (
-              <Fragment key={`${next.id}-${index}`}>
-                <Wire
-                  startNode={['parent', 'previousSibling']}
-                  start={node}
-                  next={next}
-                  first={index === 0 && array.length > 1}
-                  last={index === array.length - 1 && array.length > 1}
-                  multiMark={multi}
-                />
-                <Node node={next} component={Component} />
-              </Fragment>
-            );
-          })
-        ) : !readonly ? (
-          <Wire startNode={['parent', 'previousSibling']} start={node} />
-        ) : undefined}
-      </Row>
+      {toRenderNodeNexts && (
+        <Row
+          className={classNames({
+            multi,
+            leaf: !nexts.length,
+          })}
+        >
+          {nexts.length ? (
+            nexts.map((next, index, array) => {
+              return (
+                <Fragment key={`${next.id}-${index}`}>
+                  <Wire
+                    startNode={['parent', 'previousSibling']}
+                    start={node}
+                    next={next}
+                    first={index === 0 && array.length > 1}
+                    last={index === array.length - 1 && array.length > 1}
+                    multiMark={multi}
+                  />
+                  <Node node={next} component={Component} />
+                </Fragment>
+              );
+            })
+          ) : !readonly ? (
+            <Wire startNode={['parent', 'previousSibling']} start={node} />
+          ) : undefined}
+        </Row>
+      )}
     </Container>
   );
 };
