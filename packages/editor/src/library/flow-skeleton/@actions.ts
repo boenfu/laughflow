@@ -30,6 +30,7 @@ type _NodeAction<
   | AddNodeAction<TNode>
   | AddBranchesNodeAction<TNode>
   | ConnectNodeAction<TNode>
+  | DisconnectNodeAction<TNode>
   | NodeActionWithPresetPosition<'add', TFlow, undefined>
   | NodeActionWithPresetPosition<'move', TFlow, TNode>
   | NodeActionWithPresetPosition<'copy', TFlow, TNode>
@@ -87,6 +88,8 @@ type AddBranchesNodeAction<T extends IFlow | INode> = IAction<
 type AddFlowAction<T extends INode> = IAction<'add-flow', T>;
 
 type ConnectNodeAction<T extends INode> = IAction<'connect-node', T, T>;
+
+type DisconnectNodeAction<T extends INode> = IAction<'disconnect-node', T>;
 
 export interface SuffixToPosition<
   TFlow extends IFlow = IFlow,

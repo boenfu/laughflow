@@ -13,6 +13,7 @@ import {
   createNodeAsFlowStart,
   createNodeBeforeNexts,
   createNodeBetweenNodes,
+  deleteLinkNode,
   deleteNode,
   pasteNodeAsFlowStart,
   pasteNodeBeforeNexts,
@@ -82,21 +83,25 @@ const ACTION_HANDLER_DICT: {
   'node:connect-node': (editor, action) => {
     editor.edit(addNodeNexts(action.position.id, [action.target.id]));
   },
+  'node:disconnect-node': (editor, {target}) => {
+    editor.edit(deleteLinkNode(target));
+  },
   'node:copy-after-flow': (editor, action) => {
     editor.edit(
       pasteNodeAsFlowStart({
         flow: action.position[0].id,
-        type: 'copy',
         node: action.target,
+        originStart: 'all',
+        type: 'copy',
       }),
     );
   },
   'node:copy-after-node': (editor, action) => {
     editor.edit(
       pasteNodeBeforeNexts({
-        type: 'copy',
         node: action.target,
         from: action.position[0].id,
+        type: 'copy',
       }),
     );
   },
@@ -113,10 +118,10 @@ const ACTION_HANDLER_DICT: {
   'node:copy-between-nodes': (editor, action) => {
     editor.edit(
       pasteNodeBetweenNodes({
-        type: 'copy',
         node: action.target,
         from: action.position[0].id,
         to: action.position[1].id,
+        type: 'copy',
       }),
     );
   },
@@ -127,17 +132,18 @@ const ACTION_HANDLER_DICT: {
     editor.edit(
       pasteNodeAsFlowStart({
         flow: action.position[0].id,
-        type: 'move',
         node: action.target,
+        originStart: 'all',
+        type: 'move',
       }),
     );
   },
   'node:move-after-node': (editor, action) => {
     editor.edit(
       pasteNodeBeforeNexts({
-        type: 'move',
         node: action.target,
         from: action.position[0].id,
+        type: 'move',
       }),
     );
   },
@@ -154,10 +160,10 @@ const ACTION_HANDLER_DICT: {
   'node:move-between-nodes': (editor, action) => {
     editor.edit(
       pasteNodeBetweenNodes({
-        type: 'move',
         node: action.target,
         from: action.position[0].id,
         to: action.position[1].id,
+        type: 'move',
       }),
     );
   },

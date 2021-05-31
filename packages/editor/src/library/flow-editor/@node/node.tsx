@@ -202,11 +202,21 @@ export interface SingleNodeProps {
 
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
   const {editor} = useContext(FlowEditorContext);
-  const {active: activeSource, activeState} = useSkeletonContext();
+  const {active: activeSource, activeState, onAction} = useSkeletonContext();
 
-  const onDisconnectClick = (): void => {};
+  const onDisconnectClick = (): void =>
+    onAction?.({
+      type: 'node:disconnect-node',
+      target: node,
+      position: undefined,
+    });
 
-  const onDeleteClick = (): void => {};
+  const onDeleteClick = (): void =>
+    onAction?.({
+      type: 'node:delete',
+      target: node,
+      position: undefined,
+    });
 
   if (node.left) {
     return (

@@ -1,3 +1,4 @@
+import {useKeyPress} from 'ahooks';
 import React, {
   FC,
   PropsWithChildren,
@@ -102,6 +103,10 @@ export const FlowSkeleton = <TFlow extends IFlow>({
   useEffect(() => {
     setActiveState(undefined);
   }, [active]);
+
+  useKeyPress('esc', () =>
+    activeState ? setActiveState(undefined) : setActive(undefined),
+  );
 
   return (
     <Wrapper className="flow-skeleton">

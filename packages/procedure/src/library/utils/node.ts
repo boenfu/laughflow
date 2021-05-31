@@ -61,5 +61,6 @@ export function copyNode<TNode extends Node>(node: TNode): TNode {
   return {
     ...node,
     id: createId(),
+    nexts: [],
   };
 }

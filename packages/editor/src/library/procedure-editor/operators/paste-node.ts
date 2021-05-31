@@ -87,7 +87,7 @@ export const pasteNodeAsFlowStart: OperatorFunction<
       flow: FlowId;
       type: PasteNodeOperatorParam['type'];
       node: PasteNodeOperatorParam['node'];
-      originStart?: NodeId;
+      originStart?: NodeId | 'all';
     },
   ]
 > = ({flow, type, node, originStart}) =>
