@@ -1,10 +1,10 @@
-import {ProcedureSingleTreeNode} from '@magicflow/procedure';
-import {TaskSingleNode} from '@magicflow/task';
-import React, {FC, createElement} from 'react';
+import {ProcedureSingleTreeNode, SingleNode} from '@magicflow/procedure';
+import {updateNode} from '@magicflow/procedure/operators';
+import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {transition} from '../../../../@common';
-import {useViewerContext} from '../../../../flow-context';
+import {transition} from '../../../@common';
+import {FlowViewerContext} from '../../flow-viewer';
 
 import {DisplayName} from './@displayName';
 
@@ -30,13 +30,16 @@ const HeaderExtra = styled.div`
 
 export interface HeaderProps {
   node: ProcedureSingleTreeNode;
-  taskNode?: TaskSingleNode;
 }
 
-export const Header: FC<HeaderProps> = ({node, taskNode}) => {
-  const viewer = useViewerContext();
+export const Header: FC<HeaderProps> = ({node}) => {
+  const {editor} = useContext(FlowViewerContext);
 
-  let {headLeft, headRight} = viewer.nodeRenderDescriptor['singleNode'];
+  const onNodeChange = (node: SingleNode): void => {
+    void editor.edit(updateNode(node));
+  };
+
+  let {headLeft, headRight} = editor.nodeRenderDescriptor.node;
 
   return (
     <Wrapper className="header">
@@ -46,7 +49,6 @@ export const Header: FC<HeaderProps> = ({node, taskNode}) => {
             (reactNode, component) =>
               createElement(component, {
                 node,
-                taskNode,
                 prevChildren: reactNode,
               }),
             <></>,
@@ -55,14 +57,13 @@ export const Header: FC<HeaderProps> = ({node, taskNode}) => {
       ) : undefined}
       <></>
 
-      <DisplayName node={node.definition} />
+      <DisplayName node={node.definition} onChange={onNodeChange} />
       {headRight?.length ? (
         <HeaderExtra>
           {headRight.reduce(
             (reactNode, component) =>
               createElement(component, {
                 node,
-                taskNode,
                 prevChildren: reactNode,
               }),
             <></>,

@@ -13,13 +13,23 @@ import {ConditionList} from './condition-list';
 declare global {
   namespace Magicflow {
     interface SingleNodeExtension {
-      enterConditions?: ConditionOrGroup;
-      visibleConditions?: ConditionOrGroup;
+      conditions?: {
+        enter?: ConditionOrGroup;
+        visible?: ConditionOrGroup;
+        continue?: ConditionOrGroup;
+        done?: ConditionOrGroup;
+        terminate?: ConditionOrGroup;
+      };
     }
 
     interface BranchesNodeExtension {
-      enterConditions?: ConditionOrGroup;
-      visibleConditions?: ConditionOrGroup;
+      conditions?: {
+        enter?: ConditionOrGroup;
+        visible?: ConditionOrGroup;
+        continue?: ConditionOrGroup;
+        done?: ConditionOrGroup;
+        terminate?: ConditionOrGroup;
+      };
     }
   }
 }
@@ -112,7 +122,7 @@ export class ConditionPlugin implements IConditionPlugin {
     before: ({node, prevChildren}) => {
       let definition = node.definition;
 
-      if (!definition.enterConditions?.length) {
+      if (!definition.conditions?.enter?.length) {
         return <>{prevChildren}</>;
       }
 
@@ -126,7 +136,7 @@ export class ConditionPlugin implements IConditionPlugin {
           <ConditionList
             leftCandidates={this.leftCandidates}
             rightCandidates={this.rightCandidates}
-            conditions={definition.enterConditions}
+            conditions={definition.conditions.enter}
           />
           <ConnectArrow>
             <ArrowDown />
@@ -139,7 +149,7 @@ export class ConditionPlugin implements IConditionPlugin {
 
       return (
         <>
-          {definition.visibleConditions?.length ? (
+          {definition.conditions?.visible?.length ? (
             <NodeBodyWrapper
               onClick={event => {
                 event.stopPropagation();
@@ -150,7 +160,7 @@ export class ConditionPlugin implements IConditionPlugin {
               <ConditionList
                 leftCandidates={this.leftCandidates}
                 rightCandidates={this.rightCandidates}
-                conditions={definition.visibleConditions}
+                conditions={definition.conditions.visible}
               />
             </NodeBodyWrapper>
           ) : undefined}
@@ -179,40 +189,36 @@ export class ConditionPlugin implements IConditionPlugin {
     nodeBroken: params => {
       let {definition} = params;
 
-      if (!definition.enterConditions) {
+      if (!definition.conditions?.enter) {
         return false;
       }
 
-      return !evaluate(definition.enterConditions, name =>
+      return !evaluate(definition.conditions.enter, name =>
         this.resolver(name, params),
       );
     },
     nodeIgnored: params => {
       let {definition} = params;
 
-      if (!definition.visibleConditions) {
+      if (!definition.conditions?.visible) {
         return false;
       }
 
-      return !evaluate(definition.visibleConditions, name =>
+      return !evaluate(definition.conditions.visible, name =>
         this.resolver(name, params),
       );
     },
   };
 
   get editor(): EditorRender {
-    let singleNode = this.singleNode;
-
     return {
-      node: singleNode,
+      node: this.singleNode,
     };
   }
 
   get viewer(): ViewerRender {
-    let singleNode = this.singleNode;
-
     return {
-      node: singleNode,
+      node: this.singleNode,
     };
   }
 
