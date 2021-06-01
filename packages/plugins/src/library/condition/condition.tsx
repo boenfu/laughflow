@@ -1,12 +1,17 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import {evaluate} from '@magicflow/condition';
 import {ArrowDown} from '@magicflow/icons';
 import {TaskNodeRuntimeMethodParams} from '@magicflow/task';
-import React from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import styled from 'styled-components';
 
 import {EditorRender, IPlugin, NodeEditorRender, ViewerRender} from '../plugin';
 
-import {ConditionOrGroup, CustomConditionCandidate} from './@custom-condition';
+import {
+  ConditionOrGroup,
+  CustomCondition,
+  CustomConditionCandidate,
+} from './@custom-condition';
 import {ConditionEditor} from './condition-editor';
 import {ConditionList} from './condition-list';
 
@@ -168,24 +173,34 @@ export class ConditionPlugin implements IPlugin<ConditionProps> {
         </>
       );
     },
-    config: ({value: definition, onChange, mode}) => {
+    config: ({value: definition, onChange: onDefinitionChange, mode}) => {
       let conditionField: 'visible' | 'enter' =
         mode === 'enter' ? 'visible' : 'enter';
+
+      const [editingDefinition, setDefinition] = useState(definition);
+
+      useEffect(() => {
+        onDefinitionChange?.(editingDefinition);
+      }, [editingDefinition, onDefinitionChange]);
+
+      const onChange = useCallback(
+        conditions =>
+          setDefinition({
+            ...editingDefinition,
+            conditions: {
+              ...editingDefinition.conditions,
+              [mode === 'enter' ? 'visible' : 'enter']: conditions,
+            },
+          }),
+        [editingDefinition, mode, setDefinition],
+      );
 
       return (
         <ConditionEditor
           leftCandidates={this.leftCandidates}
           rightCandidates={this.rightCandidates}
-          conditions={definition.conditions?.[conditionField]}
-          onChange={conditions =>
-            onChange?.({
-              ...definition,
-              conditions: {
-                ...definition.conditions,
-                [conditionField]: conditions,
-              },
-            })
-          }
+          conditions={editingDefinition.conditions?.[conditionField]}
+          onChange={onChange}
         />
       );
     },
@@ -199,9 +214,15 @@ export class ConditionPlugin implements IPlugin<ConditionProps> {
         return false;
       }
 
-      return !evaluate(definition.conditions.enter, name =>
-        this.resolver(name, params),
+      let condition = definition.conditions.enter.map(
+        (andGroup): CustomCondition[] =>
+          andGroup.filter(
+            (condition): condition is CustomCondition =>
+              !!(condition.left && condition.operator && condition.right),
+          ),
       );
+
+      return !evaluate(condition, name => this.resolver(name, params));
     },
     nodeIgnored: params => {
       let {definition} = params;
@@ -210,9 +231,15 @@ export class ConditionPlugin implements IPlugin<ConditionProps> {
         return false;
       }
 
-      return !evaluate(definition.conditions.visible, name =>
-        this.resolver(name, params),
+      let condition = definition.conditions.visible.map(
+        (andGroup): CustomCondition[] =>
+          andGroup.filter(
+            (condition): condition is CustomCondition =>
+              !!(condition.left && condition.operator && condition.right),
+          ),
       );
+
+      return !evaluate(condition, name => this.resolver(name, params));
     },
   };
 

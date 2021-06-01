@@ -7,7 +7,7 @@ export type PluginRenderComponent = ComponentType<{
   prevChildren?: ReactNode;
 }>;
 
-export type PluginConfigComponent<TProps = {}> = ComponentType<
+export type PluginConfigComponent<TProps = any> = ComponentType<
   TProps & {
     node: ProcedureSingleTreeNode;
     value: SingleNode;
@@ -15,7 +15,7 @@ export type PluginConfigComponent<TProps = {}> = ComponentType<
   }
 >;
 
-export interface NodeEditorRender<TConfigExtraProps = {}> {
+export interface NodeEditorRender<TConfigExtraProps = any> {
   before?: PluginRenderComponent;
   after?: PluginRenderComponent;
   headLeft?: PluginRenderComponent;
@@ -27,7 +27,7 @@ export interface NodeEditorRender<TConfigExtraProps = {}> {
 
 export type NodeViewerRender = Omit<NodeEditorRender, 'config'>;
 
-export interface EditorRender<TConfigExtraProps = {}> {
+export interface EditorRender<TConfigExtraProps = any> {
   node?: NodeEditorRender<TConfigExtraProps>;
 }
 
@@ -35,7 +35,7 @@ export interface ViewerRender {
   node?: NodeViewerRender;
 }
 
-export interface IPlugin<TConfigExtraProps = {}> {
+export interface IPlugin<TConfigExtraProps = any> {
   name: string;
 
   editor?: EditorRender<TConfigExtraProps>;

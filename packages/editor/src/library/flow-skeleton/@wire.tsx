@@ -391,7 +391,7 @@ function getGeneratePath({
 
 function formatPoint({x, y}: BezierPoint): BezierPoint {
   return {
-    x: +x.toFixed(2),
-    y: +y.toFixed(2),
+    x: +x.toFixed(0),
+    y: +y.toFixed(0),
   };
 }

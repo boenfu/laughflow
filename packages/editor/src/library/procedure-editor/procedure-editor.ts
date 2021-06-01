@@ -89,7 +89,11 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
 
                     return createElement<
                       NonNullable<PluginConfigComponent['defaultProps']>
-                    >(Component, {node, value: node.definition, onChange});
+                    >(Component, {
+                      node,
+                      value: node.definition,
+                      onChange,
+                    });
                   },
                 ]
               : undefined,

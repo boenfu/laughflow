@@ -1,5 +1,10 @@
 import {IPlugin} from '@magicflow/plugins';
-import {ProcedureDefinition} from '@magicflow/procedure';
+import {
+  ProcedureBranchesTreeNode,
+  ProcedureDefinition,
+  ProcedureFlow,
+  ProcedureSingleTreeNode,
+} from '@magicflow/procedure';
 import {useCreation, useKeyPress, useUpdate} from 'ahooks';
 import React, {
   ComponentType,
@@ -75,9 +80,71 @@ export const FlowEditor: FC<FlowEditorProps> = forwardRef<
         onAction={action => actionHandler(editor, action)}
         nodeRender={SingleNode}
         nodeNextsRender={node => !node.left}
+        activeFormatter={active => findFlowById(editor.rootFlow, active.id)}
       >
         <Footer />
       </FlowSkeleton>
     </FlowEditorContext.Provider>
   );
 });
+
+function findFlowById(
+  procedureFlow: ProcedureFlow,
+  id: string,
+):
+  | ProcedureSingleTreeNode
+  | ProcedureBranchesTreeNode
+  | ProcedureFlow
+  | undefined {
+  if (procedureFlow.id === id) {
+    return procedureFlow;
+  }
+
+  for (let node of procedureFlow.starts) {
+    let ret = findNodeById(node, id);
+
+    if (ret) {
+      return ret;
+    }
+  }
+
+  return undefined;
+}
+
+function findNodeById(
+  node: ProcedureSingleTreeNode | ProcedureBranchesTreeNode,
+  id: string,
+):
+  | ProcedureSingleTreeNode
+  | ProcedureBranchesTreeNode
+  | ProcedureFlow
+  | undefined {
+  if (node.id === id) {
+    return node;
+  }
+
+  // 在 flow editor 中，link 节点无法被选中
+  if (node.left) {
+    return undefined;
+  }
+
+  if ('flows' in node) {
+    for (let flow of node.flows) {
+      let ret = findFlowById(flow, id);
+
+      if (ret) {
+        return ret;
+      }
+    }
+  }
+
+  for (let next of node.nexts) {
+    let ret = findNodeById(next, id);
+
+    if (ret) {
+      return ret;
+    }
+  }
+
+  return undefined;
+}

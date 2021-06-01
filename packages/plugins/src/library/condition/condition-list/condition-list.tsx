@@ -87,25 +87,29 @@ export const ConditionList: FC<ConditionListProps> = ({
             return (
               <ConditionLine key={conditionIndex}>
                 <DisplayText>
-                  {leftCandidatesKeyToDisplayNameMap.get(
-                    `${left.type}:${
-                      'value' in left ? left.value : left.variable
-                    }`,
-                  ) ||
-                    ('value' in left
-                      ? `值: ${left.value}`
-                      : `变量: ${left.variable}`)}
+                  {left &&
+                    (leftCandidatesKeyToDisplayNameMap.get(
+                      `${left.type}:${
+                        'value' in left ? left.value : left.variable
+                      }`,
+                    ) ||
+                      ('value' in left
+                        ? `值: ${left.value}`
+                        : `变量: ${left.variable}`))}
                 </DisplayText>
-                <OperatorText>{getOperatorDisplayName(operator)}</OperatorText>
+                <OperatorText>
+                  {operator && getOperatorDisplayName(operator)}
+                </OperatorText>
                 <DisplayText>
-                  {rightCandidatesKeyToDisplayNameMap.get(
-                    `${right.type}:${
-                      'value' in right ? right.value : right.variable
-                    }`,
-                  ) ||
-                    ('value' in right
-                      ? `值: ${right.value}`
-                      : `变量: ${right.variable}`)}
+                  {right &&
+                    (rightCandidatesKeyToDisplayNameMap.get(
+                      `${right.type}:${
+                        'value' in right ? right.value : right.variable
+                      }`,
+                    ) ||
+                      ('value' in right
+                        ? `值: ${right.value}`
+                        : `变量: ${right.variable}`))}
                 </DisplayText>
               </ConditionLine>
             );

@@ -13,7 +13,7 @@ export interface CustomCondition extends Condition {
   right: CustomOperant;
 }
 
-export type ConditionAndGroup = CustomCondition[];
+export type ConditionAndGroup = Partial<CustomCondition>[];
 export type ConditionOrGroup = ConditionAndGroup[];
 
 export interface CustomConditionCandidate {

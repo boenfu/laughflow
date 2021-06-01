@@ -67,6 +67,14 @@ interface FlowSkeletonPropsReadonlySegment {
 
 interface FlowSkeletonPropsEditingSegment<TFLow extends IFlow> {
   onAction: FlowSkeletonContext<TFLow>['onAction'];
+  /**
+   * 因 props flow 可以传入引用完全不同的对象，
+   * 此时 active 存储的内容可能与新 flow 中的内容有差异或已不存在
+   * @param active
+   */
+  activeFormatter?(
+    active: TFLow | TFLow['starts'][number],
+  ): TFLow | TFLow['starts'][number] | undefined;
 }
 
 export const FlowSkeleton = <TFlow extends IFlow>({
@@ -103,6 +111,15 @@ export const FlowSkeleton = <TFlow extends IFlow>({
   useEffect(() => {
     setActiveState(undefined);
   }, [active]);
+
+  useEffect(() => {
+    if (!('activeFormatter' in props) || !props.activeFormatter || !active) {
+      return;
+    }
+
+    setActive(props.activeFormatter(active as any));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flow, setActive]);
 
   useKeyPress('esc', () =>
     activeState ? setActiveState(undefined) : setActive(undefined),
