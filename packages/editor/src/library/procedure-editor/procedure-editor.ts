@@ -1,4 +1,8 @@
-import {IPlugin, PluginConfigComponent} from '@magicflow/plugins';
+import {
+  IPlugin,
+  NodeEditorRender,
+  PluginConfigComponent,
+} from '@magicflow/plugins';
 import {
   Procedure,
   ProcedureDefinition,
@@ -13,9 +17,7 @@ import {createEmptyProcedure} from '@magicflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
 import {enableAllPlugins, produce} from 'immer';
 import {compact, fromPairs} from 'lodash-es';
-import {createElement} from 'react';
-
-import {NodeRenderDescriptor, buildNodeRenderDescriptor} from '../@common';
+import {ComponentType, createElement} from 'react';
 
 import {UndoStack} from './@undo-stack';
 
@@ -121,4 +123,42 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
 
     this.nodeRenderDescriptor = buildNodeRenderDescriptor(plugins, 'editor');
   }
+}
+
+export interface NodeRenderDescriptor {
+  node: Partial<Record<keyof NodeEditorRender<unknown>, ComponentType<any>[]>>;
+}
+
+export function buildNodeRenderDescriptor(
+  plugins: IPlugin[],
+  type: 'editor' | 'viewer',
+): NodeRenderDescriptor {
+  let nodeRenderDescriptor: NodeRenderDescriptor = {
+    node: {
+      before: [],
+      after: [],
+      headLeft: [],
+      headRight: [],
+      body: [],
+      footer: [],
+      config: [],
+    },
+  };
+
+  for (let plugin of plugins) {
+    let {node} = plugin[type] || {};
+
+    if (node) {
+      for (let [name, component] of Object.entries(node)) {
+        if (component) {
+          // eslint-disable-next-line @mufan/no-unnecessary-type-assertion
+          nodeRenderDescriptor['node'][
+            name as keyof NodeRenderDescriptor['node']
+          ]!.push(component);
+        }
+      }
+    }
+  }
+
+  return nodeRenderDescriptor;
 }

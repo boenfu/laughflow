@@ -5,7 +5,7 @@ import {TaskNodeRuntimeMethodParams} from '@magicflow/task';
 import React, {useCallback, useEffect, useState} from 'react';
 import styled from 'styled-components';
 
-import {EditorRender, IPlugin, NodeEditorRender, ViewerRender} from '../plugin';
+import {EditorRender, IPlugin, ViewerRender} from '../plugin';
 
 import {
   ConditionOrGroup,
@@ -123,89 +123,6 @@ export class ConditionPlugin implements IPlugin<ConditionProps> {
 
   private rightCandidates: CustomConditionCandidate[] = [];
 
-  private singleNode: NodeEditorRender<ConditionProps> = {
-    before: ({node, prevChildren}) => {
-      let definition = node.definition;
-
-      if (!definition.conditions?.enter?.length) {
-        return <>{prevChildren}</>;
-      }
-
-      return (
-        <NodeBeforeWrapper
-          onClick={event => {
-            event.stopPropagation();
-            // editor.emitConfig(node, 'enter');
-          }}
-        >
-          <ConditionList
-            leftCandidates={this.leftCandidates}
-            rightCandidates={this.rightCandidates}
-            conditions={definition.conditions.enter}
-          />
-          <ConnectArrow>
-            <ArrowDown />
-          </ConnectArrow>
-        </NodeBeforeWrapper>
-      );
-    },
-    body: ({node, prevChildren}) => {
-      let definition = node.definition;
-
-      return (
-        <>
-          {definition.conditions?.visible?.length ? (
-            <NodeBodyWrapper
-              onClick={event => {
-                event.stopPropagation();
-                // editor.emitConfig(node, 'visible');
-              }}
-            >
-              <ConditionName>展示条件</ConditionName>
-              <ConditionList
-                leftCandidates={this.leftCandidates}
-                rightCandidates={this.rightCandidates}
-                conditions={definition.conditions.visible}
-              />
-            </NodeBodyWrapper>
-          ) : undefined}
-          {prevChildren}
-        </>
-      );
-    },
-    config: ({value: definition, onChange: onDefinitionChange, mode}) => {
-      let conditionField: 'visible' | 'enter' =
-        mode === 'enter' ? 'visible' : 'enter';
-
-      const [editingDefinition, setDefinition] = useState(definition);
-
-      useEffect(() => {
-        onDefinitionChange?.(editingDefinition);
-      }, [editingDefinition, onDefinitionChange]);
-
-      const onChange = useCallback(
-        conditions =>
-          setDefinition({
-            ...editingDefinition,
-            conditions: {
-              ...editingDefinition.conditions,
-              [mode === 'enter' ? 'visible' : 'enter']: conditions,
-            },
-          }),
-        [editingDefinition, mode, setDefinition],
-      );
-
-      return (
-        <ConditionEditor
-          leftCandidates={this.leftCandidates}
-          rightCandidates={this.rightCandidates}
-          conditions={editingDefinition.conditions?.[conditionField]}
-          onChange={onChange}
-        />
-      );
-    },
-  };
-
   task: IPlugin['task'] = {
     nodeBroken: params => {
       let {definition} = params;
@@ -245,13 +162,94 @@ export class ConditionPlugin implements IPlugin<ConditionProps> {
 
   get editor(): EditorRender<ConditionProps> {
     return {
-      node: this.singleNode,
+      node: {
+        before: ({node, prevChildren}) => {
+          let definition = node.definition;
+
+          if (!definition.conditions?.enter?.length) {
+            return <>{prevChildren}</>;
+          }
+
+          return (
+            <NodeBeforeWrapper
+              onClick={event => {
+                event.stopPropagation();
+                // editor.emitConfig(node, 'enter');
+              }}
+            >
+              <ConditionList
+                leftCandidates={this.leftCandidates}
+                rightCandidates={this.rightCandidates}
+                conditions={definition.conditions.enter}
+              />
+              <ConnectArrow>
+                <ArrowDown />
+              </ConnectArrow>
+            </NodeBeforeWrapper>
+          );
+        },
+        body: ({node, prevChildren}) => {
+          let definition = node.definition;
+
+          return (
+            <>
+              {definition.conditions?.visible?.length ? (
+                <NodeBodyWrapper
+                  onClick={event => {
+                    event.stopPropagation();
+                    // editor.emitConfig(node, 'visible');
+                  }}
+                >
+                  <ConditionName>展示条件</ConditionName>
+                  <ConditionList
+                    leftCandidates={this.leftCandidates}
+                    rightCandidates={this.rightCandidates}
+                    conditions={definition.conditions.visible}
+                  />
+                </NodeBodyWrapper>
+              ) : undefined}
+              {prevChildren}
+            </>
+          );
+        },
+        config: ({value: definition, onChange: onDefinitionChange, mode}) => {
+          let conditionField: 'visible' | 'enter' =
+            mode === 'enter' ? 'visible' : 'enter';
+
+          const [editingDefinition, setDefinition] = useState(definition);
+
+          useEffect(() => {
+            onDefinitionChange?.(editingDefinition);
+          }, [editingDefinition, onDefinitionChange]);
+
+          const onChange = useCallback(
+            conditions =>
+              setDefinition({
+                ...editingDefinition,
+                conditions: {
+                  ...editingDefinition.conditions,
+                  [mode === 'enter' ? 'visible' : 'enter']: conditions,
+                },
+              }),
+            [editingDefinition, mode, setDefinition],
+          );
+
+          return (
+            <ConditionEditor
+              leftCandidates={this.leftCandidates}
+              rightCandidates={this.rightCandidates}
+              conditions={editingDefinition.conditions?.[conditionField]}
+              onChange={onChange}
+            />
+          );
+        },
+      },
     };
   }
 
   get viewer(): ViewerRender {
     return {
-      node: this.singleNode,
+      node: {},
     };
   }
 

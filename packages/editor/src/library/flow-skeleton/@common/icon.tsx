@@ -1,6 +1,6 @@
 import {css} from 'styled-components';
 
-import {transition} from './transition';
+import {transition} from '../../@common';
 
 export const Icon = css`
   opacity: 1;

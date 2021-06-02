@@ -5,9 +5,10 @@ import {Bezier, BezierPoint, BezierProps, BezierStroke, Mark} from 'rc-bezier';
 import React, {FC, MouseEvent, createContext, useContext, useRef} from 'react';
 import styled from 'styled-components';
 
-import {Icon, transition} from '../@common';
+import {transition} from '../@common';
 
 import {Action, SuffixToPosition} from './@actions';
+import {Icon} from './@common';
 import {useSkeletonContext} from './context';
 import {IFlow, INode} from './flow-skeleton';
 

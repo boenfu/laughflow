@@ -1,9 +1,9 @@
 import {ProcedureSingleTreeNode, SingleNode} from '@magicflow/procedure';
-import {ITaskRuntime} from '@magicflow/task';
+import {ITaskRuntime, TaskSingleNode} from '@magicflow/task';
 import {ComponentType, ReactNode} from 'react';
 
-export type PluginRenderComponent = ComponentType<{
-  node: ProcedureSingleTreeNode;
+export type PluginRenderComponent<TNode> = ComponentType<{
+  node: TNode;
   prevChildren?: ReactNode;
 }>;
 
@@ -15,24 +15,24 @@ export type PluginConfigComponent<TProps = any> = ComponentType<
   }
 >;
 
-export interface NodeEditorRender<TConfigExtraProps = any> {
-  before?: PluginRenderComponent;
-  after?: PluginRenderComponent;
-  headLeft?: PluginRenderComponent;
-  headRight?: PluginRenderComponent;
-  body?: PluginRenderComponent;
-  footer?: PluginRenderComponent;
+export interface NodeEditorRender<TNode, TConfigExtraProps = any> {
+  before?: PluginRenderComponent<TNode>;
+  after?: PluginRenderComponent<TNode>;
+  headLeft?: PluginRenderComponent<TNode>;
+  headRight?: PluginRenderComponent<TNode>;
+  body?: PluginRenderComponent<TNode>;
+  footer?: PluginRenderComponent<TNode>;
   config?: PluginConfigComponent<TConfigExtraProps>;
 }
 
-export type NodeViewerRender = Omit<NodeEditorRender, 'config'>;
+export type NodeViewerRender<TNode> = Omit<NodeEditorRender<TNode>, 'config'>;
 
 export interface EditorRender<TConfigExtraProps = any> {
-  node?: NodeEditorRender<TConfigExtraProps>;
+  node?: NodeEditorRender<ProcedureSingleTreeNode, TConfigExtraProps>;
 }
 
 export interface ViewerRender {
-  node?: NodeViewerRender;
+  node?: NodeViewerRender<TaskSingleNode>;
 }
 
 export interface IPlugin<TConfigExtraProps = any> {

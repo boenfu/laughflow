@@ -66,7 +66,11 @@ export const ConditionEditor: FC<ConditionEditorProps> = ({
 
   return (
     <ConditionContext.Provider
-      value={{renderDefinition, leftCandidates, rightCandidates}}
+      value={{
+        renderDefinition,
+        leftCandidates,
+        rightCandidates,
+      }}
     >
       <Wrapper>
         {orGroup.map((andGroup, index) => (

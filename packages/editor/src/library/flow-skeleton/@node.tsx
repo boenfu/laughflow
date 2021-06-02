@@ -3,8 +3,9 @@ import classNames from 'classnames';
 import React, {FC, Fragment, MouseEvent} from 'react';
 import styled from 'styled-components';
 
-import {Icon, transition} from '../@common';
+import {transition} from '../@common';
 
+import {Icon} from './@common';
 import {Flow} from './@flow';
 import {LINE_HEIGHT_DEFAULT, LINE_HEIGHT_LEAF, Wire} from './@wire';
 import {useSkeletonContext} from './context';

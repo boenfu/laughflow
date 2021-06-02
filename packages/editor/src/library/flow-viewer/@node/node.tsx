@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import React, {FC, HtmlHTMLAttributes, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {RESOURCE_WIDTH, transition} from '../../@common';
+import {transition} from '../../@common';
 import {ActiveState, useSkeletonContext} from '../../flow-skeleton';
 import {FlowViewerContext} from '../flow-viewer';
 
@@ -25,7 +25,7 @@ const AfterWrapper = styled.div`
 const Wrapper = styled.div`
   position: relative;
   margin: 0 17px;
-  width: ${RESOURCE_WIDTH}px;
+  width: 220px;
   min-height: 83px;
   display: inline-flex;
   flex-direction: column;
