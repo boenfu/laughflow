@@ -1,5 +1,4 @@
-import {ProcedureSingleTreeNode, SingleNode} from '@magicflow/procedure';
-import {updateNode} from '@magicflow/procedure/operators';
+import {ProcedureSingleTreeNode} from '@magicflow/procedure';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
@@ -35,10 +34,6 @@ export interface HeaderProps {
 export const Header: FC<HeaderProps> = ({node}) => {
   const {editor} = useContext(FlowViewerContext);
 
-  const onNodeChange = (node: SingleNode): void => {
-    void editor.edit(updateNode(node));
-  };
-
   let {headLeft, headRight} = editor.nodeRenderDescriptor.node;
 
   return (
@@ -57,7 +52,7 @@ export const Header: FC<HeaderProps> = ({node}) => {
       ) : undefined}
       <></>
 
-      <DisplayName node={node.definition} onChange={onNodeChange} />
+      <DisplayName node={node.definition} />
       {headRight?.length ? (
         <HeaderExtra>
           {headRight.reduce(

@@ -275,52 +275,53 @@ export const Wire: FC<WireProps> = ({
   placement,
   multiMark,
 }) => {
-  const {activeState} = useSkeletonContext();
+  const {readonly, activeState} = useSkeletonContext();
 
   let Mark =
     activeState === 'moving' || activeState === 'copying'
       ? PasteButton
       : PlusButton;
 
-  let marks: Mark[] =
-    multiMark !== undefined
-      ? !multiMark
-        ? [
-            {
-              key: 'single',
-              render: <Mark />,
-              position: 0.5,
-            },
-          ]
-        : first
-        ? [
-            {
-              key: 'start',
-              render: <Mark className="start" />,
-              position: 0,
-            },
-            {
-              key: 'end',
-              render: <Mark className="end" />,
-              position: 1,
-            },
-          ]
-        : last
-        ? [
-            {
-              key: 'end',
-              render: <Mark className="end" />,
-              position: 1,
-            },
-          ]
-        : [
-            {
-              key: 'end',
-              render: <Mark className="end" />,
-              position: 1,
-            },
-          ]
-      : [];
+  let marks: Mark[] = readonly
+    ? []
+    : multiMark !== undefined
+    ? !multiMark
+      ? [
+          {
+            key: 'single',
+            render: <Mark />,
+            position: 0.5,
+          },
+        ]
+      : first
+      ? [
+          {
+            key: 'start',
+            render: <Mark className="start" />,
+            position: 0,
+          },
+          {
+            key: 'end',
+            render: <Mark className="end" />,
+            position: 1,
+          },
+        ]
+      : last
+      ? [
+          {
+            key: 'end',
+            render: <Mark className="end" />,
+            position: 1,
+          },
+        ]
+      : [
+          {
+            key: 'end',
+            render: <Mark className="end" />,
+            position: 1,
+          },
+        ]
+    : [];
 
   return (
     <WireContext.Provider

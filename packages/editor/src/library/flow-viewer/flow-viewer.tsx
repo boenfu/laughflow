@@ -1,6 +1,6 @@
 import {IPlugin} from '@magicflow/plugins';
 import {ProcedureDefinition} from '@magicflow/procedure';
-import {TaskMetadata} from '@magicflow/task';
+import {Task} from '@magicflow/task';
 import {useCreation, useUpdate} from 'ahooks';
 import React, {
   FC,
@@ -16,9 +16,8 @@ import {ProcedureEditor} from '../procedure-editor';
 import {SingleNode} from './@node';
 
 export interface FlowViewerProps {
-  definition: ProcedureDefinition;
+  value: ProcedureDefinition | Task;
   plugins?: IPlugin[];
-  task?: TaskMetadata;
 }
 
 export const FlowViewerContext = createContext<{
@@ -28,11 +27,15 @@ export const FlowViewerContext = createContext<{
 export const FlowViewer: FC<FlowViewerProps> = forwardRef<
   ProcedureEditor,
   FlowViewerProps
->(({definition, plugins}, ref) => {
+>(({value, plugins}, ref) => {
   const reRender = useUpdate();
 
   const editor = useCreation(
-    () => new ProcedureEditor(definition, plugins),
+    () =>
+      new ProcedureEditor(
+        value instanceof Task ? value.definition : value,
+        plugins,
+      ),
     [],
   );
 
@@ -49,10 +52,10 @@ export const FlowViewer: FC<FlowViewerProps> = forwardRef<
   return (
     <FlowViewerContext.Provider value={{editor}}>
       <FlowSkeleton
-        flow={editor.rootFlow}
+        flow={value instanceof Task ? value.startFlow : editor.rootFlow}
         readonly
         nodeRender={SingleNode}
-        nodeNextsRender={node => !node.left}
+        nodeNextsRender={node => ('left' in node ? !node.left : true)}
       />
     </FlowViewerContext.Provider>
   );

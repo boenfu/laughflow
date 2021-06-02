@@ -89,7 +89,7 @@ export class TaskSingleNode {
     return !!this.task.runtime.nodeTerminated?.(this);
   }
 
-  get nextNodes(): TaskNode[] {
+  get nexts(): TaskNode[] {
     let {nexts = []} = this.metadata;
 
     let task = this.task;
@@ -126,11 +126,11 @@ export class TaskSingleNode {
 
   // 此节点所能抵达的第一个未完成节点/自身是最后一个节点
   get leafNodes(): TaskNode[] {
-    if (this.stage !== 'done' || !this.nextNodes.length) {
+    if (this.stage !== 'done' || !this.nexts.length) {
       return [this];
     }
 
-    return this.nextNodes.flatMap(node => node.leafNodes);
+    return this.nexts.flatMap(node => node.leafNodes);
   }
 
   get outputs(): Dict<any> {

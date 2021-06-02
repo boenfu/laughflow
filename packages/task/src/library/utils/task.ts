@@ -42,7 +42,7 @@ export function getBranchesDefinition(
 }
 
 export function flatFlow(flow: TaskFlow): TaskSingleNode[] {
-  return flow.startNodes.flatMap(flatNode);
+  return flow.starts.flatMap(flatNode);
 }
 
 export function flatNode(
@@ -50,7 +50,7 @@ export function flatNode(
 ): TaskSingleNode[] {
   return [
     ...(node instanceof TaskSingleNode ? [node] : flatBranchesNode(node)),
-    ...node.nextNodes.flatMap(flatNode),
+    ...node.nexts.flatMap(flatNode),
   ];
 }
 

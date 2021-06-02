@@ -35,7 +35,7 @@ export class TaskFlow {
     let broken = true;
     let stageSet = new Set<TaskStage>();
 
-    for (let node of this.startNodes) {
+    for (let node of this.starts) {
       broken = !broken || node.broken;
 
       for (let leafNode of node.leafNodes) {
@@ -63,7 +63,7 @@ export class TaskFlow {
     return this.root ? 'none' : 'in-progress';
   }
 
-  get startNodes(): TaskNode[] {
+  get starts(): TaskNode[] {
     let {starts} = this.metadata;
 
     let task = this.task;
@@ -97,8 +97,8 @@ export class TaskFlow {
     });
   }
 
-  get leafNodes(): TaskNode[] {
-    return this.startNodes.flatMap(node => node.leafNodes);
+  get leaves(): TaskNode[] {
+    return this.starts.flatMap(node => node.leafNodes);
   }
 
   get outputs(): Dict<any> {
@@ -106,7 +106,7 @@ export class TaskFlow {
 
     return Object.assign(
       {},
-      ...this.leafNodes.map(node => node.outputs),
+      ...this.leaves.map(node => node.outputs),
       this.stage === 'done' ? outputs : {},
     );
   }

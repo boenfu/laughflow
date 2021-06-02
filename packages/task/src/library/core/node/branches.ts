@@ -62,7 +62,7 @@ export class TaskBranchesNode {
     return !!this.task.runtime.nodeIgnored?.(this);
   }
 
-  get nextNodes(): TaskNode[] {
+  get nexts(): TaskNode[] {
     let {nexts = []} = this.metadata;
 
     let task = this.task;
@@ -103,7 +103,7 @@ export class TaskBranchesNode {
       return [this];
     }
 
-    return this.nextNodes.flatMap(node => node.leafNodes);
+    return this.nexts.flatMap(node => node.leafNodes);
   }
 
   get outputs(): Dict<any> {

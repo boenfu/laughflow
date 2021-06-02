@@ -120,7 +120,7 @@ function correctionTaskFlowMetadata(flow: TaskFlow): TaskFlowMetadata {
 
   let nextFlowMetadata = {
     stage: flow.stage,
-    starts: flow.startNodes.map(correctionTaskNodeMetadata),
+    starts: flow.starts.map(correctionTaskNodeMetadata),
     ...cloneDeep(rest),
   };
 
@@ -219,7 +219,7 @@ function correctionTaskSingleNodeMetadata(
 
   return nextNode({
     stage: node.stage,
-    nexts: node.nextNodes?.map(correctionTaskNodeMetadata),
+    nexts: node.nexts?.map(correctionTaskNodeMetadata),
     ...cloneDeep(rest),
   });
 }
@@ -232,7 +232,7 @@ function correctionTaskBranchesNodeMetadata(
   let nextNodeMetadata = {
     stage: node.stage,
     flows: node.flows.map(correctionTaskFlowMetadata),
-    nexts: node.nextNodes?.map(correctionTaskNodeMetadata),
+    nexts: node.nexts?.map(correctionTaskNodeMetadata),
     ...cloneDeep(rest),
   };
 
