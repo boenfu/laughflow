@@ -277,6 +277,12 @@ export const Wire: FC<WireProps> = ({
 }) => {
   const {readonly, activeState} = useSkeletonContext();
 
+  let nextPlaceholder = next === undefined;
+
+  if (readonly && nextPlaceholder) {
+    return <></>;
+  }
+
   let Mark =
     activeState === 'moving' || activeState === 'copying'
       ? PasteButton
@@ -343,7 +349,7 @@ export const Wire: FC<WireProps> = ({
         marks={marks}
         generatePath={getGeneratePath({first, last})}
       />
-      {next === undefined ? <Mark /> : undefined}
+      {nextPlaceholder ? <Mark /> : undefined}
     </WireContext.Provider>
   );
 };

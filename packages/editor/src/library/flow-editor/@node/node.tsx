@@ -202,7 +202,7 @@ export interface SingleNodeProps {
 
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
   const {editor} = useContext(FlowEditorContext);
-  const {active: activeSource, activeState, onAction} = useSkeletonContext();
+  const {activeState, isActive, onAction} = useSkeletonContext();
 
   const onDisconnectClick = (): void =>
     onAction?.({
@@ -229,7 +229,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
 
   let {before, after, footer, body} = editor.nodeRenderDescriptor.node;
 
-  let active = activeSource?.id === node.id;
+  let active = isActive(node);
   let editing = active ? activeState : undefined;
 
   return (

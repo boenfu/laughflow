@@ -59,6 +59,7 @@ interface FlowSkeletonCommonProps<TFLow extends IFlow> {
   flow: TFLow;
   nodeRender: FC<{node: TFLow['starts'][number]}>;
   nodeNextsRender?(node: TFLow['starts'][number]): boolean;
+  isNodeActive?(node: TFLow['starts'][number]): boolean;
 }
 
 interface FlowSkeletonPropsReadonlySegment {
@@ -81,6 +82,7 @@ export const FlowSkeleton = <TFlow extends IFlow>({
   flow,
   nodeRender,
   nodeNextsRender,
+  isNodeActive,
   children,
   ...props
 }: PropsWithChildren<FlowSkeletonProps<TFlow>>): ReactElement<any, any> => {
@@ -89,8 +91,13 @@ export const FlowSkeleton = <TFlow extends IFlow>({
   const [activeState, setActiveState] = useState<ActiveState>();
 
   const isActive = useCallback(
-    (source?: IFlow | INode) => (source ? source.id === active?.id : !!active),
-    [active],
+    (source?: IFlow | INode) =>
+      isNodeActive
+        ? isNodeActive(source as any)
+        : source
+        ? source.id === active?.id
+        : !!active,
+    [active, isNodeActive],
   );
 
   const onContentClick = (): void => {

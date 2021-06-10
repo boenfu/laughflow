@@ -1,10 +1,9 @@
-import {Copy, Cut, Jump} from '@magicflow/icons';
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
 import classnames from 'classnames';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
-import {ActiveState, useSkeletonContext} from '../../flow-skeleton';
+import {useSkeletonContext} from '../../flow-skeleton';
 import {FlowViewerContext} from '../flow-viewer';
 
 import {Header} from './@header';
@@ -94,27 +93,6 @@ const Footer = styled.div`
   display: flex;
 `;
 
-const EditingIconWrapper = styled.div`
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 32px;
-  height: 32px;
-
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
-  background: #83a9ff;
-  color: #fff;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
-  border-radius: 28px;
-
-  z-index: 3;
-`;
-
 const LinkNode = styled.div`
   min-width: 64px;
   max-width: 110px;
@@ -134,28 +112,6 @@ const Container = styled.div`
   position: relative;
 `;
 
-const STATE_ICON_DICT: Partial<
-  {[key in NonNullable<ActiveState>]: React.ElementType}
-> = {
-  moving: Cut,
-  copying: Copy,
-  connecting: Jump,
-};
-
-const EditingIcon: FC<{state: NonNullable<ActiveState>}> = ({state}) => {
-  let Component = STATE_ICON_DICT[state];
-
-  if (!Component) {
-    return <></>;
-  }
-
-  return (
-    <EditingIconWrapper>
-      <Component />
-    </EditingIconWrapper>
-  );
-};
-
 export interface SingleNodeProps {
   node: ProcedureSingleTreeNode;
   className?: string;
@@ -163,7 +119,7 @@ export interface SingleNodeProps {
 
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
   const {editor} = useContext(FlowViewerContext);
-  const {active: activeSource, activeState} = useSkeletonContext();
+  const {isActive} = useSkeletonContext();
 
   if (node.left) {
     return (
@@ -175,8 +131,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
 
   let {before, after, footer, body} = editor.nodeRenderDescriptor.node;
 
-  let active = activeSource?.id === node.id;
-  let editing = active ? activeState : undefined;
+  let active = isActive(node);
 
   return (
     <Container>
@@ -194,9 +149,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
           className,
           {
             active,
-            editing: !!editing,
           },
-          editing,
         ])}
       >
         <Header node={node} />
@@ -215,8 +168,6 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
             <></>,
           )}
         </Footer>
-
-        {editing ? <EditingIcon state={editing} /> : undefined}
       </Wrapper>
       {after?.length ? (
         <AfterWrapper>
