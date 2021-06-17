@@ -41,10 +41,6 @@ const DisplayNameInput = styled.div`
     opacity: 1;
   }
 
-  &:focus:before {
-    opacity: 0.5;
-  }
-
   &:not(:empty):before {
     content: none;
   }

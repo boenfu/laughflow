@@ -29,6 +29,10 @@ const DisplayText = styled.span`
   color: #333;
 `;
 
+const VariableText = styled.span`
+  color: #296dff;
+`;
+
 const OperatorText = styled.span`
   color: #999;
   padding: 0 3px;
@@ -93,9 +97,11 @@ export const ConditionList: FC<ConditionListProps> = ({
                         'value' in left ? left.value : left.variable
                       }`,
                     ) ||
-                      ('value' in left
-                        ? `值: ${left.value}`
-                        : `变量: ${left.variable}`))}
+                      ('value' in left ? (
+                        String(left.value)
+                      ) : (
+                        <VariableText>{left.variable}</VariableText>
+                      )))}
                 </DisplayText>
                 <OperatorText>
                   {operator && getOperatorDisplayName(operator)}
@@ -107,9 +113,11 @@ export const ConditionList: FC<ConditionListProps> = ({
                         'value' in right ? right.value : right.variable
                       }`,
                     ) ||
-                      ('value' in right
-                        ? `值: ${right.value}`
-                        : `变量: ${right.variable}`))}
+                      ('value' in right ? (
+                        String(right.value)
+                      ) : (
+                        <VariableText>{right.variable}</VariableText>
+                      )))}
                 </DisplayText>
               </ConditionLine>
             );

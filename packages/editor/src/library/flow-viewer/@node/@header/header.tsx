@@ -33,9 +33,9 @@ export interface HeaderProps {
 }
 
 export const Header: FC<HeaderProps> = ({node}) => {
-  const {editor} = useContext(FlowViewerContext);
+  const {editor, mode} = useContext(FlowViewerContext);
 
-  let {headLeft, headRight} = editor.nodeRenderDescriptor.node;
+  let {headLeft, headRight} = editor.nodeRenderDescriptorDict[mode].node;
 
   return (
     <Wrapper className="header">

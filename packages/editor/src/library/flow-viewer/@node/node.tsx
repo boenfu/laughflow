@@ -1,4 +1,5 @@
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
+import {TaskSingleNode} from '@magicflow/task';
 import classnames from 'classnames';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
@@ -46,6 +47,27 @@ const Wrapper = styled.div`
     .header {
       color: #ffffff;
       background-color: #296dff;
+    }
+  }
+
+  &.done {
+    .header {
+      color: #ffffff;
+      background-color: #81cb5f;
+    }
+  }
+
+  &.in-progress {
+    .header {
+      color: #ffffff;
+      background-color: #296dff;
+    }
+  }
+
+  &.terminated {
+    .header {
+      color: #ffffff;
+      background-color: #e55a3a;
     }
   }
 
@@ -113,15 +135,15 @@ const Container = styled.div`
 `;
 
 export interface SingleNodeProps {
-  node: ProcedureSingleTreeNode;
+  node: ProcedureSingleTreeNode | TaskSingleNode;
   className?: string;
 }
 
 export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
-  const {editor} = useContext(FlowViewerContext);
+  const {editor, mode} = useContext(FlowViewerContext);
   const {isActive} = useSkeletonContext();
 
-  if (node.left) {
+  if (mode === 'procedure' && 'left' in node && node.left) {
     return (
       <Container onClick={event => event.stopPropagation()}>
         <LinkNode>{node.definition.displayName}</LinkNode>
@@ -129,7 +151,12 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
     );
   }
 
-  let {before, after, footer, body} = editor.nodeRenderDescriptor.node;
+  let {
+    before,
+    after,
+    footer,
+    body,
+  } = editor.nodeRenderDescriptorDict.procedure.node;
 
   let active = isActive(node);
 
@@ -150,6 +177,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
           {
             active,
           },
+          node instanceof TaskSingleNode ? node.stage : '',
         ])}
       >
         <Header node={node} />

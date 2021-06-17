@@ -15,7 +15,7 @@ export type PluginConfigComponent<TProps = any> = ComponentType<
   }
 >;
 
-export interface NodeEditorRender<TNode, TConfigExtraProps = any> {
+export interface NodeRender<TNode, TConfigExtraProps = any> {
   before?: PluginRenderComponent<TNode>;
   after?: PluginRenderComponent<TNode>;
   headLeft?: PluginRenderComponent<TNode>;
@@ -25,22 +25,29 @@ export interface NodeEditorRender<TNode, TConfigExtraProps = any> {
   config?: PluginConfigComponent<TConfigExtraProps>;
 }
 
-export type NodeViewerRender<TNode> = Omit<NodeEditorRender<TNode>, 'config'>;
+export type NodeViewerRender<TNode> = Omit<NodeRender<TNode>, 'config'>;
 
-export interface EditorRender<TConfigExtraProps = any> {
-  node?: NodeEditorRender<ProcedureSingleTreeNode, TConfigExtraProps>;
+export interface ProcedureRender<TConfigExtraProps = any> {
+  node?: NodeRender<ProcedureSingleTreeNode, TConfigExtraProps>;
 }
 
-export interface ViewerRender {
+export interface TaskRender {
   node?: NodeViewerRender<TaskSingleNode>;
+}
+
+export interface IProcedurePlugin<TConfigExtraProps = any> {
+  render: ProcedureRender<TConfigExtraProps>;
+}
+
+export interface ITaskPlugin {
+  render: TaskRender;
+  runtime: ITaskRuntime;
 }
 
 export interface IPlugin<TConfigExtraProps = any> {
   name: string;
 
-  editor?: EditorRender<TConfigExtraProps>;
+  procedure?: IProcedurePlugin<TConfigExtraProps>;
 
-  viewer?: ViewerRender;
-
-  task?: ITaskRuntime;
+  task?: ITaskPlugin;
 }

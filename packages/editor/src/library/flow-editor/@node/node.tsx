@@ -227,7 +227,12 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
     );
   }
 
-  let {before, after, footer, body} = editor.nodeRenderDescriptor.node;
+  let {
+    before,
+    after,
+    footer,
+    body,
+  } = editor.nodeRenderDescriptorDict.procedure.node;
 
   let active = isActive(node);
   let editing = active ? activeState : undefined;

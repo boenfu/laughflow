@@ -39,7 +39,7 @@ export const Header: FC<HeaderProps> = ({node}) => {
     void editor.edit(updateNode(node));
   };
 
-  let {headLeft, headRight} = editor.nodeRenderDescriptor.node;
+  let {headLeft, headRight} = editor.nodeRenderDescriptorDict.procedure.node;
 
   return (
     <Wrapper className="header">

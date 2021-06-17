@@ -1,8 +1,4 @@
-import {
-  IPlugin,
-  NodeEditorRender,
-  PluginConfigComponent,
-} from '@magicflow/plugins';
+import {IPlugin, NodeRender, PluginConfigComponent} from '@magicflow/plugins';
 import {
   Procedure,
   ProcedureDefinition,
@@ -34,7 +30,15 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
 
   readonly undoStack = new UndoStack();
 
-  nodeRenderDescriptor: NodeRenderDescriptor = {
+  nodeRenderDescriptorDict: {
+    procedure: NodeRenderDescriptor;
+    task: NodeRenderDescriptor;
+  } = {
+    procedure: {node: {}},
+    task: {node: {}},
+  };
+
+  taskNodeRenderDescriptor: NodeRenderDescriptor = {
     node: {},
   };
 
@@ -82,12 +86,12 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
       fromPairs(
         compact(
           this.plugins.map(plugin =>
-            plugin.editor?.node?.config
+            plugin.procedure?.render.node?.config
               ? [
                   plugin.name,
                   () => {
                     // eslint-disable-next-line @mufan/no-unnecessary-type-assertion
-                    let Component = plugin.editor!.node!.config!;
+                    let Component = plugin.procedure!.render.node!.config!;
 
                     return createElement<
                       NonNullable<PluginConfigComponent['defaultProps']>
@@ -121,17 +125,20 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
   private setPlugins(plugins: IPlugin[]): void {
     this.plugins = plugins;
 
-    this.nodeRenderDescriptor = buildNodeRenderDescriptor(plugins, 'editor');
+    this.nodeRenderDescriptorDict = {
+      procedure: buildNodeRenderDescriptor(plugins, 'procedure'),
+      task: buildNodeRenderDescriptor(plugins, 'task'),
+    };
   }
 }
 
 export interface NodeRenderDescriptor {
-  node: Partial<Record<keyof NodeEditorRender<unknown>, ComponentType<any>[]>>;
+  node: Partial<Record<keyof NodeRender<unknown>, ComponentType<any>[]>>;
 }
 
 export function buildNodeRenderDescriptor(
   plugins: IPlugin[],
-  type: 'editor' | 'viewer',
+  type: 'procedure' | 'task',
 ): NodeRenderDescriptor {
   let nodeRenderDescriptor: NodeRenderDescriptor = {
     node: {
@@ -146,7 +153,7 @@ export function buildNodeRenderDescriptor(
   };
 
   for (let plugin of plugins) {
-    let {node} = plugin[type] || {};
+    let {node} = plugin[type]?.render || {};
 
     if (node) {
       for (let [name, component] of Object.entries(node)) {

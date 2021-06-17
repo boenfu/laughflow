@@ -69,6 +69,10 @@ export class TaskBranchesNode {
   get nexts(): TaskNode[] {
     let {nexts = []} = this.metadata;
 
+    if (this.broken) {
+      return [];
+    }
+
     let task = this.task;
     let stage = this.stage;
     let blocked = this.blocked || stage === 'none' || stage === 'in-progress';

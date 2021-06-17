@@ -36,9 +36,7 @@ export class TaskFlow {
     let stageSet = new Set<TaskStage>();
 
     for (let node of this.starts) {
-      if (broken) {
-        broken = node.broken;
-      }
+      broken &&= node.broken;
 
       for (let leafNode of node.leafNodes) {
         stageSet.add(leafNode.stage);

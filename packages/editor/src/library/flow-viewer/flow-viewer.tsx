@@ -10,6 +10,7 @@ import React, {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useState,
 } from 'react';
 
 import {FlowSkeleton} from '../flow-skeleton';
@@ -23,12 +24,18 @@ export interface FlowViewerProps {
   isNodeActive?(node: ProcedureSingleTreeNode | TaskSingleNode): boolean;
 }
 
+export type FlowViewerMode = 'task' | 'procedure';
+
 export const FlowViewerContext = createContext<{
   editor: ProcedureEditor;
+  mode: FlowViewerMode;
 }>(undefined!);
 
 export const FlowViewer = forwardRef<ProcedureEditor, FlowViewerProps>(
   ({value, plugins, isNodeActive}, ref) => {
+    const [mode, setMode] = useState<FlowViewerMode>(
+      value instanceof Task ? 'task' : 'procedure',
+    );
     const reRender = useUpdate();
 
     const editor = useCreation(
@@ -50,8 +57,11 @@ export const FlowViewer = forwardRef<ProcedureEditor, FlowViewerProps>(
 
     useEffect(() => {
       if (value instanceof Task) {
+        setMode('task');
         return;
       }
+
+      setMode('procedure');
 
       editor.definition = value;
     }, [editor, value]);
@@ -59,9 +69,9 @@ export const FlowViewer = forwardRef<ProcedureEditor, FlowViewerProps>(
     useImperativeHandle(ref, () => editor);
 
     return (
-      <FlowViewerContext.Provider value={{editor}}>
+      <FlowViewerContext.Provider value={{editor, mode}}>
         <FlowSkeleton
-          flow={value instanceof Task ? value.startFlow : editor.rootFlow}
+          flow={mode === 'task' ? (value as Task).startFlow : editor.rootFlow}
           readonly
           nodeRender={SingleNode}
           nodeNextsRender={node => ('left' in node ? !node.left : true)}
