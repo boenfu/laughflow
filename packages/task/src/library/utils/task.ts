@@ -200,6 +200,7 @@ export function initTask({
       edgeSet.add(edge);
 
       let node = nodesMap.get(nextId)!;
+
       nexts.push(
         node.type === 'singleNode' ? initNode(node) : initBranchesNode(node),
       );

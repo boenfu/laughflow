@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import {evaluate} from '@magicflow/condition';
 import {ArrowDown} from '@magicflow/icons';
-import {TaskNodeRuntimeMethodParams} from '@magicflow/task';
+import {ITaskRuntime, TaskNodeRuntimeMethodParams} from '@magicflow/task';
 import React, {useCallback, useEffect, useState} from 'react';
 import styled from 'styled-components';
 
@@ -123,7 +123,7 @@ export class ConditionPlugin implements IPlugin<ConditionProps> {
 
   private rightCandidates: CustomConditionCandidate[] = [];
 
-  task: IPlugin['task'] = {
+  task: ITaskRuntime = {
     nodeBroken: params => {
       let {definition} = params;
 

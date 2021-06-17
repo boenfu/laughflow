@@ -154,4 +154,9 @@ export class TaskSingleNode {
     readonly blocked: boolean,
     readonly inputs: Dict<any>,
   ) {}
+
+  next(operator: (metadata: TaskSingleNodeMetadata) => void): Task {
+    operator(this.metadata);
+    return this.task.next();
+  }
 }

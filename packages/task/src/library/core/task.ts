@@ -9,7 +9,7 @@ import {cloneDeep, compact} from 'lodash-es';
 import {Dict, Nominal} from 'tslang';
 
 import {Operator} from '../operators';
-import {flatFlow, getFlowDefinition} from '../utils';
+import {flatFlow, getFlowDefinition, initTask} from '../utils';
 
 import {TaskFlow, TaskFlowMetadata} from './flow';
 import {
@@ -88,7 +88,7 @@ export class Task {
 
   constructor(
     readonly procedure: Procedure,
-    readonly metadata: TaskMetadata,
+    readonly metadata: TaskMetadata = initTask(procedure.definition),
     readonly runtime: ITaskRuntime = {},
   ) {}
 
@@ -179,7 +179,7 @@ function correctionTaskNodeMetadata(node: TaskNode): TaskNodeMetadata {
       nextNodeMetadata.nexts?.map(next => next.definition),
     );
 
-    nextNodeMetadata.nexts = nextNodeMetadata.nexts || [];
+    nextNodeMetadata.nexts ||= [];
 
     console.log(node, '我需要补签');
 
