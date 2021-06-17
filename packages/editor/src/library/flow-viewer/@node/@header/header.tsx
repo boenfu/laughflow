@@ -1,4 +1,5 @@
 import {ProcedureSingleTreeNode} from '@magicflow/procedure';
+import {TaskSingleNode} from '@magicflow/task';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 
@@ -28,7 +29,7 @@ const HeaderExtra = styled.div`
 `;
 
 export interface HeaderProps {
-  node: ProcedureSingleTreeNode;
+  node: ProcedureSingleTreeNode | TaskSingleNode;
 }
 
 export const Header: FC<HeaderProps> = ({node}) => {

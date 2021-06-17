@@ -2,6 +2,7 @@ import {
   BranchesNode,
   Flow,
   FlowId,
+  Node,
   NodeId,
   ProcedureDefinition,
   SingleNode,
@@ -134,6 +135,13 @@ export function getTaskSingleNodeAtFlow(
   }
 }
 
+interface InitContext {
+  usedNodeSet: Set<NodeId>;
+  nextable?: boolean;
+  getNodeDefinition(node: NodeId): Node | undefined;
+  getFlowDefinition(flow: FlowId): Flow | undefined;
+}
+
 /**
  * 初始化任务
  * @param param0
@@ -148,216 +156,120 @@ export function initTask({
   let nodesMap = new Map(nodes.map(node => [node.id, node]));
   let flowsMap = new Map(flows.map(flow => [flow.id, flow]));
 
-  let edgeSet = new Set();
+  let usedNodeSet = new Set<NodeId>();
+
+  let context: InitContext = {
+    usedNodeSet,
+    getNodeDefinition: node => nodesMap.get(node)!,
+    getFlowDefinition: flow => flowsMap.get(flow)!,
+  };
 
   return {
     id: createId(),
     definition: id,
     stage: 'none',
-    start: initFlow(flowsMap.get(start)!),
+    start: initFlow(start, context),
   };
-
-  function initFlow({id, starts: nodeIds}: Flow): TaskFlowMetadata {
-    let nodes: TaskNodeMetadata[] = [];
-
-    for (let nodeId of nodeIds) {
-      let edge = `${id}-${nodeId}`;
-
-      if (edgeSet.has(edge)) {
-        continue;
-      }
-
-      edgeSet.add(edge);
-
-      let node = nodesMap.get(nodeId)!;
-      nodes.push(
-        node.type === 'singleNode' ? initNode(node) : initBranchesNode(node),
-      );
-    }
-
-    return {
-      id: createId(),
-      definition: id,
-      stage: 'none',
-      starts: nodes,
-    };
-  }
-
-  function initNode({
-    id,
-    type,
-    nexts: nextIds,
-  }: SingleNode): TaskSingleNodeMetadata {
-    let nexts: TaskNodeMetadata[] = [];
-
-    for (let nextId of nextIds) {
-      let edge = `${id}-${nextId}`;
-
-      if (edgeSet.has(edge)) {
-        continue;
-      }
-
-      edgeSet.add(edge);
-
-      let node = nodesMap.get(nextId)!;
-
-      nexts.push(
-        node.type === 'singleNode' ? initNode(node) : initBranchesNode(node),
-      );
-    }
-
-    return {
-      id: createId(),
-      definition: id,
-      type,
-      stage: 'none',
-      nexts,
-    };
-  }
-
-  function initBranchesNode(node: BranchesNode): TaskBranchesNodeMetadata {
-    let flows: TaskFlowMetadata[] = [];
-
-    for (let flowId of node.flows) {
-      let edge = `${id}-${flowId}`;
-
-      if (edgeSet.has(edge)) {
-        continue;
-      }
-
-      edgeSet.add(edge);
-
-      let flow = flowsMap.get(flowId)!;
-      flows.push(initFlow(flow));
-    }
-
-    return {
-      ...initNode({
-        ...node,
-        type: 'singleNode',
-      }),
-      type: 'branchesNode',
-      flows,
-    };
-  }
 }
 
-/**
- * 升级任务流程
- * @param param0
- * @param task
- * @returns
- */
-// export function upgradeTask(
-//   {id, start, flows, nodes}: ProcedureDefinition,
-//   _task: TaskMetadata,
-// ): TaskMetadata {
-//   let task = cloneDeep(_task);
+export function initFlow(
+  flowId: FlowId,
+  {usedNodeSet, getNodeDefinition, getFlowDefinition}: InitContext,
+): TaskFlowMetadata {
+  let flow = getFlowDefinition(flowId);
 
-//   let nodesMap = new Map(nodes.map(node => [node.id, node]));
-//   let flowsMap = new Map(flows.map(flow => [flow.id, flow]));
+  if (!flow) {
+    throw Error(`Not found flow "${flowId}"`);
+  }
 
-//   let edgeSet = new Set();
+  let {id, starts: nodeIds} = flow;
 
-//   checkFlow(flowsMap.get(start)!, task.start);
+  let nodes: TaskNodeMetadata[] = [];
 
-//   return task;
+  for (let nodeId of nodeIds) {
+    let nextable = !usedNodeSet.has(nodeId);
 
-//   function checkFlow(
-//     {id, starts: nodeIds}: Flow,
-//     flow: TaskFlowMetadata,
-//   ): void {
-//     let definitionIdToNodesMap = new Map(
-//       flow.nodes.map(node => [node.definition, node]),
-//     );
+    nodes.push(
+      initNode(nodeId, {
+        nextable,
+        getNodeDefinition,
+        getFlowDefinition,
+        usedNodeSet,
+      }),
+    );
+  }
 
-//     for (let nodeId of nodeIds) {
-//       let edge = `${id}-${nodeId}`;
+  return {
+    id: createId(),
+    definition: id,
+    stage: 'none',
+    starts: nodes,
+  };
+}
 
-//       if (definitionIdToNodesMap.has(nodeId)) {
-//         edgeSet.add(edge);
-//         continue;
-//       }
+export function initNode(
+  nodeId: NodeId,
+  {
+    nextable = true,
+    usedNodeSet,
+    getNodeDefinition,
+    getFlowDefinition,
+  }: InitContext,
+): TaskSingleNodeMetadata | TaskBranchesNodeMetadata {
+  let node = getNodeDefinition(nodeId);
 
-//       if (edgeSet.has(edge)) {
-//         continue;
-//       }
+  if (!node) {
+    throw Error(`Not found node "${nodeId}"`);
+  }
 
-//       let node = nodesMap.get(nodeId)!;
+  usedNodeSet.add(nodeId);
 
-//       if (node.type === 'singleNode') {
-//         checkNode(
-//           node,
-//           definitionIdToNodesMap.get(nodeId) as TaskSingleNodeMetadata,
-//         );
-//       } else {
-//         checkBranchesNode(
-//           node,
-//           definitionIdToNodesMap.get(nodeId) as TaskBranchesNodeMetadata,
-//         );
-//       }
+  let nexts: TaskNodeMetadata[] = [];
+  let flows: TaskFlowMetadata[] = [];
 
-//       edgeSet.add(edge);
-//     }
-//   }
+  if (nextable) {
+    if (node.type === 'branchesNode') {
+      if (nextable) {
+        for (let flowId of node.flows) {
+          flows.push(
+            initFlow(flowId, {
+              usedNodeSet,
+              getNodeDefinition,
+              getFlowDefinition,
+            }),
+          );
+        }
+      }
+    }
 
-//   function checkNode(
-//     {id, type, nexts: nextIds}: SingleNode,
-//     node: TaskSingleNodeMetadata,
-//   ): void {
-//     let definitionIdToNodesMap = new Map(
-//       node.nexts?.map(node => [node.definition, node]),
-//     );
+    for (let nextId of node.nexts) {
+      let nextNextable = !usedNodeSet.has(nextId);
 
-//     for (let nextId of nextIds) {
-//       let edge = `${id}-${nextId}`;
+      usedNodeSet.add(nextId);
 
-//       if (definitionIdToNodesMap.has(nextId)) {
-//         edgeSet.add(edge);
-//         continue;
-//       }
+      nexts.push(
+        initNode(nextId, {
+          usedNodeSet,
+          nextable: nextNextable,
+          getNodeDefinition,
+          getFlowDefinition,
+        }),
+      );
+    }
+  }
 
-//       if (edgeSet.has(edge)) {
-//         continue;
-//       }
-
-//       let node = nodesMap.get(nextId)!;
-
-//       if (node.type === 'singleNode') {
-//         checkNode(
-//           node,
-//           definitionIdToNodesMap.get(nextId) as TaskSingleNodeMetadata,
-//         );
-//       } else {
-//         checkBranchesNode(
-//           node,
-//           definitionIdToNodesMap.get(nextId) as TaskBranchesNodeMetadata,
-//         );
-//       }
-
-//       edgeSet.add(edge);
-//     }
-//   }
-
-//   function checkBranchesNode(
-//     node: BranchesNode,
-//     branchedNode: TaskBranchesNodeMetadata,
-//   ): void {
-//     for (let flowId of node.flows) {
-//       let edge = `${id}-${flowId}`;
-
-//       if (edgeSet.has(edge)) {
-//         continue;
-//       }
-
-//       let flow = flowsMap.get(flowId)!;
-//       // checkFlow(flow);
-//       edgeSet.add(edge);
-//     }
-
-//     // checkNode({
-//     //   ...node,
-//     //   type: 'node',
-//     // });
-//   }
-// }
+  return {
+    id: createId(),
+    definition: nodeId,
+    ...(node.type === 'singleNode'
+      ? {
+          type: 'singleNode',
+        }
+      : {
+          type: 'branchesNode',
+          flows,
+        }),
+    stage: 'none',
+    nexts,
+  };
+}

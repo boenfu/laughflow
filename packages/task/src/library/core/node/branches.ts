@@ -39,6 +39,10 @@ export class TaskBranchesNode {
 
     let stageSet = new Set<TaskStage>(this.flows.map(flow => flow.stage));
 
+    if (stageSet.size === 0) {
+      return 'done';
+    }
+
     if (stageSet.size === 1) {
       return Array.from(stageSet.values())[0];
     }
@@ -111,7 +115,7 @@ export class TaskBranchesNode {
       return this.inputs;
     }
 
-    return this.flows[this.flows.length - 1].outputs;
+    return this.flows[this.flows.length - 1]?.outputs || {};
   }
 
   get flows(): TaskFlow[] {
