@@ -5,6 +5,9 @@
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "lodash-es": "^4.17.20",
     "tslib": "^2.2.0"

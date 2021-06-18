@@ -8,6 +8,9 @@
   "scripts": {
     "test": "jest"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@magicflow/procedure": "^0.0.1-wip.1",
     "lodash-es": "^4.17.20",

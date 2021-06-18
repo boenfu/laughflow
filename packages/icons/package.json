@@ -8,6 +8,9 @@
   "scripts": {
     "prebuild": "rimraf ./src/library/*.tsx && svgr ./resources --out-dir ./src/library --typescript --icon --replace-attr-values '#333=currentColor' "
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "react": ">=16.8.0"
   },

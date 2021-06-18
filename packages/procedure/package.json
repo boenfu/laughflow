@@ -8,6 +8,9 @@
   "scripts": {
     "test": "jest"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "lodash-es": "^4.17.20",
     "nanoid": "^3.1.20",
