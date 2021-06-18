@@ -1,6 +1,6 @@
 {
   "name": "@magicflow/plugins",
-  "version": "0.0.1-wip.2",
+  "version": "0.0.1-wip.1",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/library/index.js",
@@ -10,10 +10,10 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@magicflow/condition": "^0.0.1-wip.2",
-    "@magicflow/icons": "^0.0.1-wip.2",
-    "@magicflow/procedure": "^0.0.1-wip.2",
-    "@magicflow/task": "^0.0.1-wip.2",
+    "@magicflow/condition": "^0.0.1-wip.1",
+    "@magicflow/icons": "^0.0.1-wip.1",
+    "@magicflow/procedure": "^0.0.1-wip.1",
+    "@magicflow/task": "^0.0.1-wip.1",
     "classnames": "^2.2.6",
     "lodash-es": "^4.17.20",
     "react-select": "^4.3.0",

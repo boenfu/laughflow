@@ -1,6 +1,6 @@
 {
   "name": "@magicflow/procedure",
-  "version": "0.0.1-wip.2",
+  "version": "0.0.1-wip.1",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/library/index.js",
