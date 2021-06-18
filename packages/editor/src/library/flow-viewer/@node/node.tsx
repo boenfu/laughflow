@@ -40,6 +40,36 @@ const Wrapper = styled.div`
       background-color: #5b6e95;
     }
   }
+`;
+
+const Body = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+`;
+
+const Footer = styled.div`
+  display: flex;
+`;
+
+const LinkNode = styled.div`
+  min-width: 64px;
+  max-width: 110px;
+  padding: 8px 12px;
+  height: 16px;
+  line-height: 16px;
+  font-size: 12px;
+  margin: 0 14px;
+  background-color: #ffffff;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.07);
+  border-radius: 28px;
+`;
+
+const Container = styled.div`
+  position: relative;
 
   &.active {
     box-shadow: 0 6px 12px rgba(58, 69, 92, 0.16);
@@ -71,67 +101,23 @@ const Wrapper = styled.div`
     }
   }
 
-  &.editing {
-    &::before {
-      opacity: 0;
-      margin: 0px;
-      height: 100%;
-      transform: translate(-10px, -10px);
-      padding: 10px;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 100%;
-      content: '';
-      z-index: 2;
-      border: 1px dashed #a9b7d7;
-      border-radius: 4px;
-      pointer-events: none;
-    }
+  &.ignored {
+    opacity: 0.4;
 
-    &:hover {
-      &::before {
-        opacity: 1;
-      }
-    }
-
-    &.active {
-      &::before {
-        opacity: 1;
-        background-color: rgba(255, 255, 255, 0.88);
-      }
+    .header {
+      color: #ffffff;
+      background-color: #666;
     }
   }
-`;
 
-const Body = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: center;
-`;
+  &.broken {
+    opacity: 0.4;
 
-const Footer = styled.div`
-  display: flex;
-`;
-
-const LinkNode = styled.div`
-  min-width: 64px;
-  max-width: 110px;
-  padding: 8px 12px;
-  height: 16px;
-  line-height: 16px;
-  font-size: 12px;
-  margin: 0 14px;
-  background-color: #ffffff;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.07);
-  border-radius: 28px;
-`;
-
-const Container = styled.div`
-  position: relative;
+    .header {
+      color: #ffffff;
+      background-color: #e55a3a;
+    }
+  }
 `;
 
 export interface SingleNodeProps {
@@ -161,7 +147,32 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
   let active = isActive(node);
 
   return (
-    <Container>
+    <Container
+      className={classnames([
+        className,
+        {
+          active,
+        },
+        ...(node instanceof TaskSingleNode
+          ? [
+              node.stage,
+              {
+                ignored: node.ignored,
+                broken: node.broken,
+              },
+            ]
+          : []),
+      ])}
+      title={
+        node instanceof TaskSingleNode
+          ? node.ignored
+            ? '节点被忽略'
+            : node.broken
+            ? '节点被中断'
+            : undefined
+          : undefined
+      }
+    >
       {before?.length ? (
         <BeforeWrapper>
           {before.reduce(
@@ -171,15 +182,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
           )}
         </BeforeWrapper>
       ) : undefined}
-      <Wrapper
-        className={classnames([
-          className,
-          {
-            active,
-          },
-          node instanceof TaskSingleNode ? node.stage : '',
-        ])}
-      >
+      <Wrapper>
         <Header node={node} />
         <Body>
           {body?.reduce(

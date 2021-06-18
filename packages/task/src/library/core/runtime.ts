@@ -8,8 +8,8 @@ import {
 import {Dict} from 'tslang';
 
 import {TaskFlowMetadata} from './flow';
-import {TaskNodeMetadata, TaskSingleNodeMetadata} from './node';
-import {TaskMetadata} from './task';
+import {TaskNodeMetadata, TaskSingleNode, TaskSingleNodeMetadata} from './node';
+import {Task, TaskMetadata} from './task';
 
 export interface TaskRuntimeMethodParams {
   definition: ProcedureDefinition;
@@ -60,9 +60,12 @@ export interface ITaskRuntime {
 
   // next
 
-  next?(task: TaskMetadata): TaskMetadata;
+  next?(task: Task, metadata: TaskMetadata): TaskMetadata;
 
-  nextNode?(node: TaskSingleNodeMetadata): TaskSingleNodeMetadata;
+  nextNode?(
+    node: TaskSingleNode,
+    metadata: TaskSingleNodeMetadata,
+  ): TaskSingleNodeMetadata;
 }
 
 export class TaskRuntime implements Required<ITaskRuntime> {
@@ -133,25 +136,28 @@ export class TaskRuntime implements Required<ITaskRuntime> {
     );
   };
 
-  next = (metadata: TaskMetadata): TaskMetadata => {
+  next = (task: Task, metadata: TaskMetadata): TaskMetadata => {
     for (let {next} of this.runTimeArray) {
       if (!next) {
         continue;
       }
 
-      metadata = next(metadata);
+      metadata = next(task, metadata);
     }
 
     return metadata;
   };
 
-  nextNode = (metadata: TaskSingleNodeMetadata): TaskSingleNodeMetadata => {
+  nextNode = (
+    node: TaskSingleNode,
+    metadata: TaskSingleNodeMetadata,
+  ): TaskSingleNodeMetadata => {
     for (let {nextNode} of this.runTimeArray) {
       if (!nextNode) {
         continue;
       }
 
-      metadata = nextNode(metadata);
+      metadata = nextNode(node, metadata);
     }
 
     return metadata;

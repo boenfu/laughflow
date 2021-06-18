@@ -59,11 +59,11 @@ export class TaskBranchesNode {
   }
 
   get broken(): boolean {
-    return !!this.task.runtime.nodeBroken?.(this);
+    return !this.blocked && !!this.task.runtime.nodeBroken?.(this);
   }
 
   get ignored(): boolean {
-    return !!this.task.runtime.nodeIgnored?.(this);
+    return !this.blocked && !!this.task.runtime.nodeIgnored?.(this);
   }
 
   get nexts(): TaskNode[] {

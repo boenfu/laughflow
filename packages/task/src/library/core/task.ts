@@ -109,9 +109,9 @@ export class Task {
 function correctionTaskMetadata(task: Task): TaskMetadata {
   let {stage, start, ...rest} = task.metadata;
   // eslint-disable-next-line @mufan/explicit-return-type
-  let {next = metadata => metadata} = task.runtime;
+  let {next = (_, metadata) => metadata} = task.runtime;
 
-  return next({
+  return next(task, {
     stage: task.stage,
     start: correctionTaskFlowMetadata(task.startFlow),
     ...cloneDeep(rest),
@@ -184,9 +184,9 @@ function correctionTaskSingleNodeMetadata(
 ): TaskSingleNodeMetadata {
   let {stage, nexts, ...rest} = node.metadata;
   // eslint-disable-next-line @mufan/explicit-return-type
-  let {nextNode = metadata => metadata} = node.task.runtime;
+  let {nextNode = (_, metadata) => metadata} = node.task.runtime;
 
-  return nextNode({
+  return nextNode(node, {
     stage: node.stage,
     nexts: node.nexts?.map(correctionTaskNodeMetadata),
     ...cloneDeep(rest),

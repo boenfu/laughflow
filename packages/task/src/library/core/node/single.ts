@@ -51,21 +51,25 @@ export class TaskSingleNode {
       (stage === 'terminated' && !this.ableToBeTerminated) ||
       (stage === 'done' && !this.ableToBeDone)
     ) {
-      return 'in-progress';
+      return 'none';
     }
 
     return stage;
   }
 
   get broken(): boolean {
-    return !!this.task.runtime.nodeBroken?.(this);
+    return !this.blocked && !!this.task.runtime.nodeBroken?.(this);
   }
 
   get ignored(): boolean {
-    return !!this.task.runtime.nodeIgnored?.(this);
+    return !this.blocked && !!this.task.runtime.nodeIgnored?.(this);
   }
 
   get ableToBeStart(): boolean {
+    if (this.blocked) {
+      return false;
+    }
+
     let {nodeStartAble} = this.task.runtime;
 
     if (!nodeStartAble) {
@@ -76,6 +80,10 @@ export class TaskSingleNode {
   }
 
   get ableToBeDone(): boolean {
+    if (this.blocked) {
+      return false;
+    }
+
     let {nodeDone} = this.task.runtime;
 
     if (!nodeDone) {
