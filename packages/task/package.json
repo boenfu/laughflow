@@ -1,6 +1,6 @@
 {
   "name": "@magicflow/task",
-  "version": "0.0.0",
+  "version": "0.0.1-wip.2",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/library/index.js",
@@ -9,7 +9,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@magicflow/procedure": "*",
+    "@magicflow/procedure": "^0.0.1-wip.2",
     "lodash-es": "^4.17.20",
     "tslang": "^0.1.23",
     "tslib": "^2.2.0"
