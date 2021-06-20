@@ -1,6 +1,6 @@
 {
   "name": "@magicflow/icons",
-  "version": "0.0.1-wip.1",
+  "version": "0.0.1-wip.2",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/library/index.js",
