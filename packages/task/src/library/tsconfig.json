@@ -6,7 +6,7 @@
     "lib": ["ESNext", "DOM"],
     "outDir": "../../bld/library",
 
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "Node"
   },
   "references": [

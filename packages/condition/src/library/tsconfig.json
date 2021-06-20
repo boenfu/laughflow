@@ -4,7 +4,7 @@
     "composite": true,
     "outDir": "../../bld/library",
 
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "Node"
   },
   "references": []
