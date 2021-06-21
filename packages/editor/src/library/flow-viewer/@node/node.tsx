@@ -72,7 +72,9 @@ const Container = styled.div`
   position: relative;
 
   &.active {
-    box-shadow: 0 6px 12px rgba(58, 69, 92, 0.16);
+    ${Wrapper} {
+      box-shadow: 0 6px 12px rgba(58, 69, 92, 0.16);
+    }
 
     .header {
       color: #ffffff;

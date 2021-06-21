@@ -5,7 +5,7 @@
 
     "jsx": "react",
 
-    "module": "CommonJS",
+    "module": "ESNext",
     "moduleResolution": "Node",
 
     "outDir": "../../bld/library"

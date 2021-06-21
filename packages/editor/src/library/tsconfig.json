@@ -7,7 +7,7 @@
     "jsx": "react",
     "downlevelIteration": true,
 
-    "module": "CommonJS",
+    "module": "ESNext",
     "moduleResolution": "Node",
 
     "outDir": "../../bld/library"
