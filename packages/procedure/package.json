@@ -15,7 +15,7 @@
     "lodash-es": "^4.17.20",
     "nanoid": "^3.1.20",
     "tslang": "^0.1.23",
-    "tslib": "^2.2.0"
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",

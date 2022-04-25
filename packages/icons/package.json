@@ -15,7 +15,7 @@
     "react": ">=16.8.0"
   },
   "dependencies": {
-    "tslib": "^2.2.0"
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
     "@svgr/cli": "^5.5.0"

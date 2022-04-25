@@ -15,7 +15,7 @@
     "@laughflow/procedure": "^0.0.1-wip.3",
     "lodash-es": "^4.17.20",
     "tslang": "^0.1.23",
-    "tslib": "^2.2.0"
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.4"

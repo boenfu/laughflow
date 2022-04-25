@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "lodash-es": "^4.17.20",
-    "tslib": "^2.2.0"
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.4"
