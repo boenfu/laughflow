@@ -1,6 +1,6 @@
 {
   "name": "@laughflow/condition",
-  "version": "0.0.1-wip.3",
+  "version": "0.1.1",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/library/index.js",

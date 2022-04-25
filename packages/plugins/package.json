@@ -1,6 +1,6 @@
 {
   "name": "@laughflow/plugins",
-  "version": "0.0.1-wip.3",
+  "version": "0.1.1",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/library/index.js",
@@ -13,10 +13,10 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@laughflow/condition": "^0.0.1-wip.3",
-    "@laughflow/icons": "^0.0.1-wip.3",
-    "@laughflow/procedure": "^0.0.1-wip.3",
-    "@laughflow/task": "^0.0.1-wip.3",
+    "@laughflow/condition": "^0.1.1",
+    "@laughflow/icons": "^0.1.1",
+    "@laughflow/procedure": "^0.1.1",
+    "@laughflow/task": "^0.1.1",
     "classnames": "^2.2.6",
     "lodash-es": "^4.17.20",
     "react-select": "^4.3.0",

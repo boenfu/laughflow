@@ -1,6 +1,6 @@
 {
   "name": "@laughflow/task",
-  "version": "0.0.1-wip.3",
+  "version": "0.1.1",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/library/index.js",
@@ -12,7 +12,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@laughflow/procedure": "^0.0.1-wip.3",
+    "@laughflow/procedure": "^0.1.1",
     "lodash-es": "^4.17.20",
     "tslang": "^0.1.23",
     "tslib": "^2.4.0"
