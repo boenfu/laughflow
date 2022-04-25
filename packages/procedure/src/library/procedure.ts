@@ -1,6 +1,6 @@
 import {compact} from 'lodash-es';
 
-import {
+import type {
   BranchesNode,
   Flow,
   FlowId,

@@ -1,4 +1,5 @@
-import {FlowId, ProcedureUtil} from '../../library';
+import type {FlowId} from '../../library';
+import {ProcedureUtil} from '../../library';
 
 test('createFlow params', () => {
   expect(ProcedureUtil.createFlow()).toBeTruthy();

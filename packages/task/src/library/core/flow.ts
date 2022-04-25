@@ -1,15 +1,11 @@
-import {Flow, FlowId, IOutputsEntity} from '@laughflow/procedure';
-import {Dict, Nominal} from 'tslang';
+import type {Flow, FlowId, IOutputsEntity} from '@laughflow/procedure';
+import type {Dict, Nominal} from 'tslang';
 
 import {getBranchesDefinition, getNodeDefinition} from '../utils';
 
-import {
-  TaskBranchesNode,
-  TaskNode,
-  TaskNodeMetadata,
-  TaskSingleNode,
-} from './node';
-import {Task, TaskStage} from './task';
+import type {TaskNode, TaskNodeMetadata} from './node';
+import {TaskBranchesNode, TaskSingleNode} from './node';
+import type {Task, TaskStage} from './task';
 
 export type TaskFlowId = Nominal<string, 'task-flow:id'>;
 

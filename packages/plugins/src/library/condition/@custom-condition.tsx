@@ -1,5 +1,6 @@
-import {Condition, Operant} from '@laughflow/condition';
-import React, {FC} from 'react';
+import type {Condition, Operant} from '@laughflow/condition';
+import type {FC} from 'react';
+import React from 'react';
 
 export type CustomOperant = Operant & {
   /**
@@ -31,12 +32,13 @@ export interface CustomConditionRenderDefinition {
   [TRenderType: string]: CustomConditionRender;
 }
 
-export const defaultConditionRenderDefinition: CustomConditionRenderDefinition = {
-  string: ({value, onChange}) => (
-    <input
-      type="text"
-      value={value}
-      onChange={event => onChange(event.target.value)}
-    />
-  ),
-};
+export const defaultConditionRenderDefinition: CustomConditionRenderDefinition =
+  {
+    string: ({value, onChange}) => (
+      <input
+        type="text"
+        value={value}
+        onChange={event => onChange(event.target.value)}
+      />
+    ),
+  };

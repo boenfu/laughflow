@@ -1,4 +1,5 @@
-import {Patch, applyPatches} from 'immer';
+import type {Patch} from 'immer';
+import {applyPatches} from 'immer';
 
 export class UndoStack {
   constructor(

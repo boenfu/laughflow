@@ -1,7 +1,7 @@
-import {FlowId, Node, NodeId} from '../core';
+import type {FlowId, Node, NodeId} from '../core';
 import {ProcedureUtil} from '../utils';
 
-import {Operator} from './common';
+import type {Operator} from './common';
 
 export function addNode<TNode extends Node>(node: TNode): Operator<[TNode]> {
   return definition => {

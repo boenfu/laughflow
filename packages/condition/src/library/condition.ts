@@ -1,4 +1,4 @@
-import {OperatorName, Type} from './operator';
+import type {OperatorName, Type} from './operator';
 
 export interface IOperant {
   type: Type;

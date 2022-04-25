@@ -1,4 +1,4 @@
-import {Dict} from 'tslang';
+import type {Dict} from 'tslang';
 
 export * from './procedure';
 export * from './operators';

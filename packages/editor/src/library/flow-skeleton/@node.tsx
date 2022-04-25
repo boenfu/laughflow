@@ -1,6 +1,7 @@
 import {Branch} from '@laughflow/icons';
 import classNames from 'classnames';
-import React, {FC, Fragment, MouseEvent} from 'react';
+import type {FC, MouseEvent} from 'react';
+import React, {Fragment} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../@common';
@@ -9,7 +10,7 @@ import {Icon} from './@common';
 import {Flow} from './@flow';
 import {LINE_HEIGHT_DEFAULT, LINE_HEIGHT_LEAF, Wire} from './@wire';
 import {useSkeletonContext} from './context';
-import {INode} from './flow-skeleton';
+import type {INode} from './flow-skeleton';
 
 const Container = styled.div`
   display: flex;

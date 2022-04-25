@@ -1,14 +1,13 @@
-import {IPlugin} from '@laughflow/plugins';
-import {
+import type {IPlugin} from '@laughflow/plugins';
+import type {
   ProcedureBranchesTreeNode,
   ProcedureDefinition,
   ProcedureFlow,
   ProcedureSingleTreeNode,
 } from '@laughflow/procedure';
 import {useCreation, useKeyPress, useUpdate} from 'ahooks';
+import type {ComponentType, FC} from 'react';
 import React, {
-  ComponentType,
-  FC,
   createContext,
   forwardRef,
   useEffect,

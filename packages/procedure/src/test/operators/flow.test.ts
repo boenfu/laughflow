@@ -1,5 +1,5 @@
 /* eslint-disable @mufan/import-path-shallowest */
-import {FlowId, NodeId} from '../../library';
+import type {FlowId, NodeId} from '../../library';
 import {
   addFlow,
   addFlowStart,

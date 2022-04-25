@@ -1,6 +1,7 @@
-import {SingleNode} from '@laughflow/procedure';
+import type {SingleNode} from '@laughflow/procedure';
 import {useDebounceFn} from 'ahooks';
-import React, {ChangeEvent, FC, MouseEvent, useEffect, useRef} from 'react';
+import type {ChangeEvent, FC, MouseEvent} from 'react';
+import React, {useEffect, useRef} from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`

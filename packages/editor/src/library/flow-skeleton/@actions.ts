@@ -1,9 +1,9 @@
-import {IFlow, INode} from './flow-skeleton';
+import type {IFlow, INode} from './flow-skeleton';
 
 export interface IAction<
   TType extends string,
   TTarget extends IFlow | INode | undefined,
-  TPosition extends ActionPosition | undefined = undefined
+  TPosition extends ActionPosition | undefined = undefined,
 > {
   type: TType;
   target: TTarget;
@@ -25,7 +25,7 @@ export type Action<TFlow extends IFlow = IFlow> =
 
 type _NodeAction<
   TFlow extends IFlow = IFlow,
-  TNode extends INode = Exclude<TFlow['starts'][number], {flows: any}>
+  TNode extends INode = Exclude<TFlow['starts'][number], {flows: any}>,
 > =
   | AddNodeAction<TNode>
   | AddBranchesNodeAction<TNode>
@@ -44,7 +44,7 @@ export type NodeAction<TFlow extends IFlow = IFlow> = ActionWithPrefix<
 
 type _BranchesNodeAction<
   TFlow extends IFlow = IFlow,
-  TBranchesNode extends INode = Extract<TFlow['starts'][number], {flows?: any}>
+  TBranchesNode extends INode = Extract<TFlow['starts'][number], {flows?: any}>,
 > =
   | AddNodeAction<TBranchesNode>
   | AddBranchesNodeAction<TBranchesNode>
@@ -69,7 +69,7 @@ export type FlowAction<TFlow extends IFlow = IFlow> = ActionWithPrefix<
 
 type ActionWithPrefix<
   TAction extends IAction<string, any, any>,
-  P extends string
+  P extends string,
 > = [TAction['type']] extends [infer TType]
   ? TType extends string
     ? {
@@ -93,7 +93,7 @@ type DisconnectNodeAction<T extends INode> = IAction<'disconnect-node', T>;
 
 export interface SuffixToPosition<
   TFlow extends IFlow = IFlow,
-  TNode extends INode = TFlow['starts'][number]
+  TNode extends INode = TFlow['starts'][number],
 > {
   'between-nodes': [TNode, TNode];
   'after-node': [TNode];
@@ -104,7 +104,7 @@ export interface SuffixToPosition<
 type NodeActionWithPresetPosition<
   TType extends string,
   TFlow extends IFlow,
-  TTarget extends INode | undefined
+  TTarget extends INode | undefined,
 > = [keyof SuffixToPosition] extends [infer TSuffix]
   ? TSuffix extends keyof SuffixToPosition
     ? IAction<`${TType}-${TSuffix}`, TTarget, SuffixToPosition<TFlow>[TSuffix]>

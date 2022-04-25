@@ -1,22 +1,13 @@
 import {useKeyPress} from 'ahooks';
-import React, {
-  FC,
-  PropsWithChildren,
-  ReactElement,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import type {FC, PropsWithChildren, ReactElement} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import styled from 'styled-components';
 
-import {Action} from './@actions';
+import type {Action} from './@actions';
 import {Flow} from './@flow';
 import {Navigation} from './@navigation';
-import {
-  ActiveState,
-  FlowSkeletonContext,
-  FlowSkeletonContextProvider,
-} from './context';
+import type {ActiveState, FlowSkeletonContext} from './context';
+import {FlowSkeletonContextProvider} from './context';
 
 const Wrapper = styled.div`
   position: relative;

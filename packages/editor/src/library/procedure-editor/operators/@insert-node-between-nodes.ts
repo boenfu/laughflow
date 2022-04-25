@@ -1,6 +1,6 @@
-import {NodeId} from '@laughflow/procedure';
+import type {NodeId} from '@laughflow/procedure';
+import type {OperatorFunction} from '@laughflow/procedure/operators';
 import {
-  OperatorFunction,
   addNodeNexts,
   compose,
   replaceNodeNext,
@@ -9,5 +9,7 @@ import {
 export const insertNodeBetweenNodes: ({}: {
   from: NodeId;
   to: NodeId;
-}) => OperatorFunction<[NodeId]> = ({from, to}) => target =>
-  compose([replaceNodeNext(from, to, target), addNodeNexts(target, [to])]);
+}) => OperatorFunction<[NodeId]> =
+  ({from, to}) =>
+  target =>
+    compose([replaceNodeNext(from, to, target), addNodeNexts(target, [to])]);

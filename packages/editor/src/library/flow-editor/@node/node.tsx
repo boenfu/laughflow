@@ -1,11 +1,13 @@
 import {Copy, Cut, Jump, Wrong} from '@laughflow/icons';
-import {ProcedureSingleTreeNode} from '@laughflow/procedure';
-import classnames from 'classnames';
-import React, {FC, HtmlHTMLAttributes, createElement, useContext} from 'react';
+import type {ProcedureSingleTreeNode} from '@laughflow/procedure';
+import classNames from 'classnames';
+import type {FC, HtmlHTMLAttributes} from 'react';
+import React, {createElement, useContext} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../../@common';
-import {ActiveState, useSkeletonContext} from '../../flow-skeleton';
+import type {ActiveState} from '../../flow-skeleton';
+import {useSkeletonContext} from '../../flow-skeleton';
 import {FlowEditorContext} from '../flow-editor';
 
 import {Header} from './@header';
@@ -173,9 +175,9 @@ const DeleteButton: FC<HtmlHTMLAttributes<HTMLDivElement>> = ({...props}) => {
   );
 };
 
-const STATE_ICON_DICT: Partial<
-  {[key in NonNullable<ActiveState>]: React.ElementType}
-> = {
+const STATE_ICON_DICT: Partial<{
+  [key in NonNullable<ActiveState>]: React.ElementType;
+}> = {
   moving: Cut,
   copying: Copy,
   connecting: Jump,
@@ -227,12 +229,8 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
     );
   }
 
-  let {
-    before,
-    after,
-    footer,
-    body,
-  } = editor.nodeRenderDescriptorDict.procedure.node;
+  let {before, after, footer, body} =
+    editor.nodeRenderDescriptorDict.procedure.node;
 
   let active = isActive(node);
   let editing = active ? activeState : undefined;
@@ -249,7 +247,7 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
         </BeforeWrapper>
       ) : undefined}
       <Wrapper
-        className={classnames([
+        className={classNames([
           className,
           {
             active,

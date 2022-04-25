@@ -1,15 +1,13 @@
-import {
-  OperatorDefinition,
-  VariableOperant,
-  listOperatorDefinitionsForLeftOperantOfType,
-} from '@laughflow/condition';
+import type {OperatorDefinition, VariableOperant} from '@laughflow/condition';
+import {listOperatorDefinitionsForLeftOperantOfType} from '@laughflow/condition';
 import {Exchange, Wrong} from '@laughflow/icons';
 import {isEqual} from 'lodash-es';
-import React, {FC, useContext, useState} from 'react';
+import type {FC} from 'react';
+import React, {useContext, useState} from 'react';
 import Select from 'react-select';
 import styled from 'styled-components';
 
-import {
+import type {
   CustomCondition,
   CustomConditionCandidate,
   CustomOperant,

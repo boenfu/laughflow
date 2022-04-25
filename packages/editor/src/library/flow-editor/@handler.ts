@@ -1,13 +1,13 @@
-import {ProcedureFlow} from '@laughflow/procedure';
+import type {ProcedureFlow} from '@laughflow/procedure';
 import {
   addNodeNexts,
   compose,
   removeFlow,
 } from '@laughflow/procedure/operators';
 
-import {FlowAction as Action} from '../flow-skeleton';
+import type {FlowAction as Action} from '../flow-skeleton';
+import type {ProcedureEditor} from '../procedure-editor';
 import {
-  ProcedureEditor,
   createFlow,
   createNode,
   createNodeAsFlowStart,

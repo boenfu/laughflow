@@ -1,4 +1,4 @@
-import {Flow, FlowId, ProcedureDefinition} from '../core';
+import type {Flow, FlowId, ProcedureDefinition} from '../core';
 
 import {createId} from './common';
 

@@ -1,11 +1,11 @@
-import {SingleNode} from '@laughflow/procedure';
-import {Dict} from 'tslang';
+import type {SingleNode} from '@laughflow/procedure';
+import type {Dict} from 'tslang';
 
 import {getBranchesDefinition, getNodeDefinition} from '../../utils';
-import {Task, TaskStage} from '../task';
+import type {Task, TaskStage} from '../task';
 
 import {TaskBranchesNode} from './branches';
-import {ITaskNodeMetadata, TaskNode, TaskNodeId} from './node';
+import type {ITaskNodeMetadata, TaskNode, TaskNodeId} from './node';
 
 export interface TaskSingleNodeMetadata
   extends ITaskNodeMetadata,

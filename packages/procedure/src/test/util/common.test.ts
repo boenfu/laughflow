@@ -1,4 +1,5 @@
-import {FlowId, NodeId, ProcedureUtil} from '../../library';
+import type {FlowId, NodeId} from '../../library';
+import {ProcedureUtil} from '../../library';
 
 const procedure = ProcedureUtil.createEmptyProcedure();
 

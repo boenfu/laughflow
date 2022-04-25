@@ -1,16 +1,18 @@
 import {Plus, PlusSmall, Union} from '@laughflow/icons';
 import {useBoolean, useClickAway} from 'ahooks';
 import classNames from 'classnames';
-import {Bezier, BezierPoint, BezierProps, BezierStroke, Mark} from 'rc-bezier';
-import React, {FC, MouseEvent, createContext, useContext, useRef} from 'react';
+import type {BezierPoint, BezierProps, BezierStroke, Mark} from 'rc-bezier';
+import {Bezier} from 'rc-bezier';
+import type {FC, MouseEvent} from 'react';
+import React, {createContext, useContext, useRef} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../@common';
 
-import {Action, SuffixToPosition} from './@actions';
+import type {Action, SuffixToPosition} from './@actions';
 import {Icon} from './@common';
 import {useSkeletonContext} from './context';
-import {IFlow, INode} from './flow-skeleton';
+import type {IFlow, INode} from './flow-skeleton';
 
 export const LINE_HEIGHT_DEFAULT = 48;
 
@@ -165,11 +167,11 @@ function buildAction(
     }
   }
 
-  return ({
+  return {
     type: `${prefix}:${type}-${suffix}`,
     target: active,
     position: next ? [start, next] : [start],
-  } as unknown) as Action;
+  } as unknown as Action;
 }
 
 const PasteButton: FC<{className?: string}> = ({className}) => {

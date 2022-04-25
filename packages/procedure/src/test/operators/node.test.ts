@@ -1,5 +1,5 @@
 /* eslint-disable @mufan/import-path-shallowest */
-import {NodeId} from '../../library';
+import type {NodeId} from '../../library';
 import {
   addNode,
   addNodeNexts,

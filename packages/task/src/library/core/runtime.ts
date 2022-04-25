@@ -1,15 +1,19 @@
-import {
+import type {
   Flow,
   Node,
   NodeId,
   NodeType,
   ProcedureDefinition,
 } from '@laughflow/procedure';
-import {Dict} from 'tslang';
+import type {Dict} from 'tslang';
 
-import {TaskFlowMetadata} from './flow';
-import {TaskNodeMetadata, TaskSingleNode, TaskSingleNodeMetadata} from './node';
-import {Task, TaskMetadata} from './task';
+import type {TaskFlowMetadata} from './flow';
+import type {
+  TaskNodeMetadata,
+  TaskSingleNode,
+  TaskSingleNodeMetadata,
+} from './node';
+import type {Task, TaskMetadata} from './task';
 
 export interface TaskRuntimeMethodParams {
   definition: ProcedureDefinition;
@@ -17,7 +21,7 @@ export interface TaskRuntimeMethodParams {
 }
 
 export interface TaskNodeRuntimeMethodParams<
-  TNodeType extends NodeType = NodeType
+  TNodeType extends NodeType = NodeType,
 > {
   definition: Extract<Node, {type: TNodeType}>;
   metadata: Extract<TaskNodeMetadata, {type: TNodeType}>;

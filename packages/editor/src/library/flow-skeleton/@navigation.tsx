@@ -1,11 +1,13 @@
 import {Expand} from '@laughflow/icons';
 import classNames from 'classnames';
-import React, {FC, MouseEvent} from 'react';
+import type {FC, MouseEvent} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import {IconButton, transition} from '../@common';
 
-import {IMenu, getMenus} from './@menus';
+import type {IMenu} from './@menus';
+import {getMenus} from './@menus';
 import {useSkeletonContext} from './context';
 
 const Wrapper = styled.div`
@@ -41,13 +43,8 @@ const Right = styled.div`
 `;
 
 export const Navigation: FC = React.memo(() => {
-  const {
-    active,
-    activeState,
-    setActive,
-    setActiveState,
-    onAction,
-  } = useSkeletonContext();
+  const {active, activeState, setActive, setActiveState, onAction} =
+    useSkeletonContext();
   const menus: IMenu[] = (active && getMenus?.(active)) || [];
 
   const onNodeMenuClick = (event: MouseEvent<HTMLDivElement>): void => {

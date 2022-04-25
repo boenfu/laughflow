@@ -1,6 +1,7 @@
-import {ITaskRuntime, TaskRuntime} from '@laughflow/task';
+import type {ITaskRuntime} from '@laughflow/task';
+import {TaskRuntime} from '@laughflow/task';
 
-import {IPlugin} from './plugin';
+import type {IPlugin} from './plugin';
 
 export class TaskPluginRuntime extends TaskRuntime {
   constructor(plugins: IPlugin[]) {

@@ -1,6 +1,6 @@
-import {FlowId, NodeId} from '@laughflow/procedure';
+import type {FlowId, NodeId} from '@laughflow/procedure';
+import type {OperatorFunction} from '@laughflow/procedure/operators';
 import {
-  OperatorFunction,
   addFlowStart,
   addNodeNexts,
   compose,
@@ -12,19 +12,21 @@ import {
 export const insertNodeAsFlowStart: ({}: {
   flow: FlowId;
   originStart?: NodeId | 'all';
-}) => OperatorFunction<[NodeId]> = ({flow, originStart}) => target =>
-  compose([
-    ...(originStart
-      ? originStart === 'all'
-        ? [
-            out(removeAllFlowStart(flow), starts => [
-              addFlowStart(flow, target),
-              addNodeNexts(target, starts),
-            ]),
-          ]
-        : [
-            replaceFlowStart(flow, originStart, target),
-            addNodeNexts(target, [originStart]),
-          ]
-      : [addFlowStart(flow, target)]),
-  ]);
+}) => OperatorFunction<[NodeId]> =
+  ({flow, originStart}) =>
+  target =>
+    compose([
+      ...(originStart
+        ? originStart === 'all'
+          ? [
+              out(removeAllFlowStart(flow), starts => [
+                addFlowStart(flow, target),
+                addNodeNexts(target, starts),
+              ]),
+            ]
+          : [
+              replaceFlowStart(flow, originStart, target),
+              addNodeNexts(target, [originStart]),
+            ]
+        : [addFlowStart(flow, target)]),
+    ]);

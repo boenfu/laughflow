@@ -1,7 +1,8 @@
-import React, {FC} from 'react';
+import type {FC} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
-import {ConditionAndGroup, CustomCondition} from '../../@custom-condition';
+import type {ConditionAndGroup, CustomCondition} from '../../@custom-condition';
 import {AddButton} from '../@add-button';
 
 import {ConditionLine} from './@line';

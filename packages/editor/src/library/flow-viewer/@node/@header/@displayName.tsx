@@ -1,5 +1,6 @@
-import {SingleNode} from '@laughflow/procedure';
-import React, {FC} from 'react';
+import type {SingleNode} from '@laughflow/procedure';
+import type {FC} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`

@@ -1,4 +1,4 @@
-import {NodeId} from '@laughflow/procedure';
+import type {NodeId} from '@laughflow/procedure';
 
 import {ProcedureOperator, ProcedureUtil} from '../../library';
 

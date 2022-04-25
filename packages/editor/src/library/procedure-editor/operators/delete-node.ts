@@ -1,6 +1,6 @@
-import {ProcedureTreeNode} from '@laughflow/procedure';
+import type {ProcedureTreeNode} from '@laughflow/procedure';
+import type {OperatorFunction} from '@laughflow/procedure/operators';
 import {
-  OperatorFunction,
   compose,
   removeFlowStart,
   removeNode,

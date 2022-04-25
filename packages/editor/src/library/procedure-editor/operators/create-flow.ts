@@ -1,6 +1,6 @@
-import {Flow, NodeId} from '@laughflow/procedure';
+import type {Flow, NodeId} from '@laughflow/procedure';
+import type {OperatorFunction} from '@laughflow/procedure/operators';
 import {
-  OperatorFunction,
   addFlow,
   addNode,
   addNode as _addNode,

@@ -1,11 +1,11 @@
 import {castArray} from 'lodash-es';
 import {nanoid} from 'nanoid';
 
-import {Flow, ProcedureDefinition} from '../core';
+import type {Flow, ProcedureDefinition} from '../core';
 import {ProcedureOperator} from '../operators';
 
 export function createId<TId>(): TId {
-  return (nanoid(8) as unknown) as TId;
+  return nanoid(8) as unknown as TId;
 }
 
 export function createEmptyProcedure(): ProcedureDefinition {
@@ -36,9 +36,9 @@ export function chain(): ProcedureChain {
   } & ProcedureChain;
 
   return new Proxy<ProcedureChainInternal>(
-    ({
+    {
       _fns: [],
-    } as unknown) as ProcedureChainInternal,
+    } as unknown as ProcedureChainInternal,
     {
       get(target, key, proxy) {
         if (key !== 'exec') {
@@ -50,9 +50,11 @@ export function chain(): ProcedureChain {
 
         return (definition: ProcedureDefinition) => {
           for (let [fnName, params] of target._fns) {
-            let fn = ((ProcedureOperator as unknown) as {
-              [key in string]: (...args: any[]) => any;
-            })[String(fnName)];
+            let fn = (
+              ProcedureOperator as unknown as {
+                [key in string]: (...args: any[]) => any;
+              }
+            )[String(fnName)];
 
             definition = castArray(fn(...params)(definition))[0];
           }

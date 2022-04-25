@@ -1,6 +1,6 @@
-import {Nominal} from 'tslang';
+import type {Nominal} from 'tslang';
 
-import {FlowId} from './flow';
+import type {FlowId} from './flow';
 
 export type NodeId = Nominal<string, 'node:id'>;
 

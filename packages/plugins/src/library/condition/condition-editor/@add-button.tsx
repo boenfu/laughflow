@@ -1,5 +1,6 @@
 import {Plus} from '@laughflow/icons';
-import React, {FC} from 'react';
+import type {FC} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`

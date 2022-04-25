@@ -1,13 +1,14 @@
-import React, {FC, Fragment} from 'react';
+import type {FC} from 'react';
+import React, {Fragment} from 'react';
 import styled from 'styled-components';
 
-import {
+import type {
   ConditionAndGroup,
   ConditionOrGroup,
   CustomConditionCandidate,
   CustomConditionRenderDefinition,
-  defaultConditionRenderDefinition,
 } from '../@custom-condition';
+import {defaultConditionRenderDefinition} from '../@custom-condition';
 
 import {AddButton} from './@add-button';
 import {ConditionContext} from './@context';

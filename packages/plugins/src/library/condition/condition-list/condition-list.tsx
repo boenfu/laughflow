@@ -1,10 +1,15 @@
-import {Operant, getOperatorDisplayName} from '@laughflow/condition';
+import type {Operant} from '@laughflow/condition';
+import {getOperatorDisplayName} from '@laughflow/condition';
 import classNames from 'classnames';
-import React, {FC} from 'react';
+import type {FC} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import {TextSeparator} from '../@common';
-import {ConditionOrGroup, CustomConditionCandidate} from '../@custom-condition';
+import type {
+  ConditionOrGroup,
+  CustomConditionCandidate,
+} from '../@custom-condition';
 
 const Wrapper = styled.div``;
 

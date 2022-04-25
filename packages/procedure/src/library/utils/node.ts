@@ -1,4 +1,4 @@
-import {
+import type {
   BranchesNode,
   Node,
   NodeId,

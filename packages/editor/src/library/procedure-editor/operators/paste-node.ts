@@ -1,7 +1,10 @@
-import {FlowId, NodeId, ProcedureSingleTreeNode} from '@laughflow/procedure';
+import type {
+  FlowId,
+  NodeId,
+  ProcedureSingleTreeNode,
+} from '@laughflow/procedure';
+import type {Operator, OperatorFunction} from '@laughflow/procedure/operators';
 import {
-  Operator,
-  OperatorFunction,
   addNode,
   addNodeNexts,
   compose,

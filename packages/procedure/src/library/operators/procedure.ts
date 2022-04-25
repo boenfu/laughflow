@@ -1,6 +1,6 @@
-import {BranchesNode, Flow, FlowId, NodeId, SingleNode} from '../core';
+import type {BranchesNode, Flow, FlowId, NodeId, SingleNode} from '../core';
 
-import {Operator} from './common';
+import type {Operator} from './common';
 
 /**
  * 清理所有未使用的内容

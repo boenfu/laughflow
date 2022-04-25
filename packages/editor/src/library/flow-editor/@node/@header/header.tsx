@@ -1,6 +1,7 @@
-import {ProcedureSingleTreeNode, SingleNode} from '@laughflow/procedure';
+import type {ProcedureSingleTreeNode, SingleNode} from '@laughflow/procedure';
 import {updateNode} from '@laughflow/procedure/operators';
-import React, {FC, createElement, useContext} from 'react';
+import type {FC} from 'react';
+import React, {createElement, useContext} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../../../@common';

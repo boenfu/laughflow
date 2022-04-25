@@ -1,4 +1,4 @@
-import {TaskMetadata} from '../core';
+import type {TaskMetadata} from '../core';
 
 export type Operator<TRet = void> = (
   task: TaskMetadata,

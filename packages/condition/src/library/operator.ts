@@ -151,16 +151,14 @@ function generateOperators(
   right: Type,
   names: OperatorName[],
 ): OperatorDefinition[] {
-  return names.map(
-    (name): OperatorDefinition => {
-      return {
-        name,
-        left,
-        right,
-        ...commonOperatorDefinitionDict[name],
-      };
-    },
-  );
+  return names.map((name): OperatorDefinition => {
+    return {
+      name,
+      left,
+      right,
+      ...commonOperatorDefinitionDict[name],
+    };
+  });
 }
 
 function includes(leftValue: any, rightValue: any): boolean {
@@ -179,28 +177,30 @@ function includes(leftValue: any, rightValue: any): boolean {
   }
 }
 
-export const leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap = new Map(
-  Object.entries(
-    groupBy(operatorDefinitions, definition => definition.left),
-  ).map(([left, definitions]: [Type, OperatorDefinition[]]) => [
-    left,
-    new Map(
-      Object.entries(
-        groupBy(definitions, definition => definition.name),
-      ).map(([name, definitions]: [OperatorName, OperatorDefinition[]]) => [
-        name,
-        new Map(definitions.map(definition => [definition.right, definition])),
-      ]),
-    ),
-  ]),
-);
+export const leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap =
+  new Map(
+    Object.entries(
+      groupBy(operatorDefinitions, definition => definition.left),
+    ).map(([left, definitions]: [Type, OperatorDefinition[]]) => [
+      left,
+      new Map(
+        Object.entries(groupBy(definitions, definition => definition.name)).map(
+          ([name, definitions]: [OperatorName, OperatorDefinition[]]) => [
+            name,
+            new Map(
+              definitions.map(definition => [definition.right, definition]),
+            ),
+          ],
+        ),
+      ),
+    ]),
+  );
 
 export function listOperatorDefinitionsForLeftOperantOfType(
   type: Type,
 ): OperatorDefinition[] {
-  let operatorNameToRightTypeToOperatorDefinitionMapMap = leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap.get(
-    type,
-  );
+  let operatorNameToRightTypeToOperatorDefinitionMapMap =
+    leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap.get(type);
 
   if (!operatorNameToRightTypeToOperatorDefinitionMapMap) {
     return [];
@@ -217,9 +217,8 @@ export function getRightOperantType(
   left: Type,
   operator: OperatorName,
 ): Type | undefined {
-  let operatorNameToRightTypeToOperatorDefinitionMapMap = leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap.get(
-    left,
-  );
+  let operatorNameToRightTypeToOperatorDefinitionMapMap =
+    leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap.get(left);
 
   let rightTypeToOperatorDefinitionMap =
     operatorNameToRightTypeToOperatorDefinitionMapMap &&

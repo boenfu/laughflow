@@ -1,6 +1,11 @@
 {
   "root": true,
-  "ignorePatterns": ["bld", ".bld-cache", "packages/icons"],
+  "ignorePatterns": [
+    "bld",
+    ".bld-cache",
+    "packages/icons",
+    "packages/procedure/**/*.js"
+  ],
   "extends": ["eslint:recommended"],
   "env": {
     "node": true,
@@ -12,6 +17,10 @@
       "extends": ["plugin:@mufan/default"],
       "parserOptions": {
         "project": "**/tsconfig.json"
+      },
+      "rules": {
+        "@mufan/reference-missing-proof": 0,
+        "@mufan/no-object-literal-type-assertion": 0
       }
     },
     {

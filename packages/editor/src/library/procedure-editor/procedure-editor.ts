@@ -1,19 +1,24 @@
-import {IPlugin, NodeRender, PluginConfigComponent} from '@laughflow/plugins';
-import {
-  Procedure,
+import type {
+  IPlugin,
+  NodeRender,
+  PluginConfigComponent,
+} from '@laughflow/plugins';
+import type {
   ProcedureDefinition,
   ProcedureFlow,
   ProcedureSingleTreeNode,
   ProcedureTreeView,
-  ProcedureUtil,
   SingleNode,
 } from '@laughflow/procedure';
-import {Operator, compose, updateNode} from '@laughflow/procedure/operators';
+import {Procedure, ProcedureUtil} from '@laughflow/procedure';
+import type {Operator} from '@laughflow/procedure/operators';
+import {compose, updateNode} from '@laughflow/procedure/operators';
 import {createEmptyProcedure} from '@laughflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
 import {enableAllPlugins, produce} from 'immer';
 import {compact, fromPairs} from 'lodash-es';
-import {ComponentType, createElement} from 'react';
+import type {ComponentType} from 'react';
+import {createElement} from 'react';
 
 import {UndoStack} from './@undo-stack';
 
@@ -90,7 +95,6 @@ export class ProcedureEditor extends Eventemitter<ProcedureEventType> {
               ? [
                   plugin.name,
                   () => {
-                    // eslint-disable-next-line @mufan/no-unnecessary-type-assertion
                     let Component = plugin.procedure!.render.node!.config!;
 
                     return createElement<
@@ -158,7 +162,6 @@ export function buildNodeRenderDescriptor(
     if (node) {
       for (let [name, component] of Object.entries(node)) {
         if (component) {
-          // eslint-disable-next-line @mufan/no-unnecessary-type-assertion
           nodeRenderDescriptor['node'][
             name as keyof NodeRenderDescriptor['node']
           ]!.push(component);

@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import {castArray} from 'lodash-es';
-import React, {FC} from 'react';
+import type {FC} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 export interface IconButtonProps extends React.HTMLAttributes<HTMLDivElement> {

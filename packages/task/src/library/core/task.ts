@@ -1,4 +1,5 @@
-import {
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import type {
   Flow,
   FlowId,
   IOutputsEntity,
@@ -9,21 +10,22 @@ import {
   ProcedureId,
 } from '@laughflow/procedure';
 import {cloneDeep} from 'lodash-es';
-import {Dict, Nominal} from 'tslang';
+import type {Dict, Nominal} from 'tslang';
 
-import {Operator} from '../operators';
+import type {Operator} from '../operators';
 import {flatFlow, getFlowDefinition, initNode, initTask} from '../utils';
 
-import {TaskFlow, TaskFlowMetadata} from './flow';
-import {
+import type {TaskFlowMetadata} from './flow';
+import {TaskFlow} from './flow';
+import type {
   TaskBranchesNode,
   TaskBranchesNodeMetadata,
   TaskNode,
   TaskNodeMetadata,
-  TaskSingleNode,
   TaskSingleNodeMetadata,
 } from './node';
-import {ITaskRuntime} from './runtime';
+import {TaskSingleNode} from './node';
+import type {ITaskRuntime} from './runtime';
 
 export type TaskId = Nominal<string, 'task:id'>;
 

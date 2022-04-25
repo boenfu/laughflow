@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import {evaluate} from '@laughflow/condition';
 import {ArrowDown} from '@laughflow/icons';
-import {TaskNodeRuntimeMethodParams} from '@laughflow/task';
+import type {TaskNodeRuntimeMethodParams} from '@laughflow/task';
 import React from 'react';
 import styled from 'styled-components';
 
-import {IPlugin, IProcedurePlugin, ITaskPlugin} from '../plugin';
+import type {IPlugin, IProcedurePlugin, ITaskPlugin} from '../plugin';
 
-import {
+import type {
   ConditionOrGroup,
   CustomCondition,
   CustomConditionCandidate,

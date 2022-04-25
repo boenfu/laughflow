@@ -1,9 +1,14 @@
 import {Copy, Cut, Jump, More, Plus, Trash, Union} from '@laughflow/icons';
-import {FC} from 'react';
+import type {FC} from 'react';
 
-import {Action, BranchesNodeAction, FlowAction, NodeAction} from './@actions';
-import {ActiveState} from './context';
-import {IFlow, INode} from './flow-skeleton';
+import type {
+  Action,
+  BranchesNodeAction,
+  FlowAction,
+  NodeAction,
+} from './@actions';
+import type {ActiveState} from './context';
+import type {IFlow, INode} from './flow-skeleton';
 
 export interface IMenu {
   type: string;

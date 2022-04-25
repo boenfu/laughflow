@@ -1,6 +1,6 @@
 import {castArray} from 'lodash-es';
 
-import {ProcedureDefinition} from '../core';
+import type {ProcedureDefinition} from '../core';
 
 export type Operator<TRet = void> = (
   definition: ProcedureDefinition,
@@ -86,7 +86,7 @@ export function variables<TContext>(
       let operator = expression(variable);
       let ret = castArray(operator(definition)) as [
         ProcedureDefinition,
-        ...any[]
+        ...any[],
       ];
 
       if (outedOperatorMap.has(operator)) {

@@ -1,9 +1,10 @@
-import {IPlugin} from '@laughflow/plugins';
-import {
+import type {IPlugin} from '@laughflow/plugins';
+import type {
   ProcedureDefinition,
   ProcedureSingleTreeNode,
 } from '@laughflow/procedure';
-import {Task, TaskSingleNode} from '@laughflow/task';
+import type {TaskSingleNode} from '@laughflow/task';
+import {Task} from '@laughflow/task';
 import {useCreation, useUpdate} from 'ahooks';
 import React, {
   createContext,

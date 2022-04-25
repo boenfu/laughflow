@@ -1,4 +1,4 @@
-import {Condition, Operant} from './condition';
+import type {Condition, Operant} from './condition';
 import {
   commonOperatorDefinitionDict,
   leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap,
@@ -12,12 +12,12 @@ export function evaluate(
 ): boolean {
   return orGroup.some(andGroup =>
     andGroup.every(({operator: operatorName, left, right}) => {
-      let operatorNameToRightTypeToOperatorDefinitionMapMap = leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap.get(
-        left.type,
-      );
-      let rightTypeToOperatorDefinitionMap = operatorNameToRightTypeToOperatorDefinitionMapMap?.get(
-        operatorName,
-      );
+      let operatorNameToRightTypeToOperatorDefinitionMapMap =
+        leftTypeToOperatorNameToRightTypeToOperatorDefinitionMapMapMap.get(
+          left.type,
+        );
+      let rightTypeToOperatorDefinitionMap =
+        operatorNameToRightTypeToOperatorDefinitionMapMap?.get(operatorName);
 
       let operatorDefinition =
         rightTypeToOperatorDefinitionMap?.get(right.type) ??

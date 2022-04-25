@@ -1,6 +1,6 @@
-import {ProcedureSingleTreeNode, SingleNode} from '@laughflow/procedure';
-import {ITaskRuntime, TaskSingleNode} from '@laughflow/task';
-import {ComponentType, ReactNode} from 'react';
+import type {ProcedureSingleTreeNode, SingleNode} from '@laughflow/procedure';
+import type {ITaskRuntime, TaskSingleNode} from '@laughflow/task';
+import type {ComponentType, ReactNode} from 'react';
 
 export type PluginRenderComponent<TNode> = ComponentType<{
   node: TNode;

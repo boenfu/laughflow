@@ -1,4 +1,4 @@
-import {
+import type {
   BranchesNode,
   Flow,
   FlowId,
@@ -9,7 +9,7 @@ import {
 } from '@laughflow/procedure';
 import {createId} from '@laughflow/procedure/utils';
 
-import {
+import type {
   Task,
   TaskBranchesNode,
   TaskBranchesNodeMetadata,
@@ -18,9 +18,9 @@ import {
   TaskMetadata,
   TaskNodeId,
   TaskNodeMetadata,
-  TaskSingleNode,
   TaskSingleNodeMetadata,
 } from '../core';
+import {TaskSingleNode} from '../core';
 
 export function getFlowDefinition(task: Task, flow: FlowId): Flow | undefined {
   return task.procedure.flowsMap.get(flow);

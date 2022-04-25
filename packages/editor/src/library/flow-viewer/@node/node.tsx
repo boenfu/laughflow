@@ -1,7 +1,8 @@
-import {ProcedureSingleTreeNode} from '@laughflow/procedure';
+import type {ProcedureSingleTreeNode} from '@laughflow/procedure';
 import {TaskSingleNode} from '@laughflow/task';
-import classnames from 'classnames';
-import React, {FC, createElement, useContext} from 'react';
+import classNames from 'classnames';
+import type {FC} from 'react';
+import React, {createElement, useContext} from 'react';
 import styled from 'styled-components';
 
 import {useSkeletonContext} from '../../flow-skeleton';
@@ -139,18 +140,14 @@ export const SingleNode: FC<SingleNodeProps> = ({className, node}) => {
     );
   }
 
-  let {
-    before,
-    after,
-    footer,
-    body,
-  } = editor.nodeRenderDescriptorDict.procedure.node;
+  let {before, after, footer, body} =
+    editor.nodeRenderDescriptorDict.procedure.node;
 
   let active = isActive(node);
 
   return (
     <Container
-      className={classnames([
+      className={classNames([
         className,
         {
           active,

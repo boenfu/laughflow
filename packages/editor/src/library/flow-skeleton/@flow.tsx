@@ -1,5 +1,6 @@
 import classNames from 'classnames';
-import React, {FC, Fragment, MouseEvent} from 'react';
+import type {FC, MouseEvent} from 'react';
+import React, {Fragment} from 'react';
 import styled from 'styled-components';
 
 import {transition} from '../@common';
@@ -7,7 +8,7 @@ import {transition} from '../@common';
 import {Node} from './@node';
 import {LINE_HEIGHT_DEFAULT, Wire} from './@wire';
 import {useSkeletonContext} from './context';
-import {IFlow, INode} from './flow-skeleton';
+import type {IFlow, INode} from './flow-skeleton';
 
 const Container = styled.div`
   display: inline-flex;

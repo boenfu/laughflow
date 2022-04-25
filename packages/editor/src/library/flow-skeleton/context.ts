@@ -1,13 +1,13 @@
 import {createContext, useContext} from 'react';
 
-import {Action} from './@actions';
-import {IFlow} from './flow-skeleton';
+import type {Action} from './@actions';
+import type {IFlow} from './flow-skeleton';
 
 export type ActiveState = 'moving' | 'copying' | 'connecting' | undefined;
 
 export interface FlowSkeletonContext<
   TFlow extends IFlow,
-  TNode = TFlow['starts'][number]
+  TNode = TFlow['starts'][number],
 > {
   active: TFlow | TNode | undefined;
   activeState: ActiveState;
@@ -28,6 +28,6 @@ const FlowSkeletonContext = createContext<FlowSkeletonContext<IFlow>>(
 export const FlowSkeletonContextProvider = FlowSkeletonContext.Provider;
 
 export const useSkeletonContext = <
-  TFlow extends IFlow
+  TFlow extends IFlow,
 >(): FlowSkeletonContext<TFlow> =>
   useContext(FlowSkeletonContext) as FlowSkeletonContext<TFlow>;

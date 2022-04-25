@@ -1,7 +1,7 @@
-import {Flow, FlowId, NodeId} from '../core';
+import type {Flow, FlowId, NodeId} from '../core';
 import {ProcedureUtil} from '../utils';
 
-import {Operator} from './common';
+import type {Operator} from './common';
 
 export function addFlow(branchesNodeId: NodeId, flow: Flow): Operator<[Flow]> {
   return definition => {
