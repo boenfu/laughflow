@@ -1,4 +1,4 @@
-# @magicflow/plugins
+# @laughflow/plugins
 
 Just another awesome magic.
 

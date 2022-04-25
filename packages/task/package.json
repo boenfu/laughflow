@@ -1,5 +1,5 @@
 {
-  "name": "@magicflow/task",
+  "name": "@laughflow/task",
   "version": "0.0.1-wip.3",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
@@ -12,7 +12,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@magicflow/procedure": "^0.0.1-wip.3",
+    "@laughflow/procedure": "^0.0.1-wip.3",
     "lodash-es": "^4.17.20",
     "tslang": "^0.1.23",
     "tslib": "^2.2.0"

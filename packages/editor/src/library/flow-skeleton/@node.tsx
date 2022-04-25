@@ -1,4 +1,4 @@
-import {Branch} from '@magicflow/icons';
+import {Branch} from '@laughflow/icons';
 import classNames from 'classnames';
 import React, {FC, Fragment, MouseEvent} from 'react';
 import styled from 'styled-components';

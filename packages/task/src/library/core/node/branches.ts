@@ -1,4 +1,4 @@
-import {BranchesNode} from '@magicflow/procedure';
+import {BranchesNode} from '@laughflow/procedure';
 import {Dict} from 'tslang';
 
 import {
@@ -14,7 +14,7 @@ import {TaskSingleNode} from './single';
 
 export interface TaskBranchesNodeMetadata
   extends ITaskNodeMetadata,
-    Magicflow.TaskBranchesNodeMetadataExtension {
+    laughflow.TaskBranchesNodeMetadataExtension {
   type: 'branchesNode';
   flows: TaskFlowMetadata[];
 }

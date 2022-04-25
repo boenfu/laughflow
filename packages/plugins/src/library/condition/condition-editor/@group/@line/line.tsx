@@ -2,8 +2,8 @@ import {
   OperatorDefinition,
   VariableOperant,
   listOperatorDefinitionsForLeftOperantOfType,
-} from '@magicflow/condition';
-import {Exchange, Wrong} from '@magicflow/icons';
+} from '@laughflow/condition';
+import {Exchange, Wrong} from '@laughflow/icons';
 import {isEqual} from 'lodash-es';
 import React, {FC, useContext, useState} from 'react';
 import Select from 'react-select';

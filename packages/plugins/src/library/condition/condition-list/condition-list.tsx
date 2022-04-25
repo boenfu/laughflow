@@ -1,4 +1,4 @@
-import {Operant, getOperatorDisplayName} from '@magicflow/condition';
+import {Operant, getOperatorDisplayName} from '@laughflow/condition';
 import classNames from 'classnames';
 import React, {FC} from 'react';
 import styled from 'styled-components';

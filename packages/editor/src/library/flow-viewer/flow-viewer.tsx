@@ -1,9 +1,9 @@
-import {IPlugin} from '@magicflow/plugins';
+import {IPlugin} from '@laughflow/plugins';
 import {
   ProcedureDefinition,
   ProcedureSingleTreeNode,
-} from '@magicflow/procedure';
-import {Task, TaskSingleNode} from '@magicflow/task';
+} from '@laughflow/procedure';
+import {Task, TaskSingleNode} from '@laughflow/task';
 import {useCreation, useUpdate} from 'ahooks';
 import React, {
   createContext,

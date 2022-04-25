@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import {evaluate} from '@magicflow/condition';
-import {ArrowDown} from '@magicflow/icons';
-import {TaskNodeRuntimeMethodParams} from '@magicflow/task';
+import {evaluate} from '@laughflow/condition';
+import {ArrowDown} from '@laughflow/icons';
+import {TaskNodeRuntimeMethodParams} from '@laughflow/task';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -15,7 +15,7 @@ import {
 import {ConditionList} from './condition-list';
 
 declare global {
-  namespace Magicflow {
+  namespace laughflow {
     interface SingleNodeExtension {
       conditions?: {
         enter?: ConditionOrGroup;

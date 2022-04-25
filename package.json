@@ -1,11 +1,11 @@
 {
-  "name": "magicflow",
+  "name": "laughflow",
   "private": true,
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "scripts": {
     "lerna:publish": "yarn build && lerna publish prerelease --registry=https://registry.npmjs.org",
-    "prebuild:icons": "yarn workspace @magicflow/icons prebuild",
+    "prebuild:icons": "yarn workspace @laughflow/icons prebuild",
     "prebuild": "yarn prebuild:icons",
     "build": "rimraf packages/*/bld && tsc --build",
     "lint": "eslint .",

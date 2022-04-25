@@ -1,4 +1,4 @@
-import {ITaskRuntime, TaskRuntime} from '@magicflow/task';
+import {ITaskRuntime, TaskRuntime} from '@laughflow/task';
 
 import {IPlugin} from './plugin';
 

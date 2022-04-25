@@ -1,4 +1,4 @@
-import {Expand} from '@magicflow/icons';
+import {Expand} from '@laughflow/icons';
 import classNames from 'classnames';
 import React, {FC, MouseEvent} from 'react';
 import styled from 'styled-components';

@@ -1,4 +1,4 @@
-import {SingleNode} from '@magicflow/procedure';
+import {SingleNode} from '@laughflow/procedure';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 

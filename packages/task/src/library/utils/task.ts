@@ -6,8 +6,8 @@ import {
   NodeId,
   ProcedureDefinition,
   SingleNode,
-} from '@magicflow/procedure';
-import {createId} from '@magicflow/procedure/utils';
+} from '@laughflow/procedure';
+import {createId} from '@laughflow/procedure/utils';
 
 import {
   Task,

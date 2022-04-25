@@ -1,4 +1,4 @@
-import {Plus, PlusSmall, Union} from '@magicflow/icons';
+import {Plus, PlusSmall, Union} from '@laughflow/icons';
 import {useBoolean, useClickAway} from 'ahooks';
 import classNames from 'classnames';
 import {Bezier, BezierPoint, BezierProps, BezierStroke, Mark} from 'rc-bezier';

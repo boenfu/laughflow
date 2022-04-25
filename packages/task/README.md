@@ -1,4 +1,4 @@
-# @magicflow/task
+# @laughflow/task
 
 Just another awesome magic.
 

@@ -1,12 +1,12 @@
 {
   "extends": "@mufan/code-boilerplates/typescript",
   "options": {
-    "name": "magicflow",
+    "name": "laughflow",
     "license": "MIT",
     "author": "Chengdu Mufan Technology Co., Ltd.",
     "packages": [
       {
-        "name": "@magicflow/procedure",
+        "name": "@laughflow/procedure",
         "tsProjects": [
           {
             "name": "library",
@@ -19,13 +19,13 @@
         ]
       },
       {
-        "name": "@magicflow/task",
+        "name": "@laughflow/task",
         "tsProjects": [
           {
             "name": "library",
             "references": [
               {
-                "package": "@magicflow/procedure",
+                "package": "@laughflow/procedure",
                 "project": "library"
               }
             ]
@@ -37,25 +37,25 @@
         ]
       },
       {
-        "name": "@magicflow/editor",
+        "name": "@laughflow/editor",
         "tsProjects": [
           {
             "name": "library",
             "references": [
               {
-                "package": "@magicflow/procedure",
+                "package": "@laughflow/procedure",
                 "project": "library"
               },
               {
-                "package": "@magicflow/task",
+                "package": "@laughflow/task",
                 "project": "library"
               },
               {
-                "package": "@magicflow/plugins",
+                "package": "@laughflow/plugins",
                 "project": "library"
               },
               {
-                "package": "@magicflow/icons",
+                "package": "@laughflow/icons",
                 "project": "library"
               }
             ]
@@ -67,7 +67,7 @@
         ]
       },
       {
-        "name": "@magicflow/condition",
+        "name": "@laughflow/condition",
         "tsProjects": [
           {
             "name": "library",
@@ -79,25 +79,25 @@
         ]
       },
       {
-        "name": "@magicflow/plugins",
+        "name": "@laughflow/plugins",
         "tsProjects": [
           {
             "name": "library",
             "references": [
               {
-                "package": "@magicflow/procedure",
+                "package": "@laughflow/procedure",
                 "project": "library"
               },
               {
-                "package": "@magicflow/task",
+                "package": "@laughflow/task",
                 "project": "library"
               },
               {
-                "package": "@magicflow/condition",
+                "package": "@laughflow/condition",
                 "project": "library"
               },
               {
-                "package": "@magicflow/icons",
+                "package": "@laughflow/icons",
                 "project": "library"
               }
             ]
@@ -108,7 +108,7 @@
         ]
       },
       {
-        "name": "@magicflow/icons",
+        "name": "@laughflow/icons",
         "tsProjects": [
           {
             "name": "library"

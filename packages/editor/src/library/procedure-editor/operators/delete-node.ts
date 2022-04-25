@@ -1,11 +1,11 @@
-import {ProcedureTreeNode} from '@magicflow/procedure';
+import {ProcedureTreeNode} from '@laughflow/procedure';
 import {
   OperatorFunction,
   compose,
   removeFlowStart,
   removeNode,
   removeNodeNext,
-} from '@magicflow/procedure/operators';
+} from '@laughflow/procedure/operators';
 
 import {stripNode} from './@strip-node';
 

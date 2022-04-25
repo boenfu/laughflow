@@ -1,4 +1,4 @@
-import {Condition, Operant} from '@magicflow/condition';
+import {Condition, Operant} from '@laughflow/condition';
 import React, {FC} from 'react';
 
 export type CustomOperant = Operant & {

@@ -1,4 +1,4 @@
-import {Plus} from '@magicflow/icons';
+import {Plus} from '@laughflow/icons';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 

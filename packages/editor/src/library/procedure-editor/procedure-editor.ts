@@ -1,4 +1,4 @@
-import {IPlugin, NodeRender, PluginConfigComponent} from '@magicflow/plugins';
+import {IPlugin, NodeRender, PluginConfigComponent} from '@laughflow/plugins';
 import {
   Procedure,
   ProcedureDefinition,
@@ -7,9 +7,9 @@ import {
   ProcedureTreeView,
   ProcedureUtil,
   SingleNode,
-} from '@magicflow/procedure';
-import {Operator, compose, updateNode} from '@magicflow/procedure/operators';
-import {createEmptyProcedure} from '@magicflow/procedure/utils';
+} from '@laughflow/procedure';
+import {Operator, compose, updateNode} from '@laughflow/procedure/operators';
+import {createEmptyProcedure} from '@laughflow/procedure/utils';
 import Eventemitter from 'eventemitter3';
 import {enableAllPlugins, produce} from 'immer';
 import {compact, fromPairs} from 'lodash-es';

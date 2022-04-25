@@ -1,5 +1,5 @@
-import {ProcedureSingleTreeNode, SingleNode} from '@magicflow/procedure';
-import {ITaskRuntime, TaskSingleNode} from '@magicflow/task';
+import {ProcedureSingleTreeNode, SingleNode} from '@laughflow/procedure';
+import {ITaskRuntime, TaskSingleNode} from '@laughflow/task';
 import {ComponentType, ReactNode} from 'react';
 
 export type PluginRenderComponent<TNode> = ComponentType<{

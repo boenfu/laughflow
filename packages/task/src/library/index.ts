@@ -3,7 +3,7 @@ export * from './operators';
 export * from './utils';
 
 declare global {
-  namespace Magicflow {
+  namespace laughflow {
     interface TaskMetadataExtension {}
 
     interface TaskFlowMetadataExtension {}

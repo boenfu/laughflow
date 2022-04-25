@@ -1,4 +1,4 @@
-import {Flow, FlowId, IOutputsEntity} from '@magicflow/procedure';
+import {Flow, FlowId, IOutputsEntity} from '@laughflow/procedure';
 import {Dict, Nominal} from 'tslang';
 
 import {getBranchesDefinition, getNodeDefinition} from '../utils';
@@ -14,7 +14,7 @@ import {Task, TaskStage} from './task';
 export type TaskFlowId = Nominal<string, 'task-flow:id'>;
 
 export interface TaskFlowMetadata
-  extends Magicflow.TaskFlowMetadataExtension,
+  extends laughflow.TaskFlowMetadataExtension,
     IOutputsEntity {
   id: TaskFlowId;
   definition: FlowId;

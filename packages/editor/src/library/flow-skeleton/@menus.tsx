@@ -1,4 +1,4 @@
-import {Copy, Cut, Jump, More, Plus, Trash, Union} from '@magicflow/icons';
+import {Copy, Cut, Jump, More, Plus, Trash, Union} from '@laughflow/icons';
 import {FC} from 'react';
 
 import {Action, BranchesNodeAction, FlowAction, NodeAction} from './@actions';

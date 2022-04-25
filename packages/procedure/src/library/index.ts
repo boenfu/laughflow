@@ -10,7 +10,7 @@ export interface IOutputsEntity<TOutputs = any> {
 }
 
 declare global {
-  namespace Magicflow {
+  namespace laughflow {
     interface ProcedureExtension extends IOutputsEntity {}
 
     interface FlowExtension extends IOutputsEntity {}

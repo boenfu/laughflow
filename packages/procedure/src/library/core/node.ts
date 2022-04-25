@@ -14,11 +14,11 @@ export interface INode {
 
 export type Node = SingleNode | BranchesNode;
 
-export interface SingleNode extends Magicflow.SingleNodeExtension, INode {
+export interface SingleNode extends laughflow.SingleNodeExtension, INode {
   type: 'singleNode';
 }
 
-export interface BranchesNode extends Magicflow.BranchesNodeExtension, INode {
+export interface BranchesNode extends laughflow.BranchesNodeExtension, INode {
   type: 'branchesNode';
   flows: FlowId[];
 }

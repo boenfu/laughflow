@@ -1,5 +1,5 @@
-import {ProcedureSingleTreeNode, SingleNode} from '@magicflow/procedure';
-import {updateNode} from '@magicflow/procedure/operators';
+import {ProcedureSingleTreeNode, SingleNode} from '@laughflow/procedure';
+import {updateNode} from '@laughflow/procedure/operators';
 import React, {FC, createElement, useContext} from 'react';
 import styled from 'styled-components';
 

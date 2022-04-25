@@ -5,7 +5,7 @@ import {Node} from './node';
 
 export type ProcedureId = Nominal<string, 'procedure:id'>;
 
-export interface ProcedureDefinition extends Magicflow.ProcedureExtension {
+export interface ProcedureDefinition extends laughflow.ProcedureExtension {
   id: ProcedureId;
   start: FlowId;
   nodes: Node[];

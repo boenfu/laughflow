@@ -4,7 +4,7 @@ export * from './flow-skeleton';
 export * from './flow-editor';
 
 declare global {
-  namespace Magicflow {
+  namespace laughflow {
     interface SingleNodeExtension {
       displayName?: string;
     }

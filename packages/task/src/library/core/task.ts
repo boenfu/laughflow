@@ -7,7 +7,7 @@ import {
   Procedure,
   ProcedureDefinition,
   ProcedureId,
-} from '@magicflow/procedure';
+} from '@laughflow/procedure';
 import {cloneDeep} from 'lodash-es';
 import {Dict, Nominal} from 'tslang';
 
@@ -30,7 +30,7 @@ export type TaskId = Nominal<string, 'task:id'>;
 export type TaskStage = 'none' | 'in-progress' | 'done' | 'terminated';
 
 export interface TaskMetadata
-  extends Magicflow.TaskMetadataExtension,
+  extends laughflow.TaskMetadataExtension,
     IOutputsEntity {
   id: TaskId;
   definition: ProcedureId;

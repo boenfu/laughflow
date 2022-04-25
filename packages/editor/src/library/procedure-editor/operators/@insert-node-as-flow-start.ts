@@ -1,4 +1,4 @@
-import {FlowId, NodeId} from '@magicflow/procedure';
+import {FlowId, NodeId} from '@laughflow/procedure';
 import {
   OperatorFunction,
   addFlowStart,
@@ -7,7 +7,7 @@ import {
   out,
   removeAllFlowStart,
   replaceFlowStart,
-} from '@magicflow/procedure/operators';
+} from '@laughflow/procedure/operators';
 
 export const insertNodeAsFlowStart: ({}: {
   flow: FlowId;

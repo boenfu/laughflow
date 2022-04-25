@@ -1,4 +1,4 @@
-import {IOutputsEntity, NodeId, NodeType} from '@magicflow/procedure';
+import {IOutputsEntity, NodeId, NodeType} from '@laughflow/procedure';
 import {Nominal} from 'tslang';
 
 import {TaskStage} from '../task';

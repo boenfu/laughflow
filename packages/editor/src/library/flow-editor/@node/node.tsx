@@ -1,5 +1,5 @@
-import {Copy, Cut, Jump, Wrong} from '@magicflow/icons';
-import {ProcedureSingleTreeNode} from '@magicflow/procedure';
+import {Copy, Cut, Jump, Wrong} from '@laughflow/icons';
+import {ProcedureSingleTreeNode} from '@laughflow/procedure';
 import classnames from 'classnames';
 import React, {FC, HtmlHTMLAttributes, createElement, useContext} from 'react';
 import styled from 'styled-components';

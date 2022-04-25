@@ -1,10 +1,10 @@
-import {IPlugin} from '@magicflow/plugins';
+import {IPlugin} from '@laughflow/plugins';
 import {
   ProcedureBranchesTreeNode,
   ProcedureDefinition,
   ProcedureFlow,
   ProcedureSingleTreeNode,
-} from '@magicflow/procedure';
+} from '@laughflow/procedure';
 import {useCreation, useKeyPress, useUpdate} from 'ahooks';
 import React, {
   ComponentType,

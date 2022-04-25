@@ -1,15 +1,15 @@
-import {FlowId, NodeId, NodeType} from '@magicflow/procedure';
+import {FlowId, NodeId, NodeType} from '@laughflow/procedure';
 import {
   Operator,
   OperatorFunction,
   addNode as _addNode,
   addNodeNexts,
   out,
-} from '@magicflow/procedure/operators';
+} from '@laughflow/procedure/operators';
 import {
   createBranchesNode,
   createNode as createNodeHelper,
-} from '@magicflow/procedure/utils';
+} from '@laughflow/procedure/utils';
 
 import {insertNodeAsFlowStart} from './@insert-node-as-flow-start';
 import {insertNodeBeforeNexts} from './@insert-node-before-nexts';

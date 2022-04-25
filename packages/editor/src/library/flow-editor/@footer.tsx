@@ -1,4 +1,4 @@
-import {Redo, Undo} from '@magicflow/icons';
+import {Redo, Undo} from '@laughflow/icons';
 import React, {FC, useContext} from 'react';
 import styled from 'styled-components';
 

@@ -1,9 +1,9 @@
-import {ProcedureFlow} from '@magicflow/procedure';
+import {ProcedureFlow} from '@laughflow/procedure';
 import {
   addNodeNexts,
   compose,
   removeFlow,
-} from '@magicflow/procedure/operators';
+} from '@laughflow/procedure/operators';
 
 import {FlowAction as Action} from '../flow-skeleton';
 import {

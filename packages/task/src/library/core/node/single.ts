@@ -1,4 +1,4 @@
-import {SingleNode} from '@magicflow/procedure';
+import {SingleNode} from '@laughflow/procedure';
 import {Dict} from 'tslang';
 
 import {getBranchesDefinition, getNodeDefinition} from '../../utils';
@@ -9,7 +9,7 @@ import {ITaskNodeMetadata, TaskNode, TaskNodeId} from './node';
 
 export interface TaskSingleNodeMetadata
   extends ITaskNodeMetadata,
-    Magicflow.TaskSingleNodeMetadataExtension {
+    laughflow.TaskSingleNodeMetadataExtension {
   type: 'singleNode';
 }
 

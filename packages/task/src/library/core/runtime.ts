@@ -4,7 +4,7 @@ import {
   NodeId,
   NodeType,
   ProcedureDefinition,
-} from '@magicflow/procedure';
+} from '@laughflow/procedure';
 import {Dict} from 'tslang';
 
 import {TaskFlowMetadata} from './flow';

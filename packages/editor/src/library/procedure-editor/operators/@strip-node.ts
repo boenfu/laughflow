@@ -1,4 +1,4 @@
-import {FlowId, NodeId, NodeType} from '@magicflow/procedure';
+import {FlowId, NodeId, NodeType} from '@laughflow/procedure';
 import {
   OperatorFunction,
   addFlowStart,
@@ -8,7 +8,7 @@ import {
   removeFlowStart,
   removeNodeNext,
   removeNodeNexts,
-} from '@magicflow/procedure/operators';
+} from '@laughflow/procedure/operators';
 
 export const stripNode: OperatorFunction<
   [

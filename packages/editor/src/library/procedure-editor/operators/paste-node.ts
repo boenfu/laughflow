@@ -1,4 +1,4 @@
-import {FlowId, NodeId, ProcedureSingleTreeNode} from '@magicflow/procedure';
+import {FlowId, NodeId, ProcedureSingleTreeNode} from '@laughflow/procedure';
 import {
   Operator,
   OperatorFunction,
@@ -6,8 +6,8 @@ import {
   addNodeNexts,
   compose,
   out,
-} from '@magicflow/procedure/operators';
-import {copyNode} from '@magicflow/procedure/utils';
+} from '@laughflow/procedure/operators';
+import {copyNode} from '@laughflow/procedure/utils';
 
 import {insertNodeAsFlowStart} from './@insert-node-as-flow-start';
 import {insertNodeBeforeNexts} from './@insert-node-before-nexts';

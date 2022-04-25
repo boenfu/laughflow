@@ -1,10 +1,10 @@
-import {NodeId} from '@magicflow/procedure';
+import {NodeId} from '@laughflow/procedure';
 import {
   OperatorFunction,
   addNodeNexts,
   out,
   replaceNodeNexts,
-} from '@magicflow/procedure/operators';
+} from '@laughflow/procedure/operators';
 
 export const insertNodeBeforeNexts: (
   from: NodeId,
