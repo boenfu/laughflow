@@ -1,4 +1,4 @@
-# @magicflow/procedure
+# @laughflow/procedure
 
 Just another awesome magic.
 

@@ -1,11 +1,12 @@
 {
-  "name": "@magicflow/task",
+  "name": "@laughflow/task",
   "version": "0.0.0",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "main": "bld/library/index.js",
+  "types": "bld/library/index.d.ts",
   "dependencies": {
-    "@magicflow/core": "*",
-    "@magicflow/procedure": "*",
-    "tslib": "^2.2.0"
+    "@laughflow/procedure": "*",
+    "tslib": "^2.4.0"
   }
 }

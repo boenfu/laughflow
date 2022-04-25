@@ -11,12 +11,8 @@
       "files": ["**/*.{ts,tsx}"],
       "extends": ["plugin:@mufan/default"],
       "parserOptions": {
-        "project": "!(node_modules)/**/tsconfig.json"
+        "project": "**/tsconfig.json"
       }
-    },
-    {
-      "files": ["packages/core/src/test/**/*.{ts,tsx}"],
-      "extends": ["plugin:@mufan/override-dev"]
     },
     {
       "files": ["packages/procedure/src/test/**/*.{ts,tsx}"],

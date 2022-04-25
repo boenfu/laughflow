@@ -1,4 +1,4 @@
-# magicflow
+# laughflow
 
 Just another awesome magic.
 
