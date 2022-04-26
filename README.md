@@ -1,7 +1,7 @@
 # laughflow
 
-Just another awesome magic.
+(使用文档待补充)
 
-## License
+## Who Use
 
-MIT License.
+![markdown-flow](./docs/who-use.png)
